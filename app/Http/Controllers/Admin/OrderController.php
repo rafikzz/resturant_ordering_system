@@ -32,18 +32,21 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $title = $this->title;
-        return view('admin.orders.index', compact('title'));
+        $breadcrumbs =[ 'Order'=>route('admin.orders.index')];
+
+        return view('admin.orders.index', compact('title','breadcrumbs'));
     }
 
     public function create()
     {
+        $breadcrumbs =[ 'Order'=>route('admin.orders.index'),'Create'=>'#'];
         $title = $this->title;
         Cart::clear();
         $categories = Category::all();
         $statuses = Status::all();
         $customers = Customer::all();
 
-        return view('admin.orders.create', compact('title', 'categories', 'customers', 'statuses'));
+        return view('admin.orders.create', compact('title', 'categories', 'customers', 'statuses','breadcrumbs'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -99,6 +102,8 @@ class OrderController extends Controller
     public function edit($id)
     {
         $title = $this->title;
+        $breadcrumbs =[ 'Order'=>route('admin.orders.index'),'Edit'=>'#'];
+
         $order = Order::findOrFail($id);
         Cart::clear();
         $orderItems = CartItem::where('order_id', $order->id)->get();
@@ -114,7 +119,7 @@ class OrderController extends Controller
         $statuses = Status::all();
         $customers = Customer::all();
 
-        return view('admin.orders.edit', compact('title', 'order', 'categories', 'customers', 'statuses'));
+        return view('admin.orders.edit', compact('title', 'order', 'categories', 'customers', 'statuses','breadcrumbs'));
     }
 
     public function update(UpdateOrderRequest $request,Order $order)

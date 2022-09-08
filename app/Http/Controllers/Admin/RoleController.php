@@ -27,8 +27,9 @@ class RoleController extends Controller
         // $roles = Role::with('roles')->orderBy('id', 'desc')->get();
         $title = $this->title;
 
+        $breadcrumbs =[ 'Role'=>route('admin.roles.index')];
 
-        return view('admin.roles.index', compact('title'));
+        return view('admin.roles.index', compact('title','breadcrumbs'));
     }
 
 
@@ -36,8 +37,9 @@ class RoleController extends Controller
     {
         $permissions = Permission::all();
         $title = $this->title;
+        $breadcrumbs =[ 'Role'=>route('admin.roles.index'),'Create'=>'#'];
 
-        return view('admin.roles.create', compact('permissions', 'title'));
+        return view('admin.roles.create', compact('permissions', 'title','breadcrumbs'));
     }
 
 
@@ -60,19 +62,23 @@ class RoleController extends Controller
     {
         $role = Role::findOrFail($id);
         $title = $this->title;
+        $breadcrumbs =[ 'Role'=>route('admin.roles.index'),'Show'=>'#'];
 
-        return view('admin.roles.show', compact('role', 'title'));
+
+        return view('admin.roles.show', compact('role', 'title','breadcrumbs'));
     }
 
 
     public function edit($id)
     {
         $role = Role::findOrFail($id);
+        $breadcrumbs =[ 'Role'=>route('admin.roles.index'),'Edit'=>'#'];
+
         $rolePermissions = $role->permissions->pluck('name','name')->toArray();
         $permissions = Permission::all();
         $title = $this->title;
 
-        return view('admin.roles.edit', compact('rolePermissions','permissions', 'role', 'title'));
+        return view('admin.roles.edit', compact('rolePermissions','permissions', 'role', 'title','breadcrumbs'));
     }
 
 

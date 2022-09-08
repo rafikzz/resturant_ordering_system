@@ -21,15 +21,19 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $title = $this->title;
+        $breadcrumbs =[ 'Customer'=>route('admin.customers.index')];
+
         $data = Customer::select('*')->orderBy('id', 'desc')->get();
 
-        return view('admin.customers.index', compact('title'));
+        return view('admin.customers.index', compact('title','breadcrumbs'));
     }
     public function show(Customer $customer)
     {
         $title = $this->title;
+        $breadcrumbs =[ 'Customer'=>route('admin.customers.index'), 'Show'=>'#'];
 
-       return view('admin.customers.show',compact('title','customer'));
+
+       return view('admin.customers.show',compact('title','customer','breadcrumbs'));
     }
 
     public function getData(Request $request)

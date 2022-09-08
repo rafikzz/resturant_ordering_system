@@ -23,8 +23,10 @@ class SettingController extends Controller
     public function create()
     {
         $title =  $this->title;
+        $breadcrumbs =[ 'Setting'=>route('admin.settings.create')];
+
         $setting =Setting::get()->first();
-        return view('admin.settings.create',compact('setting','title'));
+        return view('admin.settings.create',compact('setting','title','breadcrumbs'));
     }
 
 

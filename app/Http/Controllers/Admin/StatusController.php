@@ -21,10 +21,10 @@ class StatusController extends Controller
     }
     public function index()
     {
-        $this->middleware('permission:status_list|status_create|status_edit|status_delete', ['only' => ['index','show','getData']]);
-        $this->middleware('permission:status_edit', ['only' => ['edit','update',]]);
         $title = $this->title;
-        return view('admin.statuses.index', compact('title'));
+        $breadcrumbs =[ 'Status'=>route('admin.statuses.index')];
+
+        return view('admin.statuses.index', compact('title','breadcrumbs'));
     }
 
 
@@ -55,8 +55,9 @@ class StatusController extends Controller
     {
         $status = Status::findOrFail($id);
         $title = $this->title;
+        $breadcrumbs =[ 'Status'=>route('admin.statuses.index'),'Edit'=>'#'];
 
-        return view('admin.statuses.edit', compact('status', 'title'));
+        return view('admin.statuses.edit', compact('status', 'title','breadcrumbs'));
     }
 
     public function update(UpdateStatusRequest $request, Status $status)

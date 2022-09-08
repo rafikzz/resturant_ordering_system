@@ -24,13 +24,15 @@ class ItemSalesReportController extends Controller
 
     public function index(Request $request)
     {
+        $breadcrumbs =[ 'Item Report'=>route('admin.reports.item_sales.index')];
+
 
         $title = $this->title;
         $totalSales = DB::table('table_orders')->sum(DB::raw('total - discount'));
         $todaysSales = DB::table('table_orders')->whereDate('order_datetime','=',Carbon::today())->sum(DB::raw('total - discount'));
 
 
-        return view('admin.reports.items-sales.index', compact('title','totalSales','todaysSales'));
+        return view('admin.reports.items-sales.index', compact('title','totalSales','todaysSales','breadcrumbs'));
     }
 
 

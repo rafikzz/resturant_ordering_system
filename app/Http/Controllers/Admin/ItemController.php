@@ -31,7 +31,9 @@ class ItemController extends Controller
 
 
         $title = $this->title;
-        return view('admin.items.index', compact('title'));
+        $breadcrumbs =[ 'Item'=>route('admin.items.index')];
+
+        return view('admin.items.index', compact('title','breadcrumbs'));
     }
 
 
@@ -39,7 +41,9 @@ class ItemController extends Controller
     {
         $title = $this->title;
         $categories = Category::where('status',1)->get();
-        return view('admin.items.create', compact('title', 'categories'));
+        $breadcrumbs =[ 'Item'=>route('admin.items.index'),'Create'=>'#'];
+
+        return view('admin.items.create', compact('title', 'categories','breadcrumbs'));
     }
 
 
@@ -69,20 +73,24 @@ class ItemController extends Controller
 
     public function show($id)
     {
+        $breadcrumbs =[ 'Item'=>route('admin.items.index'),'Show'=>'#'];
+
         $item = Item::findOrFail($id);
         $title = $this->title;
 
-        return view('admin.items.show', compact('item', 'title'));
+        return view('admin.items.show', compact('item', 'title','breadcrumbs'));
     }
 
 
     public function edit($id)
     {
+        $breadcrumbs =[ 'Item'=>route('admin.items.index'),'Edit'=>'#'];
+
         $item = Item::findOrFail($id);
         $title = $this->title;
         $categories = Category::where('status',1)->get();
 
-        return view('admin.items.edit', compact('item', 'categories', 'title'));
+        return view('admin.items.edit', compact('item', 'categories', 'title','breadcrumbs'));
     }
 
 

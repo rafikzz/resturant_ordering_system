@@ -28,6 +28,7 @@ class UserController extends Controller
     {
         // $users = User::with('roles')->orderBy('id', 'desc')->get();
         $title = $this->title;
+        $breadcrumbs =[ 'User'=>route('admin.users.index')];
 
 
         return view('admin.users.index', compact('title'));
@@ -38,8 +39,9 @@ class UserController extends Controller
     {
         $roles = Role::all();
         $title = $this->title;
+        $breadcrumbs =[ 'User'=>route('admin.users.index')];
 
-        return view('admin.users.create', compact('roles', 'title'));
+        return view('admin.users.create', compact('roles', 'title','breadcrumbs'));
     }
 
 
@@ -64,8 +66,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $title = $this->title;
+        $breadcrumbs =[ 'User'=>route('admin.users.index'),'Show'=>'#'];
 
-        return view('admin.users.show', compact('user', 'title'));
+
+        return view('admin.users.show', compact('user', 'title','breadcrumbs'));
     }
 
 
@@ -74,9 +78,10 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $roles = Role::all();
         $title = $this->title;
+        $breadcrumbs =[ 'User'=>route('admin.users.index'),'Edit'=>'#'];
 
 
-        return view('admin.users.edit', compact('user', 'roles', 'title'));
+        return view('admin.users.edit', compact('user', 'roles', 'title','breadcrumbs'));
     }
 
 

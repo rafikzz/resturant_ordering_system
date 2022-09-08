@@ -172,7 +172,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {{-- DateRange Picker --}}
     <script src="{{ asset('admin-lte/plugins/daterangepicker/daterangepicker.js') }}"></script>
     {{-- Bs custom file Input --}}
-    <script src="{{ asset('js/bs-custom-file-input/bs-customf-file-input.min.js') }}"></script>
+    <script src="{{ asset('admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
     {{-- Owl Carousel --}}
     <script src="{{ asset('js/owl.carousel.js') }}"></script>
     {{-- Ck Editor --}}

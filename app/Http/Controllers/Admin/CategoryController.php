@@ -27,7 +27,8 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $title = $this->title;
-        return view('admin.categories.index', compact('title'));
+        $breadcrumbs =[ 'Category'=>'#'];
+        return view('admin.categories.index', compact('title','breadcrumbs'));
     }
 
 
@@ -35,9 +36,10 @@ class CategoryController extends Controller
     {
 
         $title = $this->title;
+        $breadcrumbs =[ 'Category'=>route('admin.categories.index'), 'Create'=>'#'];
 
 
-        return view('admin.categories.create', compact('title'));
+        return view('admin.categories.create', compact('title','breadcrumbs'));
     }
 
 
@@ -66,6 +68,7 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
         $title = $this->title;
+        $breadcrumbs =[ 'Category'=>route('admin.categories.index'), 'Show'=>'#'];
 
         return view('admin.categories.show', compact('category', 'title'));
     }
@@ -75,9 +78,10 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
         $title = $this->title;
+        $breadcrumbs =[ 'Category'=>route('admin.categories.index'), 'Edit'=>'#'];
 
 
-        return view('admin.categories.edit', compact('category', 'title'));
+        return view('admin.categories.edit', compact('category', 'title','breadcrumbs'));
     }
 
 
