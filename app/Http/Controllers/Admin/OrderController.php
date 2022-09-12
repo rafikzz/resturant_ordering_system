@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Item;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Status;
 use Carbon\Carbon;
 use Cart;
@@ -23,30 +24,30 @@ class OrderController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:order_list|order_create|order_edit|order_delete', ['only' => ['index','show','getData']]);
-        $this->middleware('permission:order_create', ['only' => ['create','store']]);
-        $this->middleware('permission:order_edit', ['only' => ['edit','update',]]);
-        $this->middleware('permission:order_delete', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:order_list|order_create|order_edit|order_delete', ['only' => ['index', 'show', 'getData']]);
+        $this->middleware('permission:order_create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:order_edit', ['only' => ['edit', 'update',]]);
+        $this->middleware('permission:order_delete', ['only' => ['destroy', 'restore', 'forceDelete']]);
         $this->title = 'Order Management';
     }
     public function index(Request $request)
     {
         $title = $this->title;
-        $breadcrumbs =[ 'Order'=>route('admin.orders.index')];
+        $breadcrumbs = ['Order' => route('admin.orders.index')];
 
-        return view('admin.orders.index', compact('title','breadcrumbs'));
+        return view('admin.orders.index', compact('title', 'breadcrumbs'));
     }
 
     public function create()
     {
-        $breadcrumbs =[ 'Order'=>route('admin.orders.index'),'Create'=>'#'];
+        $breadcrumbs = ['Order' => route('admin.orders.index'), 'Create' => '#'];
         $title = $this->title;
         Cart::clear();
         $categories = Category::all();
         $statuses = Status::all();
         $customers = Customer::all();
 
-        return view('admin.orders.create', compact('title', 'categories', 'customers', 'statuses','breadcrumbs'));
+        return view('admin.orders.create', compact('title', 'categories', 'customers', 'statuses', 'breadcrumbs'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -81,7 +82,7 @@ class OrderController extends Controller
             ]);
             $cartItems = Cart::getContent();
             foreach ($cartItems as $item) {
-                CartItem::create([
+                OrderItem::create([
                     'item_id' => $item->id,
                     'price' => $item->price,
                     'quantity' => $item->quantity,
@@ -95,18 +96,17 @@ class OrderController extends Controller
         DB::commit();
         Cart::clear();
 
-        return redirect()->route('admin.orders.index')->with('success','Order Created Successfully');
-
+        return redirect()->route('admin.orders.index')->with('success', 'Order Created Successfully');
     }
 
     public function edit($id)
     {
         $title = $this->title;
-        $breadcrumbs =[ 'Order'=>route('admin.orders.index'),'Edit'=>'#'];
+        $breadcrumbs = ['Order' => route('admin.orders.index'), 'Edit' => '#'];
 
         $order = Order::findOrFail($id);
         Cart::clear();
-        $orderItems = CartItem::where('order_id', $order->id)->get();
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
         foreach ($orderItems as $item) {
             Cart::add(array(
                 'id' => $item->item_id, // uinique row ID
@@ -119,18 +119,11 @@ class OrderController extends Controller
         $statuses = Status::all();
         $customers = Customer::all();
 
-        return view('admin.orders.edit', compact('title', 'order', 'categories', 'customers', 'statuses','breadcrumbs'));
+        return view('admin.orders.edit', compact('title', 'order', 'categories', 'customers', 'statuses', 'breadcrumbs'));
     }
 
-    public function update(UpdateOrderRequest $request,Order $order)
+    public function update(UpdateOrderRequest $request, Order $order)
     {
-
-        if (Cart::isEmpty()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => 'No Items Orderd',
-            ]);
-        }
 
         DB::beginTransaction();
         try {
@@ -143,27 +136,27 @@ class OrderController extends Controller
                 ]);
                 $customerId = $customer->id;
             }
-            $billNo = time();
             $order->update([
-                'bill_no' => $billNo,
                 'table_no' => $request->table_no,
                 'customer_id' => $customerId,
                 'total' => Cart::getTotal(),
                 'discount' => ($request->discount) ? $request->discount : 0,
                 'status_id' => $request->status_id,
             ]);
-            $orderItems = CartItem::where('order_id', $order->id)->get();
-            foreach ($orderItems as $item) {
-               $item->forceDelete();
-            }
             $cartItems = Cart::getContent();
+            $orderItems = OrderItem::where('order_id', $order->id)->whereNotIn('item_id', $cartItems->pluck('id', 'id'))->get();
+
             foreach ($cartItems as $item) {
-                CartItem::create([
-                    'item_id' => $item->id,
+
+                OrderItem::withTrashed()->updateOrCreate(['order_id' => $order->id, 'item_id' => $item->id], [
                     'price' => $item->price,
                     'quantity' => $item->quantity,
-                    'order_id' => $order->id
+                    'deleted_at' => null
                 ]);
+            }
+
+            foreach ($orderItems as $item) {
+                $item->delete();
             }
         } catch (\Throwable $th) {
             DB::rollback();
@@ -172,12 +165,64 @@ class OrderController extends Controller
         DB::commit();
         Cart::clear();
 
-        return redirect()->route('admin.orders.index')->with('success','Order Edited Successfully');
+        return redirect()->route('admin.orders.index')->with('success', 'Order Edited Successfully');
     }
     public function destroy(Order $order)
     {
         $order->forceDelete();
-        return redirect()->route('admin.orders.index')->with('success','Order Deleted Successfully');
+        return redirect()->route('admin.orders.index')->with('success', 'Order Deleted Successfully');
+    }
+
+    public function addMoreItem($id)
+    {
+        $title = $this->title;
+        $breadcrumbs = ['Order' => route('admin.orders.index'), 'AddItem' => '#'];
+
+        $order = Order::findOrFail($id);
+        Cart::clear();
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+        $categories = Category::all();
+        $statuses = Status::all();
+        $customers = Customer::all();
+
+        return view('admin.orders.addItem', compact('title', 'order', 'categories', 'customers', 'statuses', 'breadcrumbs', 'orderItems'));
+    }
+
+    public function updateMoreItem(Request $request, Order $order)
+    {
+        DB::beginTransaction();
+        try {
+            $orderItems = OrderItem::where('order_id', $order->id)->get();
+            foreach ($orderItems as $item) {
+                Cart::add(array(
+                    'id' => $item->item_id, // uinique row ID
+                    'name' => $item->item->name,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity
+                ));
+            }
+            $cartItems = Cart::getContent();
+            foreach ($cartItems as $item) {
+
+                OrderItem::withTrashed()->updateOrCreate(['order_id' => $order->id, 'item_id' => $item->id], [
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                    'deleted_at' => null
+                ]);
+            }
+            $order->update([
+                'total' => Cart::getTotal(),
+                'discount' => ($request->discount) ? $request->discount : 0,
+                'status_id' => $request->status_id,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            throw $th;
+        }
+        DB::commit();
+        Cart::clear();
+        return redirect()->route('admin.orders.index')->with('success', 'Order Added Successfully');
     }
 
     public function getData(Request $request)
@@ -185,30 +230,31 @@ class OrderController extends Controller
         if ($request->ajax()) {
             switch ($request->mode) {
                 case ('all'):
-                    $data = Order::select('*')->with('status:id,title,color');
+                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color');
                     break;
                 case ('daily'):
                     $today = Carbon::today();
 
-                    $data = Order::select('*')->with('status:id,title,color')->whereDate('order_datetime', $today);
+                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color')->whereDate('order_datetime', $today);
                     break;
                 case ('weekly'):
                     $startDate = Carbon::parse('last sunday')->startOfDay();
                     $endDate = Carbon::parse('next saturday')->endOfDay();
 
-                    $data = Order::select('*')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
+                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
                     break;
                 case ('monthly'):
                     $startDate = Carbon::now()->firstOfMonth();
                     $endDate = Carbon::parse('this month')->now();
 
-                    $data = Order::select('*')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
+                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
                     break;
                 case ('history'):
-                    $data = Order::select('*')->with('status:id,title,color')->where('customer_id',$request->customer_id);
+                    //For Customer History Page
+                    $data = Order::select('*')->with('status:id,title,color')->where('customer_id', $request->customer_id);
                     break;
                 default:
-                    $data = Order::select('*')->with('status:id,title,color');
+                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color');
             }
 
 
@@ -225,10 +271,14 @@ class OrderController extends Controller
                             $editBtn =  auth()->user()->can('order_edit') ? '<a class="btn btn-sm btn-warning"  href="' . route('admin.orders.edit', $row->id) . '">Edit</a>' : '';
                             $deleteBtn =  auth()->user()->can('order_delete') ? '<button type="submit" class="btn btn-sm btn-danger btn-delete">Delete</button>' : '';
                             $formStart = '<form action="' . route('admin.orders.destroy', $row->id) . '" method="POST">
-                            <input type="hidden" name="_method" value="delete"><a href="'.route('orders.get',$row->id).'" target="_blank" class="btn btn-secondary btn-sm">Get Bill</a>' . csrf_field();
+                            <input type="hidden" name="_method" value="delete"><a href="' . route('orders.get', $row->id) . '" target="_blank" class="btn btn-secondary btn-sm">Get Bill</a>' . csrf_field();
+
                             $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-sm get-detail my-2">Order Detail</button>';
+                            $addBtn =  auth()->user()->can('order_add') ? '<a class="btn btn-sm btn-success"  href="' . route('admin.orders.addItem', $row->id) . '">Add More Item</a>' : '';
+
+
                             $formEnd = '</form>';
-                            $btn = $formStart .' '. $detail . ' ' . $editBtn .  ' ' . $deleteBtn . $formEnd;
+                            $btn = $formStart . ' ' . $detail . ' ' . $addBtn . ' ' . $editBtn .  ' ' . $deleteBtn . $formEnd;
 
                             return $btn;
                         }
@@ -247,7 +297,7 @@ class OrderController extends Controller
     {
         if (request()->ajax()) {
             $order = Order::with('status:id,title')->with('customer:id,name,phone_no')->where('id', $request->order_id)->first();
-            $orderItems = CartItem::with('item:id,name')->where('order_id', $order->id)->get();
+            $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->withTrashed()->get();
             if ($order) {
                 return response()->json([
                     'order' => $order,
@@ -263,8 +313,4 @@ class OrderController extends Controller
             }
         }
     }
-
-
-
-
 }

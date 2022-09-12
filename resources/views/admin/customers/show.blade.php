@@ -40,12 +40,14 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                order: [[5, 'desc']],
+                order: [
+                    [5, 'desc']
+                ],
                 ajax: {
                     url: "{{ route('admin.orders.getData') }}",
                     data: function(d) {
                         d.mode = 'history',
-                        d.customer_id ={{ $customer->id }};
+                            d.customer_id = {{ $customer->id }};
 
                     }
                 },
@@ -72,9 +74,9 @@
                     {
                         data: 'created_at',
                         name: 'created_at',
-                        render:{
-                            _:'display',
-                            sort:'timestamp'
+                        render: {
+                            _: 'display',
+                            sort: 'timestamp'
                         },
                         searchable: false
 
@@ -128,8 +130,13 @@
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .quantity, item.price));
+                                    .quantity, item.price,item.deleted_at));
                             });
+                            $('#table-items').append("<tr><td colspan='4'>Discount</td><td>" +
+                                data.order.discount + "</td></tr>");
+
+                            $('#table-items').append("<tr><td colspan='4'>Net Total</td><td>" +
+                                data.order.net_total + "</td></tr>");
 
                         } else {
                             console.log('false');
@@ -151,10 +158,22 @@
 
         });
 
-        function template(name, quantity, price) {
+        function template(name, quantity, price, deleted_at) {
 
-            return '<tr><td>' + name + '</td><td>' + quantity + '</td><td>Rs. ' +
-                price + '</td></tr>';
+            if (deleted_at === null) {
+
+                var status = 'Paid';
+                return '<tr><td>' + name + '</td><td>' + quantity + '</td><td>Rs. ' +
+                    price + '</td><td>' + status + '</td><td>Rs. ' +
+                    price * quantity + '</td><</tr>';
+
+            } else {
+                var status = 'Cancelled';
+                return '<tr><td><s>' + name + '</s></td><td><s>' + quantity + '</s></td><td><s>Rs. ' +
+                    price + '</s></td><td><s>' + status + '</s></td><td><s>Rs. ' +
+                    price * quantity + '</s></td><</tr>';
+            }
+
         }
 
         function clearModal() {
@@ -177,4 +196,3 @@
         }
     </script>
 @endsection
-

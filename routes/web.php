@@ -68,8 +68,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-status-data', [StatusController::class, 'getData'])->name('statuses.getData');
 
     //Order route
-
     Route::resource('orders', OrderController::class);
+    Route::get('orders/add/{order}', [OrderController::class,'addMoreItem'])->name('orders.addItem');
+    Route::put('orders/add/{order}', [OrderController::class,'updateMoreItem'])->name('orders.addItem.update');
     Route::get('get-order-data', [OrderController::class, 'getData'])->name('orders.getData');
     Route::get('get-order-detail', [OrderController::class, 'getOrderDetail'])->name('orders.getOrderDetail');
 

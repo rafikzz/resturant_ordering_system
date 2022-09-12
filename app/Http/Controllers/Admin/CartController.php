@@ -95,7 +95,6 @@ class CartController extends Controller
                     ),
                 ));
                 $total = Cart::getTotal();
-
                 return response()->json([
                     'total' => $total,
                     'status' => 'success',

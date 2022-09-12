@@ -92,7 +92,7 @@
     <li
         class="nav-item has-treeview {{ Request::is('admin/reports*') ? 'menu-open' : '' }}   ">
         <a href="#"
-            class="nav-link {{ Request::is('admin/reports') ? 'active' : '' }} ">
+            class="nav-link {{ Request::is('admin/reports*') ? 'active' : '' }} ">
             <i class="nav-icon fas fa-list-ol"></i>
             <p>
                 Reports

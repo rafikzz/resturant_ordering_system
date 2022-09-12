@@ -23,6 +23,15 @@ class Category extends Model
     {
         return $this->hasMany(Item::class);
     }
+    public function setTitlesAttribute($value)
+    {
+        $this->attributes['title'] = strtolower($value);
+    }
+
+    public function getTitlesAttribute($title)
+    {
+        return  ucwords($title);
+    }
 
     protected static function boot() {
         parent::boot();

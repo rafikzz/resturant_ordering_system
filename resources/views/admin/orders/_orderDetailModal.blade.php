@@ -35,6 +35,8 @@
                             <th>Item Name</th>
                             <th>Quantity</th>
                             <th>Price per Item</th>
+                            <th>Status</th>
+                            <th>SubTotal</th>
                         </thead>
                         <tbody id="table-items">
 

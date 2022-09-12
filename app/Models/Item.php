@@ -29,4 +29,15 @@ class Item extends Model
     {
         return $this->belongsTo(Category::class, 'category_id')->withTrashed();
     }
+
+    public function setNameAttribute($value)
+    {
+
+        $this->attributes['name'] = strtolower($value);
+    }
+
+    public function getNameAttribute($value)
+    {
+        return  ucwords($value);
+    }
 }

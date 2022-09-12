@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use App\Exports\ItemSalesReport;
-
+use App\Models\OrderItem;
 
 class ItemSalesReportController extends Controller
 {
@@ -43,12 +43,12 @@ class ItemSalesReportController extends Controller
             $startDate = Carbon::parse($request->startDate)->startOfDay();
             $endDate = Carbon::parse($request->endDate)->endOfDay();
             if(!$request->order){
-                $data = CartItem::with('item:id,name')->select('item_id', DB::raw('sum(quantity * price) as total_price'),DB::raw('sum(quantity) as total_quantity'))
+                $data = OrderItem::with('item:id,name')->select('item_id', DB::raw('sum(quantity * price) as total_price'),DB::raw('sum(quantity) as total_quantity'))
                 ->groupBy('item_id')->whereHas('order',function($q) use($startDate,$endDate){
                     $q->whereBetween('order_datetime', [$startDate, $endDate]);
                 })->orderBy('total_quantity','desc');
             }else{
-                $data = CartItem::with('item:id,name')->select('item_id', DB::raw('sum(quantity * price) as total_price'),DB::raw('sum(quantity) as total_quantity'))
+                $data = OrderItem::with('item:id,name')->select('item_id', DB::raw('sum(quantity * price) as total_price'),DB::raw('sum(quantity) as total_quantity'))
                 ->groupBy('item_id')->whereHas('order',function($q) use($startDate,$endDate){
                     $q->whereBetween('order_datetime', [$startDate, $endDate]);
                 });

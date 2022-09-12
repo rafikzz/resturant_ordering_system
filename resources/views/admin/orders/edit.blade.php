@@ -249,45 +249,60 @@
         });
 
 
-        //For Adding Order Item to List
-        $(document).on('click', '.add-item', function() {
-            let itemId = $(this).data('id');
-            let itemName = $(this).data('name');
-            let itemPrice = $(this).data('price');
-            $.ajax({
-                type: 'GET',
-                url: '{{ route('admin.cart.addCartItem') }}',
-                data: {
-                    'item_id': itemId,
-                },
-                success: function(data) {
-                    if (data.status === 'success') {
-                        $('#order-list').html('');
-                        for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item].id, data.items[
-                                    item].name, data.items[item].price, data.items[item]
-                                .quantity));
-                            Swal.fire({
-                                title: 'Success',
-                                text: data.message,
-                                icon: 'success',
-                            });
+         //For Adding Order Item to List
+         $(document).on('click', '.add-item', function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to add this item?",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let itemId = $(this).data('id');
+                    let itemName = $(this).data('name');
+                    let itemPrice = $(this).data('price');
+                    $.ajax({
+                        type: 'GET',
+                        url: '{{ route('admin.cart.addCartItem') }}',
+                        data: {
+                            'item_id': itemId,
+                        },
+                        success: function(data) {
+                            if (data.status === 'success') {
+                                $('#order-list').html('');
+                                for (var item in data.items) {
+                                    $('#order-list').append(tableRowTemplate(data.items[item]
+                                        .id, data.items[
+                                            item].name, data.items[item].price, data
+                                        .items[item]
+                                        .quantity));
+                                    Swal.fire({
+                                        title: 'Success',
+                                        text: data.message,
+                                        icon: 'success',
+                                    });
 
+                                }
+                                setTotal(data.total);
+
+                                // data.items.forEach(function(item){
+                                //     $('#order-list').append(tableRowTemplate(item.id, item.name, item.Price));
+                                // });
+
+                            } else {
+                                console.log(data.message);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log('Internal Server Error')
                         }
-                        setTotal(data.total);
-
-                        // data.items.forEach(function(item){
-                        //     $('#order-list').append(tableRowTemplate(item.id, item.name, item.Price));
-                        // });
-
-                    } else {
-                        console.log(data.message);
-                    }
-                },
-                error: function(xhr) {
-                    console.log('Internal Server Error')
+                    });
                 }
             });
+
 
         });
         //For Updating Quantity of Items
@@ -323,30 +338,42 @@
         });
         //For Deleting Cart Item
         $(document).on('click', '.tr-remove', function() {
-            let btn = $(this);
-            let item_id = $(this).attr('rel');
-            console.log(item_id);
-            $.ajax({
-                type: 'GET',
-                url: '{{ route('admin.cart.removeCartItem') }}',
-                data: {
-                    'item_id': item_id
-                },
-                success: function(data) {
-                    if (data.status === 'success') {
-                        setTotal(data.total);
-                        removeItem(btn, item_id);
-                        Swal.fire({
-                            title: 'Success',
-                            text: data.message,
-                            icon: 'success',
-                        });
-                    } else {
-                        console.log(data.message);
-                    }
-                },
-                error: function(xhr) {
-                    console.log('Internal Server Error')
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to remove this item?",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let btn = $(this);
+                    let item_id = $(this).attr('rel');
+                    console.log(item_id);
+                    $.ajax({
+                        type: 'GET',
+                        url: '{{ route('admin.cart.removeCartItem') }}',
+                        data: {
+                            'item_id': item_id
+                        },
+                        success: function(data) {
+                            if (data.status === 'success') {
+                                setTotal(data.total);
+                                removeItem(btn, item_id);
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: data.message,
+                                    icon: 'success',
+                                });
+                            } else {
+                                console.log(data.message);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log('Internal Server Error')
+                        }
+                    });
                 }
             });
         });

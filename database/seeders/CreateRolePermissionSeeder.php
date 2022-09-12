@@ -40,6 +40,7 @@ class CreateRolePermissionSeeder extends Seeder
             'order_create',
             'order_edit',
             'order_delete',
+            'order_add',
             'report_list',
             'setting_create',
          ];
@@ -64,6 +65,7 @@ class CreateRolePermissionSeeder extends Seeder
             'order_create',
             'order_edit',
             'order_delete',
+            'order_add',
             'report_list',
             'setting_create',
          ];
@@ -84,6 +86,8 @@ class CreateRolePermissionSeeder extends Seeder
             'order_create',
             'order_edit',
             'order_delete',
+            'order_add',
+
          ];
 
         Role::create(['name' => 'Superadmin']);

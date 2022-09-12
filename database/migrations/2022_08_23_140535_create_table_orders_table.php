@@ -21,7 +21,7 @@ class CreateTableOrdersTable extends Migration
             $table->string('table_no')->nullable();
             $table->decimal('discount',10,2)->nullable()->default(0);
             $table->decimal('total',10,2);
-            $table->timestamp('order_datetime');
+            $table->timestamp('order_datetime')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
