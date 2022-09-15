@@ -17,15 +17,16 @@ class CreateTableOrdersTable extends Migration
             $table->id();
             $table->foreignId('customer_id')->nullable()->constrained('table_customers');
             $table->foreignId('status_id')->constrained('table_statuses');
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('updated_by')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('bill_no');
             $table->string('table_no')->nullable();
             $table->decimal('discount',10,2)->nullable()->default(0);
             $table->decimal('total',10,2);
             $table->timestamp('order_datetime')->nullable();
+            $table->string('payment_type')->nullable();
             $table->softDeletes();
             $table->timestamps();
-
-
 
         });
     }

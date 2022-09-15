@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CartItem;
+use App\Models\OrderItem;
 use App\Models\Customer;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -27,7 +27,7 @@ class DashboardController extends Controller
         // dd($this->getSalesChartData());
 
         $totalCustomers =Customer::count();
-        $topSoldItems =CartItem::with('item')->select('item_id', DB::raw('sum(quantity) as total'))
+        $topSoldItems =OrderItem::with('item')->select('item_id', DB::raw('sum(quantity) as total'))
         ->groupBy('item_id')->orderBy('total','desc')->take(5)->get();
         $topSoldItem =($topSoldItems->first())? $topSoldItems->first()->item->name:null;
 

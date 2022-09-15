@@ -15,7 +15,7 @@ class StatusSeeder extends Seeder
     public function run()
     {
         $statuses = [
-            ['Pending',  '#F4A476'],
+            ['Processing',  '#7285DF'],
             [ 'Cancelled',  '#C12D2D'],
             ['Completed', '#0ABA3B'],
 

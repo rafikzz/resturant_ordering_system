@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CheckoutController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\ItemSalesReportController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\OrderItemController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
@@ -74,6 +76,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-order-data', [OrderController::class, 'getData'])->name('orders.getData');
     Route::get('get-order-detail', [OrderController::class, 'getOrderDetail'])->name('orders.getOrderDetail');
 
+    //OrderItem Route
+    Route::get('order_items/',[ OrderItemController::class,'index'])->name('order_items.index');
+    Route::put('order_items/{order_item}',[ OrderItemController::class,'update'])->name('order_items.update');
+    Route::delete('order_items/{order_item}',[ OrderItemController::class,'destory'])->name('order_items.delete');
+
+    //Checkout Route
+    Route::get('orders/checkout/{id}',[CheckoutController::class,'index'])->name('orders.checkout');
+    Route::post('orders/checkout/{id}',[CheckoutController::class,'store'])->name('orders.checkout.store');
+
+
     //Cart route
     Route::get('get-cart-items', [CartController::class, 'getCartItems'])->name('cart.getCartItems');
     Route::get('add-cart-item', [CartController::class, 'addCartItem'])->name('cart.addCartItem');
@@ -110,8 +122,7 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //Invoice Controller
-Route::get('/invoice-demo', [App\Http\Controllers\InvoiceController::class, 'index']);
-Route::get('/order/invoice/{order}', [App\Http\Controllers\InvoiceController::class, 'index'])->name('orders.get');
+Route::get('/order/invoice/{order}', [App\Http\Controllers\InvoiceController::class, 'index'])->name('orders.getBill');
 
 
 

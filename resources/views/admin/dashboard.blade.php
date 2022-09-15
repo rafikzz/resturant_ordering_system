@@ -63,7 +63,7 @@
 
     </div>
     <div class="row">
-        <section class="col-lg-8">
+        <section class="col-lg-6">
 
             <div class="card">
                 <div class="card-header">
@@ -85,7 +85,7 @@
                 </div>
 
         </section>
-        <section class="col-lg-4">
+        <section class="col-lg-6">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Top Selling Items</h3>

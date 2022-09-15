@@ -114,8 +114,8 @@ class RoleController extends Controller
                     'action',
                     function ($row) {
                         if (auth()->user()->can('role_edit') || auth()->user()->can('role_delete')) {
-                        $editBtn =  auth()->user()->can('role_edit') ? '<a class="btn btn-sm btn-primary" href="' . route('admin.roles.edit', $row->id) . '">Edit</a>' : '';
-                        $deleteBtn =  auth()->user()->can('role_delete') ? '<button type="submit" class="btn btn-sm btn-danger btn-delete">Delete</button>' : '';
+                        $editBtn =  auth()->user()->can('role_edit') ? '<a class="btn btn-xs btn-primary" href="' . route('admin.roles.edit', $row->id) . '">Edit</a>' : '';
+                        $deleteBtn =  auth()->user()->can('role_delete') ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
                         $formStart = '<form action="' . route('admin.roles.destroy', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                  <input type="hidden" name="_method" value="delete" />';

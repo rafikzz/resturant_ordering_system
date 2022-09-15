@@ -6,30 +6,31 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-    protected $table ='table_orders';
-    protected $fillable = ['customer_id','status_id','bill_no','table_no','discount','total','order_datetime'];
+    protected $table = 'table_orders';
+    protected $fillable = ['customer_id', 'status_id', 'table_no', 'created_by', 'updated_by', 'bill_no', 'table_no', 'discount', 'total', 'order_datetime'];
 
 
-    protected $appends = ['net_total','order_date'];
+    protected $appends = ['net_total', 'order_date'];
 
-    public function cart_items()
+    public function order_items()
     {
-        return $this->hasMany(CartItem::class);
+        return $this->hasMany(OrderItem::class);
     }
 
     public function status()
     {
-        return $this->belongsTo(Status::class,'status_id');
+        return $this->belongsTo(Status::class, 'status_id');
     }
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class,'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
     public function getNetTotalAttribute()
@@ -42,16 +43,31 @@ class Order extends Model
         return Carbon::parse($this->order_datetime)->format('M d Y');
     }
 
-
-    protected static function boot() {
-        parent::boot();
-
-        static::deleting(function($order) {
-            $order->cart_items()->delete();
-        });
-
-        static::restoring(function($order) {
-            $order->cart_items()->restore();
-        });
+    public function getOrderNo()
+    {
+        if ($this->order_items()->count()) {
+            return  $this->order_items()->max('order_no') + 1;
+        } else {
+            return 1;
+        }
     }
+
+    public function setTotal($user =null)
+    {
+        $orderTotal = $this->order_items()->sum(DB::raw('total * price'));
+        $order = $this->update([
+            'total' => $orderTotal,
+            'updated_by' => ($user)?$user:auth()->id(),
+
+        ]);
+        return $orderTotal;
+    }
+
+    public function getTotal($user =null)
+    {
+
+        return  $orderTotal = ($this->order_items()->count())? $this->order_items()->sum(DB::raw('total * price')) : 0;
+    }
+
+
 }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use LaravelDaily\Invoices\Classes\Buyer;
 use LaravelDaily\Invoices\Classes\InvoiceItem;
@@ -14,9 +14,9 @@ class InvoiceController extends Controller
 {
     public function index(Order $order)
     {
-        $orderItems = CartItem::where('order_id',$order->id)->get();
+        $orderItems = OrderItem::where('order_id',$order->id)->where('total','>',0)->get();
         foreach($orderItems as $item){
-            $items[$item->id] =  (new InvoiceItem())->title($item->item->name)->pricePerUnit($item->price)->quantity($item->quantity);
+            $items[$item->id] =  (new InvoiceItem())->title($item->item->name)->pricePerUnit($item->price)->quantity($item->total)->subTotalPrice($item->price*$item->total);
         }
         $seller = new Party([
             'name'          =>'Seller',
@@ -24,6 +24,7 @@ class InvoiceController extends Controller
                 'contact_no' => '9898932232',
             ],
         ]);
+
         $customer = new Buyer([
             'name'          => $order->customer->name,
             'custom_fields' => [
@@ -38,9 +39,9 @@ class InvoiceController extends Controller
             ->seller($seller)
             ->buyer($customer)
             ->totalDiscount($order->discount)
+            ->totalAmount($order->net_total)
             ->addItems($items)->template('default');
 
-        // return view('vendor.invoices.templates.default',compact('invoice'));
 
         return $invoice->stream();
     }

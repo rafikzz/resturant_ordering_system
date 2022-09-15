@@ -55,7 +55,7 @@
                                 @foreach ($orderItems as $item)
                                     <tr>
                                         <td>{{ $item->item->name }}</td>
-                                        <td>{{ $item->quantity }}</td>
+                                        <td>{{ $item->total }}</td>
                                         <td>Rs {{ $item->price }}</td>
                                         <td></td>
                                     </tr>
@@ -75,18 +75,6 @@
                             </div>
                         </div>
                         <hr />
-                        <div class="row">
-                            <div class="col-6">
-                                <b>Discount </b>
-                            </div>
-                            <div class="col-6 ">
-                                <div class="form-group col-sm-5 float-right d-flex">
-                                    <input class="form-control " name="discount" max="{{ $order->total }}"
-                                        value="{{ old('discount') ?: $order->discount }}" type="number" id="discount"
-                                        autocomplete="off" placeholder="Enter Discount">
-                                </div>
-                            </div>
-                        </div>
                         <hr />
                         <div class="row">
                             <div class="col-12 ">

@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory;
 
     protected $table ='table_order_items';
 
-    protected $fillable =['item_id','price','order_id','quantity','deleted_at'];
+    protected $fillable =['order_id','item_id','created_by','updated_by','price','total','removed_quantity','order_no','quantity'];
 
     public function order()
     {
@@ -21,6 +21,12 @@ class OrderItem extends Model
 
     public function item()
     {
-        return $this->belongsTo(Item::class,'item_id')->withTrashed();
+        return $this->belongsTo(Item::class,'item_id');
     }
+
+    public function getSubTotalAttribute()
+    {
+        return $this->total *$this->price;
+    }
+
 }

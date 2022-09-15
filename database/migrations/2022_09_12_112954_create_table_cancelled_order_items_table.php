@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTableOrderItemsTable extends Migration
+class CreateTableCancelledOrderItemsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,13 @@ class CreateTableOrderItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('table_order_items', function (Blueprint $table) {
+        Schema::create('table_cancelled_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('table_orders')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('item_id')->constrained('table_items')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('updated_by')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->decimal('price',10,2);
-            $table->integer('order_no');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->decimal('price', 10, 2);
             $table->integer('quantity');
-            $table->integer('removed_quantity')->nullable()->default(0);
-            $table->integer('total');
             $table->timestamps();
         });
     }
@@ -35,6 +31,6 @@ class CreateTableOrderItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_order_items');
+        Schema::dropIfExists('table_cancelled_order_items');
     }
 }

@@ -93,7 +93,7 @@ class StatusController extends Controller
                 ->addColumn(
                     'action',
                     function ($row) {
-                        $editBtn =  auth()->user()->can('status_edit') ? '<a class="btn btn-sm btn-primary" href="' . route('admin.statuses.edit', $row->id) . '">Edit</a>' : 'No Action';
+                        $editBtn =  auth()->user()->can('status_edit') ? '<a class="btn btn-xs btn-primary" href="' . route('admin.statuses.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : 'No Action';
                         return $editBtn;
                     }
                 )

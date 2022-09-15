@@ -25,7 +25,6 @@ class UpdateOrderRequest extends FormRequest
     {
         return [
             'table_no'=>'required',
-            'status_id'=>'required',
             'customer_id'=>'required_without:customer_name',
             'customer_name'=>'required_without:customer_id',
             'customer_phone_no'=>['required_without:customer_id','regex:/(?:\(?\+977\)?)?[9][6-9]\d{8}|01[-]?[0-9]{7}/','unique:table_customers,phone_no'],

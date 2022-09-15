@@ -169,8 +169,8 @@ class CategoryController extends Controller
                     function ($row, Request $request) {
                         if (auth()->user()->can('category_edit') || auth()->user()->can('category_delete')) {
                             if ($request->mode == 0) {
-                                $editBtn =  auth()->user()->can('category_edit') ? '<a class="btn btn-sm btn-primary" href="' . route('admin.categories.edit', $row->id) . '">Edit</a>' : '';
-                                $deleteBtn =  auth()->user()->can('category_delete') ? '<button type="submit" class="btn btn-sm btn-danger btn-delete">Delete</button>' : '';
+                                $editBtn =  auth()->user()->can('category_edit') ? '<a class="btn btn-xs btn-primary" href="' . route('admin.categories.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $deleteBtn =  auth()->user()->can('category_delete') ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
                                 $formStart = '<form action="' . route('admin.categories.destroy', $row->id) . '" method="POST">
                                 <input type="hidden" name="_method" value="delete">' . csrf_field();
                                 $formEnd = '</form>';
@@ -178,11 +178,11 @@ class CategoryController extends Controller
 
                                 return $btn;
                             } else {
-                                $deleteBtn =  auth()->user()->can('category_delete') ? '<button type="submit" class="btn btn-sm btn-danger btn-delete">Delete</button>' : '';
+                                $deleteBtn =  auth()->user()->can('category_delete') ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
                                 $formStart = '<form action="' . route('admin.categories.forceDelete', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                 <input type="hidden" name="_method" value="delete" />';
-                                $restoreBtn =  auth()->user()->can('category_delete') ? '<a class="btn btn-sm btn-success" href="' . route('admin.categories.restore', $row->id) . '">Restore</a>' : '';
+                                $restoreBtn =  auth()->user()->can('category_delete') ? '<a class="btn btn-xs btn-success" href="' . route('admin.categories.restore', $row->id) . '">Restore</a>' : '';
                                 $formEnd = '</form>';
                                 $btn = $formStart . $restoreBtn . '  ' . $deleteBtn . $formEnd;
 

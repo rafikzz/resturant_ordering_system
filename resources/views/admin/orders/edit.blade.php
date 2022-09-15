@@ -2,17 +2,25 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
+
             <form action="{{ route('admin.orders.update', $order->id) }}" id="order-form" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Edit Order</h2>
+                        <div class="card-tools">
+                            <a class="btn btn-primary" href="{{ route('admin.orders.index') }}"> Back</a></i></a>
+                        </div>
+                    </div>
                     <div class="card-body">
+
                         <div class="row">
                             <div class="col-12">
                                 <h3>Customer Info</h3>
                             </div>
-                            <input type="hidden" name="order_id" id="orderId" value="{{ $order->id }}"/>
+                            <input type="hidden" name="order_id" id="orderId" value="{{ $order->id }}" />
                             <div class="col-12 my-2 d-flex">
                                 <label for="">Customer Type: </label>
                                 <div class="form-check mx-2">
@@ -34,11 +42,12 @@
                             <div id="old" class="col-12 form-group  py-3"
                                 style="display:  {{ old('customer_type') !== 'new' ? 'block' : 'none' }}">
                                 <select name="customer_id" class="form-control select2" style="width: 50%" id="oldCustomer"
-                                    required {{ old('customer_type') == 'new' ? 'disabled' : '' }}
-                                   >
+                                    required {{ old('customer_type') == 'new' ? 'disabled' : '' }}>
                                     <option value="">--Please Select Customer--</option>
                                     @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}"  {{ $customer->id == $order->customer_id ? 'selected' : '' }}>{{ $customer->phone_no }}</option>
+                                        <option value="{{ $customer->id }}"
+                                            {{ $customer->id == $order->customer_id ? 'selected' : '' }}>
+                                            {{ $customer->phone_no }}</option>
                                     @endforeach
                                 </select>
                                 @error('customer_id')
@@ -52,8 +61,8 @@
                                 <div class="d-flex">
                                     <div class="col-6">
                                         <label for="customer_name">Customer Name</label>
-                                        <input class="form-control" name="customer_name" value="{{ old('customer_name') }}" autocomplete="off"
-                                            type="text" placeholder="Enter Customer Name"
+                                        <input class="form-control" name="customer_name" value="{{ old('customer_name') }}"
+                                            autocomplete="off" type="text" placeholder="Enter Customer Name"
                                             {{ old('customer_type') !== 'new' ? 'disabled' : '' }}>
                                         @error('customer_name')
                                             <span class=" text-danger" role="alert">
@@ -64,8 +73,8 @@
                                     <div class="col-6">
                                         <label for="customer_phone_no">Customer Number</label>
                                         <input class="form-control" name="customer_phone_no" type="text"
-                                            value="{{ old('customer_phone_no') }}" placeholder="Enter Customer Phone No" autocomplete="off"
-                                            {{ old('customer_type') !== 'new' ? 'disabled' : '' }}>
+                                            value="{{ old('customer_phone_no') }}" placeholder="Enter Customer Phone No"
+                                            autocomplete="off" {{ old('customer_type') !== 'new' ? 'disabled' : '' }}>
                                         @error('customer_phone_no')
                                             <span class=" text-danger" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -74,12 +83,14 @@
                                     </div>
                                 </div>
                             </div>
-
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group  ml-n2">
+                                <div class="form-group ">
                                     <label for="table_no"> Table No</label>
-                                    <input type="text" class="form-control" placeholder="Set Table No" id="table_no" autocomplete="off"
-                                        name="table_no" value="{{ old('table_no') ?: $order->table_no }}" required>
+                                    <input type="text" class="form-control" placeholder="Set Table No" id="table_no"
+                                        autocomplete="off" name="table_no"
+                                        value="{{ old('table_no') ?: $order->table_no }}" required>
                                     @error('table_no')
                                         <span class=" text-danger" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -87,65 +98,66 @@
                                     @enderror
                                 </div>
                             </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group  ml-n2">
-                                    <label for="">Status</label>
-                                    <select name="status_id" class="form-control" required>
-                                        <option value="">--Select Stautus--</option>
-                                        @foreach ($statuses as $status)
-                                            <option value="{{ $status->id }}"
-                                                {{ $status->id == $order->status_id ? 'selected' : '' }}>
-                                                {{ $status->title }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('category_id')
-                                        <span class=" text-danger" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
+                        </div>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#orderModal">
+                          Add Item To Order
+                          </button>
+                        <div class="row">
+                            @forelse ($orderItems as $order_no => $items)
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3>Order List {{ $order_no }}</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-responsive">
+                                                <thead>
+                                                    <th>Item Name</th>
+                                                    <th>Quantity</th>
+                                                    <th>Price</th>
+                                                    <th>Action</th>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($items as $item)
+                                                        <tr>
+                                                            <td width="200px">{{ $item->item->name }}</td>
+                                                            <td width="200px" class="form-inline col-xs-2">
+                                                                @if ($item->total > 1)
+                                                                    <input type="number"
+                                                                        id="order-item-quantity-{{ $item->id }}"
+                                                                        max="{{ $item->total }}" class="form-control"
+                                                                        step="1" min="0"
+                                                                        value="{{ $item->total }}">
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-light update-item-quantity  ml-2 btn-sm"
+                                                                        rel="{{ $item->id }}"><i
+                                                                            class="fa fa-edit"></i>
+                                                                    </button>
+                                                                @else
+                                                                    1
+                                                                @endif
+                                                            </td>
+                                                            <td width="200px">Rs {{ $item->price }}</td>
+                                                            <td width="200px"><button type="button"
+                                                                    class="btn btn-sm btn-danger delete-ordered-item"
+                                                                    rel="{{ $item->id }}"><i class="fa fa-trash"></i>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <h3>Order List</h3>
-                            <table class="table " style="  min-height: 20vh; ">
-                                <thead>
-                                    <th>Item Name</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Action</th>
-                                </thead>
-                                <tbody id="order-list">
-
-                                </tbody>
-                            </table>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-6">
-                                <b>Total</b>
-                            </div>
-                            <div class="col-5 ">
-                                <b class="float-right" id="totalAmount">Rs. {{ old('total') ?: $order->total }}</b>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-6">
-                                <b>Discount </b>
-                            </div>
-                            <div class="col-6 ">
-                                <div class="form-group col-sm-5 float-right d-flex">
-                                    <input class="form-control " name="discount" max="{{ old('total') ?: $order->total }}"
-                                        value="{{ old('discount') ?: $order->discount }}" type="number" id="discount" autocomplete="off"
-                                        placeholder="Enter Discount">
+                            @empty
+                                <div class="py-2">
+                                    <h2 class="text-center">No Orders Yet</h2>
                                 </div>
-                            </div>
+                            @endforelse
                         </div>
-                        <hr />
+
+
                         <div class="row">
                             <div class="col-12 ">
                                 <button id="order-submit" class="btn btn-primary float-right">Edit</button>
@@ -155,70 +167,13 @@
                 </div>
             </form>
         </div>
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Add Food Item</h2>
-                    <div class="card-tools">
-                        <a class="btn btn-primary" href="{{ route('admin.orders.index') }}"> Back</a></i></a>
-                    </div>
-                </div>
-
-                <div class="card-body ">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group  ml-n2">
-                                <label for="category_id"> Category</label>
-                                <select class="form-control" id="category">
-                                    <option selected value="" disabled>--Select Category Number--</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->title }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-                <div class="row py-3  d-flex" id="category-items" style="  min-height: 50vh; ">
-
-                </div>
-            </div>
-        </div>
-
-
-
     </div>
+    @include('admin.orders._addItemModal')
+
 @endsection
 @section('js')
     <script>
         $(function() {
-            //For getting Cart items in Session
-            $.ajax({
-                type: 'GET',
-                url: '{{ route('admin.cart.getCartItems') }}',
-                success: function(data) {
-                    if (data.status === 'success') {
-                        $('#order-list').html('');
-                        //Setting items in table
-                        for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item].id, data.items[
-                                    item].name, data.items[item].price, data.items[item]
-                                .quantity));
-
-                        }
-                        //Setting total
-                        setTotal(data.total);
-                    } else {
-                        console.log(data.message);
-
-                    }
-                },
-                error: function(xhr) {
-                    console.log('Internal Server Error')
-                }
-            });
             //Getting Items on changing category
             $('#category').on('change', function() {
                 let category_id = $(this).val();
@@ -249,8 +204,8 @@
         });
 
 
-         //For Adding Order Item to List
-         $(document).on('click', '.add-item', function() {
+        //For Adding Order Item to List
+        $(document).on('click', '.add-item', function() {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "Do you want to add this item?",
@@ -286,8 +241,6 @@
                                     });
 
                                 }
-                                setTotal(data.total);
-
                                 // data.items.forEach(function(item){
                                 //     $('#order-list').append(tableRowTemplate(item.id, item.name, item.Price));
                                 // });
@@ -305,6 +258,138 @@
 
 
         });
+
+        //For Updating Quantity of Ordered Items
+        $(document).on('click', '.update-item-quantity', function() {
+            var btn = $(this);
+            var item = $(this).attr('rel');
+            var quantity = parseInt($('#order-item-quantity-' + item).val());
+            var max = $('#order-item-quantity-' + item).attr('max');
+
+            if (Number.isInteger(quantity) && quantity <= max && quantity > 0) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to  update quantity?",
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (item) {
+                            $.ajax({
+                                type: 'PUT',
+                                url: '{{ route('admin.order_items.index') }}' + '/' + item,
+                                data: {
+                                    '_token': $('meta[name="csrf-token"]').attr('content'),
+                                    'quantity': quantity
+
+                                },
+                                success: function(data) {
+                                    if (data.status === 'success') {
+                                        var message = data.message;
+                                        Swal.fire({
+                                            title: 'Success',
+                                            text: data.message,
+                                            icon: 'success',
+                                        });
+                                        if (quantity <= 1) {
+                                            btn.closest('td').html(quantity);
+                                        } else {
+                                            btn.closest('td').html(
+                                                "<input type='number' id='order-item-quantity-" +
+                                                item + "' max='" + quantity +
+                                                "' class='form-control' step='1' min='1' value='" +
+                                                quantity +
+                                                "'><button type='button' class='btn btn-outline-light update-item-quantity  ml-2 btn-sm' rel='" +
+                                                item +
+                                                "'><i class='fa fa-edit'></i></button>");
+                                        }
+                                        setTotal(data.total);
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error',
+                                            text: data.message,
+                                            icon: 'error',
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    console.log('Internal Server Error')
+                                }
+                            });
+                        } else {
+                            console.log('No Item Found');
+                        }
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Quantity is not Valid',
+                    text: "Please Enter Valid Quantity",
+                    icon: 'warning',
+                });
+            }
+        });
+
+        //For Deleting Quantity of Ordered Items
+        $(document).on('click', '.delete-ordered-item', function() {
+            let btn = $(this);
+            var item = $(this).attr('rel');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to delete item form ordered list?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (item) {
+                        $.ajax({
+                            type: 'DELETE',
+                            url: '{{ route('admin.order_items.index') }}' + '/' + item,
+                            data: {
+                                '_token': $('meta[name="csrf-token"]').attr('content'),
+                            },
+                            success: function(data) {
+                                if (data.status === 'success') {
+                                    var message = data.message;
+                                    Swal.fire({
+                                        title: 'Success',
+                                        text: data.message,
+                                        icon: 'success',
+                                    });
+                                    setTotal(data.total);
+                                    btn.closest('tr').html('');
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: data.message,
+                                        icon: 'error',
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                console.log('Internal Server Error')
+                            }
+                        });
+                    } else {
+                        console.log('No Item Found');
+                    }
+                } else {
+                    Swal.fire({
+                        title: 'Quantity is not Valid',
+                        text: "Please Enter Valid Quantity",
+                        icon: 'warning',
+                    });
+                }
+            });
+        });
+
         //For Updating Quantity of Items
         $(document).on('click', '.update-quantity', function() {
             var item = $(this).attr('rel');
@@ -387,7 +472,7 @@
 
         //     $.ajax({
         //         type: 'POST',
-        //         url: '{{ route("admin.orders.update",$order->id) }}',
+        //         url: '{{ route('admin.orders.update', $order->id) }}',
         //         data: formData,
         //         success: function(data) {
         //             if (data.status === 'success') {
@@ -438,17 +523,12 @@
         function clearCategoryItems() {
             $('#category-items').html('');
         }
-        //For setting the total
-        function setTotal(totalAmount) {
-            $('#totalAmount').html('Rs. ' + totalAmount);
-            $('#discount').prop('max', totalAmount);
 
-        }
         //Template of category item
         function template(id, name, price, image) {
             let imagePath = "{{ url('/storage') }}/" + image;
 
-            return '<div class="col-md-5"><div class="card  m-2 "><div class="card-header"><h2 class="card-title">' +
+            return '<div class="col-md-6"><div class="card  m-2 "><div class="card-header"><h2 class="card-title">' +
                 name + '</h2></div><div class="card-body"><img src="' + imagePath +
                 '" width="200px" height="160px" /></div><div class="card-footer d-flex"><div class="col-md-6"><p>Price:Rs ' +
                 price + '</p></div><div class="col-md-6"><button type="button" data-id="' +

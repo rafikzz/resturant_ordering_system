@@ -6,16 +6,16 @@
             <div class="card card-outline card-dark">
                 <div class="card-header">
                     <h2 class="card-title">Order List</h2>
-                    <div class="card-tools form-inline" >
-                            <select id="mode" class="form-control ">
-                                <option value="all">All</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                            </select>
+                    <div class="card-tools form-inline">
+                        <select id="mode" class="form-control ">
+                            <option value="all">All</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
                         @can('order_create')
-                        <a class="btn btn-success ml-3" href="{{ route('admin.orders.create') }}"> <i
-                                class="fa fa-plus"></i></a>
+                            <a class="btn btn-success ml-3" href="{{ route('admin.orders.create') }}"> <i
+                                    class="fa fa-plus"></i></a>
                         @endcan
                     </div>
                 </div>
@@ -53,7 +53,9 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                order: [[5, 'desc']],
+                order: [
+                    [0, 'desc']
+                ],
                 ajax: {
                     url: "{{ route('admin.orders.getData') }}",
                     data: function(d) {
@@ -71,8 +73,8 @@
                     {
                         data: 'customer',
                         name: 'customer',
-                        render: function($data){
-                           return $data.name;
+                        render: function($data) {
+                            return $data.name;
                         },
 
                     },
@@ -91,9 +93,9 @@
                     {
                         data: 'created_at',
                         name: 'created_at',
-                        render:{
-                            _:'display',
-                            sort:'timestamp'
+                        render: {
+                            _: 'display',
+                            sort: 'timestamp'
                         },
                         searchable: false
 
@@ -163,11 +165,13 @@
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .quantity, item.price,item.deleted_at));
+                                    .total, item.price));
                             });
-                            $('#table-items').append("<tr><td colspan='4'>Discount</td><td>"+data.order.discount+"</td></tr>");
+                            $('#table-items').append("<tr><td colspan='3'>Discount</td><td>" +
+                                data.order.discount + "</td></tr>");
 
-                            $('#table-items').append("<tr><td colspan='4'>Net Total</td><td>"+data.order.net_total+"</td></tr>");
+                            $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
+                                data.order.net_total + "</td></tr>");
 
                         } else {
                             console.log('false');
@@ -189,22 +193,11 @@
 
         });
 
-        function template(name, quantity, price,deleted_at) {
+        function template(name, total_quantity, price) {
 
-            if(deleted_at===null){
-
-                var status ='Paid';
-                return '<tr><td>' + name + '</td><td>' + quantity + '</td><td>Rs. ' +
-                price + '</td><td>' + status + '</td><td>Rs. ' +
-                price*quantity + '</td><</tr>';
-
-            }else{
-                var status ='Cancelled';
-                return '<tr><td><s>' + name + '</s></td><td><s>' + quantity + '</s></td><td><s>Rs. ' +
-                price + '</s></td><td><s>' + status + '</s></td><td><s>Rs. ' +
-                price*quantity + '</s></td><</tr>';
-            }
-
+            return '<tr><td>' + name + '</td><td>' + total_quantity + '</td><td>Rs. ' +
+                price + '</td><td>Rs. ' +
+                price * total_quantity + '</td><</tr>';
         }
 
         function clearModal() {

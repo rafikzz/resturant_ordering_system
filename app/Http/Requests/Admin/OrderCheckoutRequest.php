@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreOrderRequest extends FormRequest
+class OrderCheckoutRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +24,8 @@ class StoreOrderRequest extends FormRequest
     public function rules()
     {
         return [
-           'table_no'=>'required',
-           'customer_id'=>'required_without:customer_name',
-           'customer_name'=>'required_without:customer_id',
-           'customer_phone_no'=>['required_without:customer_id','regex:/(?:\(?\+977\)?)?[9][6-9]\d{8}|01[-]?[0-9]{7}/','unique:table_customers,phone_no'],
-           'discount'=>'nullable',
-
+            'discount' => 'nullable',
+            'payment_type' => 'required',
         ];
     }
 }

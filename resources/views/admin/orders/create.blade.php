@@ -84,23 +84,6 @@
                                     @enderror
                                 </div>
                             </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group  ml-n2">
-                                    <label for="">Status</label>
-                                    <select name="status_id" class="form-control" required>
-                                        <option value="">--Select Stautus--</option>
-                                        @foreach ($statuses as $status)
-                                            <option value="{{ $status->id }}">{{ $status->title }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('category_id')
-                                        <span class=" text-danger" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
                         </div>
 
                         <div class="row">
@@ -126,19 +109,7 @@
                                 <b class="float-right" id="totalAmount">Rs. {{ old('total') }}</b>
                             </div>
                         </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-6">
-                                <b>Discount </b>
-                            </div>
-                            <div class="col-6 ">
-                                <div class="form-group col-sm-5 float-right d-flex">
-                                    <input class="form-control " name="discount" max="{{ old('total') }}"
-                                        value="{{ old('discount') ?: 0.0 }}" type="number" id="discount"
-                                        autocomplete="off" placeholder="Enter Discount">
-                                </div>
-                            </div>
-                        </div>
+
                         <hr />
                         <div class="row">
 
@@ -435,8 +406,6 @@
         //For setting the total
         function setTotal(totalAmount) {
             $('#totalAmount').html('Rs. ' + totalAmount);
-            $('#discount').prop('max', totalAmount);
-
         }
         //Template of category item
         function template(id, name, price, image) {

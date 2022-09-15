@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderRequest;
+use App\Models\CancelledOrderItem;
 use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Customer;
@@ -14,6 +15,7 @@ use App\Models\OrderItem;
 use App\Models\Status;
 use Carbon\Carbon;
 use Cart;
+use Darryldecode\Cart\Cart as CartCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -32,6 +34,7 @@ class OrderController extends Controller
     }
     public function index(Request $request)
     {
+
         $title = $this->title;
         $breadcrumbs = ['Order' => route('admin.orders.index')];
 
@@ -52,12 +55,6 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request)
     {
-        if (Cart::isEmpty()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => 'No Items Orderd',
-            ]);
-        }
 
         DB::beginTransaction();
         try {
@@ -71,25 +68,21 @@ class OrderController extends Controller
                 $customerId = $customer->id;
             }
             $billNo = time();
+
             $order = Order::create([
                 'bill_no' => $billNo,
                 'table_no' => $request->table_no,
                 'customer_id' => $customerId,
                 'total' => Cart::getTotal(),
-                'discount' => ($request->discount) ? $request->discount : 0,
-                'status_id' => $request->status_id,
+                'status_id' => 1,
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
                 'order_datetime' => now(),
             ]);
             $cartItems = Cart::getContent();
-            foreach ($cartItems as $item) {
-                OrderItem::create([
-                    'item_id' => $item->id,
-                    'price' => $item->price,
-                    'quantity' => $item->quantity,
-                    'order_id' => $order->id
-                ]);
-            }
+            $this->storeOrderItem($order, $cartItems);
         } catch (\Throwable $th) {
+            Cart::clear();
             DB::rollback();
             throw $th;
         }
@@ -106,20 +99,12 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         Cart::clear();
-        $orderItems = OrderItem::where('order_id', $order->id)->get();
-        foreach ($orderItems as $item) {
-            Cart::add(array(
-                'id' => $item->item_id, // uinique row ID
-                'name' => $item->item->name,
-                'price' => $item->price,
-                'quantity' => $item->quantity
-            ));
-        }
+        $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get()->groupBy('order_no');
         $categories = Category::all();
         $statuses = Status::all();
         $customers = Customer::all();
 
-        return view('admin.orders.edit', compact('title', 'order', 'categories', 'customers', 'statuses', 'breadcrumbs'));
+        return view('admin.orders.edit', compact('title', 'orderItems', 'order', 'categories', 'customers', 'statuses', 'breadcrumbs'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)
@@ -136,34 +121,26 @@ class OrderController extends Controller
                 ]);
                 $customerId = $customer->id;
             }
+
+            $cartItems = Cart::getContent();
+            $this->storeOrderItem($order, $cartItems);
+            $getTotal = $order->total + Cart::getTotal();
+
+
             $order->update([
                 'table_no' => $request->table_no,
                 'customer_id' => $customerId,
-                'total' => Cart::getTotal(),
+                'total' => $getTotal,
+                'updated_by' => auth()->id(),
                 'discount' => ($request->discount) ? $request->discount : 0,
-                'status_id' => $request->status_id,
             ]);
-            $cartItems = Cart::getContent();
-            $orderItems = OrderItem::where('order_id', $order->id)->whereNotIn('item_id', $cartItems->pluck('id', 'id'))->get();
-
-            foreach ($cartItems as $item) {
-
-                OrderItem::withTrashed()->updateOrCreate(['order_id' => $order->id, 'item_id' => $item->id], [
-                    'price' => $item->price,
-                    'quantity' => $item->quantity,
-                    'deleted_at' => null
-                ]);
-            }
-
-            foreach ($orderItems as $item) {
-                $item->delete();
-            }
         } catch (\Throwable $th) {
+            Cart::clear();
             DB::rollback();
             throw $th;
         }
-        DB::commit();
         Cart::clear();
+        DB::commit();
 
         return redirect()->route('admin.orders.index')->with('success', 'Order Edited Successfully');
     }
@@ -180,7 +157,7 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         Cart::clear();
-        $orderItems = OrderItem::where('order_id', $order->id)->get();
+        $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get();
 
         $categories = Category::all();
         $statuses = Status::all();
@@ -193,30 +170,26 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         try {
-            $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+            $cartItems = Cart::getContent();
+            $this->storeOrderItem($order, $cartItems);
+
+            $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get();
             foreach ($orderItems as $item) {
                 Cart::add(array(
                     'id' => $item->item_id, // uinique row ID
                     'name' => $item->item->name,
                     'price' => $item->price,
-                    'quantity' => $item->quantity
+                    'quantity' => $item->total
                 ));
-            }
-            $cartItems = Cart::getContent();
-            foreach ($cartItems as $item) {
-
-                OrderItem::withTrashed()->updateOrCreate(['order_id' => $order->id, 'item_id' => $item->id], [
-                    'price' => $item->price,
-                    'quantity' => $item->quantity,
-                    'deleted_at' => null
-                ]);
             }
             $order->update([
                 'total' => Cart::getTotal(),
+                'updated_by' => auth()->id(),
                 'discount' => ($request->discount) ? $request->discount : 0,
-                'status_id' => $request->status_id,
             ]);
         } catch (\Throwable $th) {
+            Cart::clear();
             DB::rollback();
             throw $th;
         }
@@ -256,6 +229,7 @@ class OrderController extends Controller
                 default:
                     $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color');
             }
+            $processingStatus = Status::where('title', 'processing')->first()->id;
 
 
             return DataTables::of($data)
@@ -266,21 +240,30 @@ class OrderController extends Controller
                     ];
                 })->addColumn(
                     'action',
-                    function ($row, Request $request) {
-                        if (auth()->user()->can('order_edit') || auth()->user()->can('order_delete')) {
-                            $editBtn =  auth()->user()->can('order_edit') ? '<a class="btn btn-sm btn-warning"  href="' . route('admin.orders.edit', $row->id) . '">Edit</a>' : '';
-                            $deleteBtn =  auth()->user()->can('order_delete') ? '<button type="submit" class="btn btn-sm btn-danger btn-delete">Delete</button>' : '';
-                            $formStart = '<form action="' . route('admin.orders.destroy', $row->id) . '" method="POST">
-                            <input type="hidden" name="_method" value="delete"><a href="' . route('orders.get', $row->id) . '" target="_blank" class="btn btn-secondary btn-sm">Get Bill</a>' . csrf_field();
+                    function ($row, Request $request) use ($processingStatus) {
+                        if ($row->status_id == $processingStatus && $request->mode !== 'history') {
+                            if (auth()->user()->can('order_edit') || auth()->user()->can('order_delete')) {
+                                $checkoutBtn=auth()->user()->can('order_create')?'<a href="' . route('admin.orders.checkout', $row->id) . '"  class="btn btn-secondary btn-xs">Checkout</a>':'';
+                                $editBtn =  auth()->user()->can('order_edit') ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $deleteBtn =  auth()->user()->can('order_delete') ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $formStart = '<form action="' . route('admin.orders.destroy', $row->id) . '" method="POST">
+                                <input type="hidden" name="_method" value="delete">' . csrf_field();
 
-                            $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-sm get-detail my-2">Order Detail</button>';
-                            $addBtn =  auth()->user()->can('order_add') ? '<a class="btn btn-sm btn-success"  href="' . route('admin.orders.addItem', $row->id) . '">Add More Item</a>' : '';
+                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
+                                $addBtn =  auth()->user()->can('order_add') ? '<a class="btn btn-xs btn-success"  href="' . route('admin.orders.addItem', $row->id) . '">Add More Item</a>' : '';
 
 
-                            $formEnd = '</form>';
-                            $btn = $formStart . ' ' . $detail . ' ' . $addBtn . ' ' . $editBtn .  ' ' . $deleteBtn . $formEnd;
+                                $formEnd = '</form>';
+                                $btn = $formStart . ' ' . $detail . ' '.$checkoutBtn.' '. $addBtn . ' ' . $editBtn .  ' ' . $deleteBtn . $formEnd;
 
-                            return $btn;
+                                return $btn;
+                            }
+                        } else {
+                            if (auth()->user()->can('order_list')) {
+
+                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
+                                return  $detail;
+                            }
                         }
                     }
                 )->orderColumn('status', function ($query, $order) {
@@ -297,7 +280,7 @@ class OrderController extends Controller
     {
         if (request()->ajax()) {
             $order = Order::with('status:id,title')->with('customer:id,name,phone_no')->where('id', $request->order_id)->first();
-            $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->withTrashed()->get();
+            $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
             if ($order) {
                 return response()->json([
                     'order' => $order,
@@ -311,6 +294,23 @@ class OrderController extends Controller
                     'message' => 'No Order found',
                 ]);
             }
+        }
+    }
+    public function storeOrderItem($order, $cartItems)
+    {
+        $orderNo = $order->getOrderNo();
+
+        foreach ($cartItems as $item) {
+            OrderItem::create([
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
+                'order_no' => $orderNo,
+                'item_id' => $item->id,
+                'price' => $item->price,
+                'quantity' => $item->quantity,
+                'total' => $item->quantity,
+                'order_id' => $order->id
+            ]);
         }
     }
 }
