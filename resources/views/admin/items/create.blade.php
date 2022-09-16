@@ -37,20 +37,31 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group col-md-6 ml-n2">
-                            <label for="category_id"> Category</label>
-                            <select class="form-control" name="category_id" required>
-                                <option selected value="" disabled>--Select Category--</option>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
-                                @endforeach
-                            </select>
-                            @error('category_id')
-                                <span class=" text-danger" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+                        <div class="row">
+                            <div class="form-group col-md-6 ml-n2">
+                                <label for="category_id"> Category</label>
+                                <select class="form-control" name="category_id" required>
+                                    <option selected value="" disabled>--Select Category--</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                    @endforeach
+                                </select>
+                                @error('category_id')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="label" for="title">Status</label>
+                                <div class="custom-control custom-switch  ">
+                                    <input type="checkbox" value="1" class="custom-control-input" name="status"
+                                        id="status">
+                                    <label class="custom-control-label" for="status">Active</label>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="form-group ml-n2">
                             <div class="col-md-6">
                                 <label for="exampleInputFile">Upload Image</label>
@@ -75,7 +86,8 @@
                         </div>
 
                         <div class="col-md-12 text-center">
-                            <button type="submit" name="new" value="1" class="btn btn-primary  mt-3">Save and Create</button>
+                            <button type="submit" name="new" value="1" class="btn btn-primary  mt-3">Save and
+                                Create</button>
                             <button type="submit" class="btn btn-primary  mt-3">Save and exit</button>
                         </div>
                     </form>

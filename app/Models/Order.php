@@ -33,6 +33,16 @@ class Order extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
+    public function order_taken_by()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function last_updated_by()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     public function getNetTotalAttribute()
     {
         return ($this->total - $this->discount);

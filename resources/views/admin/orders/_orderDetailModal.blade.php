@@ -44,6 +44,7 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-end">
+                <a href="javascript:void(0)" id="get-bill" class="btn btn-primary" target="_blank">Get Bill</a>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>

@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered" id="table">
+                    <table class="table table-bordered table-sm" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
@@ -162,6 +162,7 @@
                     success: function(data) {
                         if (data.status === 'success') {
                             setModalData(data.order);
+                            $('#get-bill').attr('href',data.billRoute);
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
@@ -207,6 +208,8 @@
             $('#order-date').html('');
             $('#order-status').html('');
             $('#table-items').html('');
+            $('#get-bill').attr('href','javascript:void(0)');
+
 
         }
 

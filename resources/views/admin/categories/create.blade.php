@@ -25,6 +25,14 @@
                                     </span>
                                 @enderror
                             </div>
+                            <div class="form-group col-md-6">
+                                <label class="label" for="title">Status</label>
+                                <div class="custom-control custom-switch  ">
+                                    <input type="checkbox" value="1" class="custom-control-input" name="status"
+                                        id="status">
+                                    <label class="custom-control-label" for="status">Active</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group ml-n2">
                             <div class="col-md-6">
@@ -48,7 +56,8 @@
                             </div>
                         </div>
                         <div class="col-md-12 text-center">
-                            <button type="submit" name="new" value="1" class="btn btn-primary  mt-3">Save and Create</button>
+                            <button type="submit" name="new" value="1" class="btn btn-primary  mt-3">Save and
+                                Create</button>
                             <button type="submit" class="btn btn-primary  mt-3">Save and exit</button>
                         </div>
                     </form>

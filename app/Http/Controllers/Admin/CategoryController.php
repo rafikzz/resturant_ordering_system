@@ -51,6 +51,7 @@ class CategoryController extends Controller
         }
         Category::create([
             'title' => $request->title,
+            'status'=> isset($request->status)?1:0,
             'image' => isset($imagePath)?$imagePath:'',
         ]);
         if(isset($request->new))

@@ -157,7 +157,8 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         Cart::clear();
-        $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get();
+        $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get()->groupBy('order_no');
+
 
         $categories = Category::all();
         $statuses = Status::all();
@@ -281,9 +282,12 @@ class OrderController extends Controller
         if (request()->ajax()) {
             $order = Order::with('status:id,title')->with('customer:id,name,phone_no')->where('id', $request->order_id)->first();
             $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
+            $billRoute = route('orders.getBill',$order->id);
+
             if ($order) {
                 return response()->json([
                     'order' => $order,
+                    'billRoute' => $billRoute,
                     'orderItems' => $orderItems,
                     'status' => 'success',
                     'message' => 'Order fetched successfully',

@@ -56,6 +56,7 @@ class ItemController extends Controller
         Item::create([
             'name' => $request->name,
             'price' => $request->price,
+            'status' => isset($request->status)?1:0,
             'category_id' => $request->category_id,
             'image' => isset($imagePath) ? $imagePath : ''
 

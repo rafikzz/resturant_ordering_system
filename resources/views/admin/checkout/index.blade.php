@@ -19,43 +19,56 @@
                                 <p>Customer Name:{{ $order->customer->name }}</p>
 
                             </div>
-                            <table class="table table-bordered ">
-                                <thead>
-                                    <th>Item Name</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>SubTotal</th>
-                                </thead>
-                                <tbody>
-                                    @foreach ($order_items as $item)
-                                        <tr>
-                                            <td>{{ $item->item->name }}</td>
-                                            <td>{{ $item->total }}</td>
-                                            <td>{{ $item->price }}</td>
-                                            <td>{{ $item->sub_total }}</td>
-                                        </tr>
+                            <div class="row">
+                                <h3>Order List</h3>
+                                <table class="table table-hover table-sm" style="  min-height: 20vh; ">
+                                    @foreach ($order_items as $order_no => $items)
+                                        <thead>
+                                            <th>Order Slip {{ $order_no }}</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>SubTotal</th>
+                                        </thead>
+                                        @foreach ($items as $item)
+
+                                            <tr>
+                                                <td>{{ $item->item->name }}</td>
+                                                <td>{{ $item->total }}</td>
+                                                <td>{{ $item->price }}</td>
+                                                <td width="200px">{{ $item->sub_total }}</td>
+                                            </tr>
+                                        @endforeach
                                     @endforeach
                                     <tr>
                                         <td colspan="3">Total:</td>
                                         <td>Rs. {{ $order->total }}</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                            <div class="row form-inline  d-flex py-2">
+                                    <tr>
+                                        <td colspan="3">Discount:</td>
+                                        <td><input name="discount" value="0" max="{{ $order->total }}" class="form-control form-control-sm " type="number"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Service Charge:</td>
 
-                            </div>
-                            <div class="row py-2">
-                                <div class="col-md-6">
-                                    <label for="">Discount</label>
-                                    <input name="discount" value="0" max="{{ $order->total }}" class="form-control" type="number"     >
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="">Payment Type:</label>
-                                    <select name="payment_type" required class="form-control  float-right" >
-                                        <option value="cash">Cash</option>
-                                        <option value="bank">Bank</option>
-                                    </select>
-                                </div>
+                                        <td class="service-charge">0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Tax Amount:</td>
+                                        <td class="tax-amount">0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Payment Type:</td>
+
+                                        <td class="service-charge">  <select name="payment_type" required class="form-control form-control-sm  float-right" >
+                                            <option value="cash">Cash</option>
+                                            <option value="bank">Bank</option>
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Total:</td>
+                                        <td>Rs. {{ $order->total }}</td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>

@@ -88,7 +88,7 @@
                             <div class="col-md-6">
                                 <div class="form-group ">
                                     <label for="table_no"> Table No</label>
-                                    <input type="text" class="form-control" placeholder="Set Table No" id="table_no"
+                                    <input type="text" class="form-control " placeholder="Set Table No" id="table_no"
                                         autocomplete="off" name="table_no"
                                         value="{{ old('table_no') ?: $order->table_no }}" required>
                                     @error('table_no')
@@ -100,8 +100,8 @@
                             </div>
                         </div>
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#orderModal">
-                          Add Item To Order
-                          </button>
+                            Add Item To Order
+                        </button>
                         <div class="row">
                             @forelse ($orderItems as $order_no => $items)
                                 <div class="col-md-6">
@@ -110,7 +110,7 @@
                                             <h3>Order List {{ $order_no }}</h3>
                                         </div>
                                         <div class="card-body">
-                                            <table class="table table-responsive">
+                                            <table class="table table-sm table-responsive">
                                                 <thead>
                                                     <th>Item Name</th>
                                                     <th>Quantity</th>
@@ -121,11 +121,11 @@
                                                     @foreach ($items as $item)
                                                         <tr>
                                                             <td width="200px">{{ $item->item->name }}</td>
-                                                            <td width="200px" class="form-inline col-xs-2">
+                                                            <td width="200px" class="form-inline  col-xs-2">
                                                                 @if ($item->total > 1)
                                                                     <input type="number"
                                                                         id="order-item-quantity-{{ $item->id }}"
-                                                                        max="{{ $item->total }}" class="form-control"
+                                                                        max="{{ $item->total }}" class="form-control form-control-sm"
                                                                         step="1" min="0"
                                                                         value="{{ $item->total }}">
                                                                     <button type="button"
@@ -203,60 +203,46 @@
             });
         });
 
-
         //For Adding Order Item to List
         $(document).on('click', '.add-item', function() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to add this item?",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let itemId = $(this).data('id');
-                    let itemName = $(this).data('name');
-                    let itemPrice = $(this).data('price');
-                    $.ajax({
-                        type: 'GET',
-                        url: '{{ route('admin.cart.addCartItem') }}',
-                        data: {
-                            'item_id': itemId,
-                        },
-                        success: function(data) {
-                            if (data.status === 'success') {
-                                $('#order-list').html('');
-                                for (var item in data.items) {
-                                    $('#order-list').append(tableRowTemplate(data.items[item]
-                                        .id, data.items[
-                                            item].name, data.items[item].price, data
-                                        .items[item]
-                                        .quantity));
-                                    Swal.fire({
-                                        title: 'Success',
-                                        text: data.message,
-                                        icon: 'success',
-                                    });
+            let btn = $(this);
+            btn.attr('disabled', 'disabled');
+            let itemId = $(this).data('id');
+            let itemName = $(this).data('name');
+            let itemPrice = $(this).data('price');
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('admin.cart.addCartItem') }}',
+                data: {
+                    'item_id': itemId,
+                },
+                success: function(data) {
+                    btn.attr('disabled', false);
 
-                                }
-                                // data.items.forEach(function(item){
-                                //     $('#order-list').append(tableRowTemplate(item.id, item.name, item.Price));
-                                // });
+                    if (data.status === 'success') {
+                        $('#order-list').html('');
+                        for (var item in data.items) {
+                            $('#order-list').append(tableRowTemplate(data.items[item]
+                                .id, data.items[
+                                    item].name, data.items[item].price, data
+                                .items[item]
+                                .quantity));
 
-                            } else {
-                                console.log(data.message);
-                            }
-                        },
-                        error: function(xhr) {
-                            console.log('Internal Server Error')
                         }
-                    });
+
+                        // sweetAlert('Success',data.message,'success');
+
+
+                    } else {
+                        console.log(data.message);
+                    }
+                },
+                error: function(xhr) {
+                    btn.attr('disabled', false);
+
+                    console.log('Internal Server Error')
                 }
             });
-
-
         });
 
         //For Updating Quantity of Ordered Items
@@ -267,69 +253,43 @@
             var max = $('#order-item-quantity-' + item).attr('max');
 
             if (Number.isInteger(quantity) && quantity <= max && quantity > 0) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Do you want to  update quantity?",
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        if (item) {
-                            $.ajax({
-                                type: 'PUT',
-                                url: '{{ route('admin.order_items.index') }}' + '/' + item,
-                                data: {
-                                    '_token': $('meta[name="csrf-token"]').attr('content'),
-                                    'quantity': quantity
-
-                                },
-                                success: function(data) {
-                                    if (data.status === 'success') {
-                                        var message = data.message;
-                                        Swal.fire({
-                                            title: 'Success',
-                                            text: data.message,
-                                            icon: 'success',
-                                        });
-                                        if (quantity <= 1) {
-                                            btn.closest('td').html(quantity);
-                                        } else {
-                                            btn.closest('td').html(
-                                                "<input type='number' id='order-item-quantity-" +
-                                                item + "' max='" + quantity +
-                                                "' class='form-control' step='1' min='1' value='" +
-                                                quantity +
-                                                "'><button type='button' class='btn btn-outline-light update-item-quantity  ml-2 btn-sm' rel='" +
-                                                item +
-                                                "'><i class='fa fa-edit'></i></button>");
-                                        }
-                                        setTotal(data.total);
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Error',
-                                            text: data.message,
-                                            icon: 'error',
-                                        });
-                                    }
-                                },
-                                error: function(xhr) {
-                                    console.log('Internal Server Error')
+                if (item) {
+                    $.ajax({
+                        type: 'PUT',
+                        url: '{{ route('admin.order_items.index') }}' + '/' + item,
+                        data: {
+                            '_token': $('meta[name="csrf-token"]').attr('content'),
+                            'quantity': quantity
+                        },
+                        success: function(data) {
+                            if (data.status === 'success') {
+                                var message = data.message;
+                                sweetAlert('Success',data.message,'success');
+                                if (quantity <= 1) {
+                                    btn.closest('td').html(quantity);
+                                } else {
+                                    btn.closest('td').html(
+                                        "<input type='number' id='order-item-quantity-" +
+                                        item + "' max='" + quantity +
+                                        "' class='form-control' step='1' min='1' value='" +
+                                        quantity +
+                                        "'><button type='button' class='btn btn-outline-light update-item-quantity  ml-2 btn-sm' rel='" +
+                                        item +
+                                        "'><i class='fa fa-edit'></i></button>");
                                 }
-                            });
-                        } else {
-                            console.log('No Item Found');
+                            } else {
+                                sweetAlert('Error', data.message,'error');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log('Internal Server Error')
                         }
-                    }
-                });
+                    });
+                } else {
+                    console.log('No Item Found');
+                }
             } else {
-                Swal.fire({
-                    title: 'Quantity is not Valid',
-                    text: "Please Enter Valid Quantity",
-                    icon: 'warning',
-                });
+                sweetAlert('Quantity is not Valid', 'Please Enter Valid Quantity', 'warning');
             }
         });
 
@@ -358,19 +318,9 @@
                             success: function(data) {
                                 if (data.status === 'success') {
                                     var message = data.message;
-                                    Swal.fire({
-                                        title: 'Success',
-                                        text: data.message,
-                                        icon: 'success',
-                                    });
-                                    setTotal(data.total);
                                     btn.closest('tr').html('');
                                 } else {
-                                    Swal.fire({
-                                        title: 'Error',
-                                        text: data.message,
-                                        icon: 'error',
-                                    });
+                                    sweetAlert('Error', data.message,'error');
                                 }
                             },
                             error: function(xhr) {
@@ -381,11 +331,7 @@
                         console.log('No Item Found');
                     }
                 } else {
-                    Swal.fire({
-                        title: 'Quantity is not Valid',
-                        text: "Please Enter Valid Quantity",
-                        icon: 'warning',
-                    });
+                    sweetAlert('Number is not Valid', "Please Enter Valid Quantity", 'warning');
                 }
             });
         });
@@ -396,29 +342,13 @@
             var quantity = parseInt($('#item-quantity-' + item).val());
             $('#item-quantity-' + item).val(quantity);
             if (Number.isInteger(quantity) && quantity !== 0) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Do you want to  update quantity?",
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        if (item, quantity) {
-                            updateItemQuantity(item, quantity);
-                        } else {
-                            console.log('No Item Found');
-                        }
-                    }
-                });
+                if (item, quantity) {
+                    updateItemQuantity(item, quantity);
+                } else {
+                    console.log('No Item Found');
+                }
             } else {
-                Swal.fire({
-                    title: 'Number is not Valid',
-                    text: "Please Enter Valid Quantity",
-                    icon: 'warning',
-                });
+                sweetAlert('Number is not Valid', "Please Enter Valid Quantity", 'warning');
             }
         });
         //For Deleting Cart Item
@@ -446,60 +376,19 @@
                             if (data.status === 'success') {
                                 setTotal(data.total);
                                 removeItem(btn, item_id);
-                                Swal.fire({
-                                    title: 'Success',
-                                    text: data.message,
-                                    icon: 'success',
-                                });
+                                sweetAlert('Success', data.message, 'success');
                             } else {
-                                console.log(data.message);
+                                alert(data.message);
                             }
                         },
                         error: function(xhr) {
-                            console.log('Internal Server Error')
+                            alert('Internal Server Error')
                         }
                     });
                 }
             });
         });
-        //For Submitting Ajax Form
-        // $('#order-form').submit(function(e) {
-        //     e.preventDefault();
-        //     var formData = $(this).serialize();
-        //     var orderId = $('#order_id').val();
 
-        //     $('#order-submit').attr('disabled', true);
-
-        //     $.ajax({
-        //         type: 'POST',
-        //         url: '{{ route('admin.orders.update', $order->id) }}',
-        //         data: formData,
-        //         success: function(data) {
-        //             if (data.status === 'success') {
-        //                 Swal.fire({
-        //                     title: 'Success',
-        //                     text: data.message,
-        //                     icon: 'success',
-        //                 });
-        //                 setTimeout(function() {
-        //                     window.location.reload();
-        //                 }, 3000)
-        //             } else {
-        //                 Swal.fire({
-        //                     title: 'No Order',
-        //                     text: data.message,
-        //                     icon: 'error',
-        //                 });
-        //             }
-        //             $('#order-submit').attr('disabled', false);
-
-        //         },
-        //         error: function(xhr) {
-        //             console.log(xhr);
-        //             $('#order-submit').attr('disabled', false);
-        //         }
-        //     });
-        // });
         //For Inputing Existing Customer
         $('#existingCustomer').click(function() {
             if ($(this).is(':checked')) {
@@ -533,13 +422,13 @@
                 '" width="200px" height="160px" /></div><div class="card-footer d-flex"><div class="col-md-6"><p>Price:Rs ' +
                 price + '</p></div><div class="col-md-6"><button type="button" data-id="' +
                 id + '" data-price="' + price + '" data-name="' + name +
-                '" class="btn btn-primary add-item float-right">Add Order</button></div></div></div></div>';
+                '" class="btn btn-primary add-item float-right">Add</button></div></div></div></div>';
         }
         //Template of table row
         function tableRowTemplate(id, name, price, quantity = '1') {
             return '<tr id="item-' + id + '" data-id="' + id + '"><td>' + name +
                 '</td><td class="form-inline col-xs-2"><input type="number" id="item-quantity-' + id +
-                '" class="form-control"  step="1" min="1" value="' +
+                '" class="form-control form-control-sm"  step="1" min="1" value="' +
                 quantity +
                 '"><button type="button" class="btn btn-outline-light update-quantity ml-2 btn-sm" rel="' + id +
                 '"><i class="fa fa-edit"></i></button></td><td>Rs. ' +
@@ -558,12 +447,7 @@
                 },
                 success: function(data) {
                     if (data.status === 'success') {
-                        var message = data.message;
-                        Swal.fire({
-                            title: 'Success',
-                            text: data.message,
-                            icon: 'success',
-                        });
+
                         setTotal(data.total);
                     } else {
                         console.log(data.message);
@@ -577,6 +461,14 @@
         //For removing Item in the row
         function removeItem(btn, item_id) {
             btn.parents('tr').remove();
+        }
+        //For Sweet Alert
+        function sweetAlert(title, text, icon) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+            });
         }
     </script>
 @endsection

@@ -29,4 +29,14 @@ class OrderItem extends Model
         return $this->total *$this->price;
     }
 
+    public function order_taken_by()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function last_updated_by()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
 }

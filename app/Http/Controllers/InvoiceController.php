@@ -41,7 +41,7 @@ class InvoiceController extends Controller
             ->totalDiscount($order->discount)
             ->totalAmount($order->net_total)
             ->addItems($items)->template('default');
-
+        // return view('vendor.invoices.templates.default',compact('invoice'));
 
         return $invoice->stream();
     }

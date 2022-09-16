@@ -29,16 +29,16 @@ class CheckoutController extends Controller
 
         $breadcrumbs =[ 'Order'=>route('admin.orders.index'), 'Checkout'=>'#'];
         $title =$this->title;
-        $processingStatus =Status::where('title','proccessing')->first()->id;
+        $processingStatus =Status::where('title','Processing')->first()->id;
         $order = Order::where('status_id','=',$processingStatus)->with('customer:id,name')->findOrFail($id);
-        $order_items = OrderItem::where('order_id',$order->id)->with('item:id,name')->where('total','>',0)->get();
+        $order_items = OrderItem::where('order_id',$order->id)->with('item:id,name')->where('total','>',0)->get()->groupBy('order_no');
         return view('admin.checkout.index',compact('order','order_items','title','breadcrumbs'));
 
     }
 
     public function store(OrderCheckoutRequest $request,$id)
     {
-        $processingStatus =Status::where('title','proccessing')->first()->id;
+        $processingStatus =Status::where('title','Processing')->first()->id;
         $order = Order::where('status_id','=',$processingStatus)->with('customer:id,name')->findOrFail($id);
         if($request->discount> $order->total){
             return back()->with('success','Discount is greater than total');

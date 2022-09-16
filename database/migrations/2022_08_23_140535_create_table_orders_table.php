@@ -25,6 +25,9 @@ class CreateTableOrdersTable extends Migration
             $table->decimal('total',10,2);
             $table->timestamp('order_datetime')->nullable();
             $table->string('payment_type')->nullable();
+            $table->string('tax')->nullable();
+            $table->string('service_charge')->nullable();
+            $table->string('net_total')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

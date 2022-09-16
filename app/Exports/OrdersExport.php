@@ -28,7 +28,7 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
     public function collection()
     {
         $this->count= Order::count();
-        return Order::with('customer')->get();
+        return Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->get();
     }
     public function map($order): array
     {
@@ -43,6 +43,11 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
                 $order->discount,
                 $order->net_total,
                 $order->created_at,
+                $order->order_taken_by->name,
+                $order->last_updated_by->name,
+
+
+
             ],
         ];
     }
@@ -58,13 +63,18 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
             'Discount',
             'Net Total',
             'Created At',
+            'Created By',
+            'Last Edited By',
 
         ];
     }
+
+
     public function styles(Worksheet $sheet)
     {
         $numOfRows =$this->count +1;
         $totalRow = $numOfRows + 1;
+
 
         // Add cell with SUM formula to last row
         $sheet->setCellValue("A{$totalRow}", "Total");

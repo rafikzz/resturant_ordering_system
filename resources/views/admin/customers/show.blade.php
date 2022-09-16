@@ -127,15 +127,16 @@
                         if (data.status === 'success') {
 
                             setModalData(data.order);
+                            $('#get-bill').attr('href', data.billRoute);
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .quantity, item.price,item.deleted_at));
+                                    .quantity, item.price, item.deleted_at));
                             });
-                            $('#table-items').append("<tr><td colspan='4'>Discount</td><td>" +
+                            $('#table-items').append("<tr><td colspan='3'>Discount</td><td>" +
                                 data.order.discount + "</td></tr>");
 
-                            $('#table-items').append("<tr><td colspan='4'>Net Total</td><td>" +
+                            $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
                                 data.order.net_total + "</td></tr>");
 
                         } else {
@@ -158,22 +159,11 @@
 
         });
 
-        function template(name, quantity, price, deleted_at) {
+        function template(name, total_quantity, price) {
 
-            if (deleted_at === null) {
-
-                var status = 'Paid';
-                return '<tr><td>' + name + '</td><td>' + quantity + '</td><td>Rs. ' +
-                    price + '</td><td>' + status + '</td><td>Rs. ' +
-                    price * quantity + '</td><</tr>';
-
-            } else {
-                var status = 'Cancelled';
-                return '<tr><td><s>' + name + '</s></td><td><s>' + quantity + '</s></td><td><s>Rs. ' +
-                    price + '</s></td><td><s>' + status + '</s></td><td><s>Rs. ' +
-                    price * quantity + '</s></td><</tr>';
-            }
-
+            return '<tr><td>' + name + '</td><td>' + total_quantity + '</td><td>Rs. ' +
+                price + '</td><td>Rs. ' +
+                price * total_quantity + '</td><</tr>';
         }
 
         function clearModal() {
@@ -183,6 +173,8 @@
             $('#order-date').html('');
             $('#order-status').html('');
             $('#table-items').html('');
+            $('#get-bill').attr('href', 'javascript:void(0)');
+
 
         }
 

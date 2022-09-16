@@ -16,7 +16,7 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <h3>Order List</h3>
-                                        <table class="table " style="  min-height: 20vh; ">
+                                        <table class="table table-sm" style="  min-height: 20vh; ">
                                             <thead>
                                                 <th>Item Name</th>
                                                 <th>Quantity</th>
