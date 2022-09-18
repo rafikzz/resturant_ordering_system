@@ -38,7 +38,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="form-group col-md-6 ml-n2">
+                            <div class="form-group col-md-6 ">
                                 <label for="category_id"> Category</label>
                                 <select class="form-control" name="category_id" required>
                                     <option selected value="" disabled>--Select Category--</option>

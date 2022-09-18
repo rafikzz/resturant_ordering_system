@@ -10,7 +10,21 @@
                     <form method="POST" action="{{ route('admin.settings.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="label" for="company_name">Company Name</label>
+                                    <input type="text" name="company_name"
+                                        value="{{ (old('company_name') ?: isset($setting)) ? $setting->company_name : '' }}"
+                                        class="form-control  @error('company_name') is-invalid @enderror" autocomplete="off"
+                                        minlength="3" placeholder="Enter Name" required>
+                                    @error('company_name')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="label" for="contact_information">Contact Information</label>
                                     <input type="text" name="contact_information"
@@ -24,7 +38,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="label" for="office_location">Office Location</label>
                                     <input type="text" name="office_location"
@@ -38,14 +52,14 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <div class="form-group  d-flex">
                                     <div class="col-md-6 ml-n2">
                                         <label for="exampleInputFile">Upload Logo</label>
                                         <div class="input-group ">
                                             <div class="custom-file">
                                                 <input type="file" class="custom-file-input" name="logo"
-                                                    id="image" @if (!isset($setting)) required @endif>
+                                                    id="image" >
                                                 <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                                             </div>
                                         </div>
@@ -62,6 +76,59 @@
                                     </span>
                                 @enderror
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6  py-2">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch  ">
+                                        <input type="checkbox" value="1" class="custom-control-input" name="tax_status"
+                                        {{ (old('tax_status') ?: isset($setting)) ? $setting->tax_status?'checked':'' : '' }}
+                                            id="tax_status">
+                                        <label class="custom-control-label" for="tax_status">Enable Tax</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="label" for="tax">Tax(%)</label>
+                                    <input type="number" name="tax"
+                                        value="{{ (old('tax') ?: isset($setting)) ? $setting->tax : '' }}"
+                                        class="form-control  @error('tax') is-invalid @enderror" autocomplete="off"
+                                        minlength="3" placeholder="Enter Tax(%)" required>
+                                    @error('tax')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row py-2">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch  ">
+                                        <input type="checkbox" value="1" class="custom-control-input" name="service_charge_status"
+                                            id="service_charge_status" {{ (old('service_charge_status') ?: isset($setting)) ? $setting->service_charge_status?'checked':'' : '' }}>
+                                        <label class="custom-control-label" for="service_charge_status">Enable Service Charge</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="label" for="service_charge">Service Charge(%)</label>
+                                    <input type="number" name="service_charge"
+                                        value="{{ (old('service_charge') ?: isset($setting)) ? $setting->service_charge : '' }}"
+                                        class="form-control  @error('service_charge') is-invalid @enderror" autocomplete="off"
+                                        minlength="3" placeholder="Enter Service Charge(%)" required>
+                                    @error('service_charge')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-12 text-center">
                                 <button type="submit" class="btn btn-primary  mt-3">Save Setting</button>
                             </div>

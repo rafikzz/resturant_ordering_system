@@ -13,7 +13,7 @@ class Order extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'table_orders';
-    protected $fillable = ['customer_id', 'status_id', 'table_no', 'created_by', 'updated_by', 'bill_no', 'table_no', 'discount', 'total', 'order_datetime'];
+    protected $fillable = ['customer_id', 'status_id', 'table_no', 'created_by', 'updated_by','tax','service_charge','payment_type', 'bill_no', 'table_no', 'discount', 'total','net_total', 'order_datetime'];
 
 
     protected $appends = ['net_total', 'order_date'];
@@ -79,5 +79,44 @@ class Order extends Model
         return  $orderTotal = ($this->order_items()->count())? $this->order_items()->sum(DB::raw('total * price')) : 0;
     }
 
+    public function serviceCharge($discount =0)
+    {
+        $setting = Setting::first();
+        if(isset($setting))
+        {
+            return   round(($setting->getServiceCharge()/100 ) * ($this->total-$discount),2);
+        }
+        return 0;
+    }
+    public function taxAmount($discount =0)
+    {
+        $setting = Setting::first();
+        if(isset($setting))
+        {
+            return   round($this->totalWithTax($discount)- $this->totalWithServiceCharge($discount),2);
+        }
+        return 0;
+
+    }
+
+    public function totalWithServiceCharge($discount = 0)
+    {
+        $setting = Setting::first();
+        if(isset($setting))
+        {
+            return   round((1+$setting->getServiceCharge()/100 )* ($this->total-$discount),2);
+        }
+        return ($this->total-$discount);
+    }
+
+    public function totalWithTax($discount = 0)
+    {
+        $setting = Setting::first();
+        if(isset($setting))
+        {
+            return   round((1+$setting->getTax()/100 )* ($this->totalWithServiceCharge($discount)),2);
+        }
+        return $this->totalWithServiceCharge($discount);
+    }
 
 }

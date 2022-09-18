@@ -12,11 +12,32 @@ class Setting extends Model
 
     protected $table ='table_settings';
 
-    protected $fillable =['logo','contact_information','office_location'];
+    protected $fillable =['company_name','logo','contact_information','office_location','tax','tax_status','service_charge','service_charge_status','enable_kot'];
 
 
     public function logo()
     {
         return (Storage::disk('public')->exists($this->logo)) ? '/storage/' . $this->logo : asset('noimgavialable.png');
+    }
+
+    public function getTax()
+    {
+        if($this->tax_status)
+        {
+            return $this->tax;
+        }else{
+            return 0;
+        }
+    }
+
+
+    public function getServiceCharge()
+    {
+        if($this->service_charge_status)
+        {
+            return $this->service_charge;
+        }else{
+            return 0;
+        }
     }
 }

@@ -300,7 +300,7 @@ class OrderController extends Controller
             }
         }
     }
-    public function storeOrderItem($order, $cartItems)
+    public function storeOrderItem($order, $cartItems,$statusId = 1)
     {
         $orderNo = $order->getOrderNo();
 
@@ -313,7 +313,9 @@ class OrderController extends Controller
                 'price' => $item->price,
                 'quantity' => $item->quantity,
                 'total' => $item->quantity,
-                'order_id' => $order->id
+                'order_id' => $order->id,
+                'status_id' => $statusId,
+
             ]);
         }
     }

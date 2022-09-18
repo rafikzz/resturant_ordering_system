@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col">
             <div class="card">
-                <form action="{{ route('admin.orders.checkout.store',$order->id) }}" method="POST">
+                <form action="{{ route('admin.orders.checkout.store', $order->id) }}" method="POST">
                     @csrf
                     <div class="card-header">
                         <h5 class="card-title">Checkout</h5>
@@ -30,7 +30,6 @@
                                             <th>SubTotal</th>
                                         </thead>
                                         @foreach ($items as $item)
-
                                             <tr>
                                                 <td>{{ $item->item->name }}</td>
                                                 <td>{{ $item->total }}</td>
@@ -45,28 +44,38 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3">Discount:</td>
-                                        <td><input name="discount" value="0" max="{{ $order->total }}" class="form-control form-control-sm " type="number"></td>
+                                        <td class="btn-group"><input  id="discount" value="0"
+                                                max="{{ $order->total }}" class="form-control form-control-sm "
+                                                type="number">
+                                                <input type="hidden" id="discount-amount" name="discount"/>
+                                            <button id="apply-discount" type="button"
+                                                class="btn btn-primary btn-sm ml-2">Apply</button>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="3">Service Charge:</td>
-
-                                        <td class="service-charge">0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3">Tax Amount:</td>
-                                        <td class="tax-amount">0.00</td>
-                                    </tr>
+                                    @if ($service_charge)
+                                        <tr>
+                                            <td colspan="3">Service Charge:</td>
+                                            <td id="service-charge">Rs. {{ $order->serviceCharge() }}</td>
+                                        </tr>
+                                    @endif
+                                    @if ($tax)
+                                        <tr>
+                                            <td colspan="3">Tax Amount:</td>
+                                            <td id="tax-amount">Rs. {{ $order->taxAmount() }}</td>
+                                        </tr>
+                                    @endif
                                     <tr>
                                         <td colspan="3">Payment Type:</td>
 
-                                        <td class="service-charge">  <select name="payment_type" required class="form-control form-control-sm  float-right" >
-                                            <option value="cash">Cash</option>
-                                            <option value="bank">Bank</option>
-                                        </select></td>
+                                        <td> <select name="payment_type" required
+                                                class="form-control form-control-sm  float-right">
+                                                <option value="cash">Cash</option>
+                                                <option value="bank">Bank</option>
+                                            </select></td>
                                     </tr>
                                     <tr>
                                         <td colspan="3">Total:</td>
-                                        <td>Rs. {{ $order->total }}</td>
+                                        <td id="grand-total">Rs. {{ $order->totalWithTax() }}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -79,4 +88,66 @@
             </div>
         </div>
     </div>
+@endsection
+@section('js')
+    <script>
+        let total = {!! $order->total !!};
+        let tax = {!! $tax !!};
+        let service_charge = {!! $service_charge !!};
+
+
+
+        $(function() {
+            $('#apply-discount').on('click', function(e) {
+            let discount = parseFloat($('#discount').val());
+                if($('#discount')[0].checkValidity() && !isNaN(discount))
+                {
+                    $('#discount-amount').val(discount);
+                    calculateSetServiceChargeAndTax();
+
+                }else
+                {
+                    $("#discount")[0].reportValidity();
+                }
+
+            })
+        });
+        $(window).keydown(function(event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                $('#apply-discount').trigger('click');
+                return false;
+            }
+        });
+
+        function calculateSetServiceChargeAndTax() {
+
+            let discount = parseFloat($('#discount').val());
+            let net_total = parseFloat(total) - discount;
+            if (net_total >= 0) {
+                let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * net_total)).toFixed(2));
+                let tax_amount = parseFloat(((parseFloat(net_total) + parseFloat(service_charge_amount)) * (tax / 100))
+                    .toFixed(2));
+
+                let grand_total = ((net_total + service_charge_amount) + tax_amount).toFixed(2);
+                console.log(net_total, service_charge_amount, tax_amount, grand_total);
+
+                $('#service-charge').text(foramtValue(service_charge_amount));
+                $('#tax-amount').text(foramtValue(tax_amount));
+                $('#grand-total').text(foramtValue(grand_total));
+            }
+            else
+            {
+                alert('Discount cannot be greater than total')
+            }
+
+
+
+
+        }
+        function foramtValue(val)
+        {
+            return 'Rs. '+val;
+        }
+    </script>
 @endsection
