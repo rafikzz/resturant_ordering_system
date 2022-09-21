@@ -9,9 +9,8 @@
                     <div class="card-tools form-inline">
                         <select id="mode" class="form-control ">
                             <option value="all">All</option>
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
+                            <option value="processing">Processing</option>
+                            <option value="completed">Complete</option>
                         </select>
                         @can('order_create')
                             <a class="btn btn-success ml-3" href="{{ route('admin.orders.create') }}"> <i
@@ -26,8 +25,6 @@
                             <th>Bill No</th>
                             <th>Customer Name</th>
                             <th>Table No</th>
-                            <th>Discount</th>
-                            <th>Total</th>
                             <th>Created At</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -39,7 +36,7 @@
                 </div>
             </div>
         </div>
-        @include('admin.orders._orderDetailModal')
+        @include('admin.kot._orderDetailModal')
     </div>
 @endsection
 @section('js')
@@ -57,7 +54,7 @@
                     [0, 'desc']
                 ],
                 ajax: {
-                    url: "{{ route('admin.orders.getData') }}",
+                    url: "{{ route('admin.kot.getData') }}",
                     data: function(d) {
                         d.mode = $('#mode').val();
                     }
@@ -81,14 +78,6 @@
                     {
                         data: 'table_no',
                         name: 'table_no',
-                    },
-                    {
-                        data: 'discount',
-                        name: 'discount'
-                    },
-                    {
-                        data: 'total',
-                        name: 'total'
                     },
                     {
                         data: 'created_at',
@@ -152,7 +141,7 @@
 
                 $.ajax({
                     type: 'GET',
-                    url: '{{ route('admin.orders.getOrderDetail') }}',
+                    url: '{{ route('admin.kot.getOrderDetail') }}',
                     data: {
                         'order_id': order_id
                     },
@@ -160,38 +149,20 @@
                         $('#overlay').show();
                     },
                     success: function(data) {
+                        $('#overlay').hide();
+                        $('.get-detail').attr('disabled', false);
+
                         if (data.status === 'success') {
                             setModalData(data.order);
                             $('#get-bill').attr('href', data.billRoute);
+                            for (let key in data.orderItems) {
 
-                            data.orderItems.forEach(function(item) {
-                                $('#table-items').append(template(item.item.name, item
-                                    .total, item.price));
-                            });
-                            if (data.order.discount) {
-                                $('#table-items').append(
-                                    "<tr><td colspan='3'>Discount</td><td>" +
-                                    foramtValue(data.order.discount) + "</td></tr>");
+                                $('#ordered-tems').append(template(data.orderItems[key],key));
                             }
-                            if (data.order.service_charge) {
-                                $('#table-items').append(
-                                    "<tr><td colspan='3'>Service Charge</td><td>" +
-                                    foramtValue(data.order.service_charge) + "</td></tr>");
-                            }
-                            if (data.order.tax) {
-                                $('#table-items').append(
-                                    "<tr><td colspan='3'>Tax</td><td>" +
-                                    foramtValue(data.order.tax) + "</td></tr>");
-                            }
-
-                            $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
-                                foramtValue(data.order.net_total) + "</td></tr>");
 
                         } else {
                             console.log('false');
                         }
-                        $('#overlay').hide();
-                        $('.get-detail').attr('disabled', false);
 
 
                     },
@@ -204,14 +175,48 @@
                 });
             });
 
-
         });
 
-        function template(name, total_quantity, price) {
+        $(document).on('click', '.complete-order-item', function() {
+            let btn = $(this);
+            let item_id = btn.attr('rel');
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{{ route('admin.kot.completeOrderItem') }}",
+                data: {
+                    item_id: item_id,
+                    "_token": "{{ csrf_token() }}",
+                },
+                success: function(response) {
+                    if (response.status == "success") {
+                        btn.closest('td').html('Completed');
+                    } else {
+                        console.log(response);
+                    }
+                }
+            });
+        });
+        $(document).on('click','.print-this',function(){
+            let key= $(this).attr('rel');
+            $('#talbeNO, #orderDate, #order-list-'+key).printThis({
+                header: "<h1>Order Slip</h1>",
+                importCSS: true,
+                printDelay: 1000,
 
-            return '<tr><td>' + name + '</td><td>' + total_quantity + '</td><td>Rs. ' +
-                price + '</td><td>Rs. ' +
-                price * total_quantity + '</td><</tr>';
+            });
+        });
+
+        function template(items,key) {
+            let template ='<div class="col-6"><h5>Order Slip '+key
+                +'</h5> </div> <div class="col-6"> <a href="javascript:void(0);" rel="'+key+'" class="btn btn-primary btn-xs print-this float-right ">Print This</a> </div> <div class="col-12"> <table class="table table-sm" id="order-list-'+
+                    key+'"> <thead> <th>Item Name</th> <th>Quantity</th> </thead> <tbody> ';
+            items.forEach(function(value) {
+                template +='<tr><td>'+value.item.name+'</td><td>'+value.total+'</td></tr>';
+            });
+            template+='</tbody></table></div>';
+            return template;
+
         }
 
         function clearModal() {
@@ -220,8 +225,9 @@
             $('#customer-contact').html('');
             $('#order-date').html('');
             $('#order-status').html('');
-            $('#table-items').html('');
+            $('#ordered-tems').html('');
             $('#get-bill').attr('href', 'javascript:void(0)');
+            $('#table-no').html('');
 
 
         }
@@ -232,8 +238,11 @@
             $('#customer-contact').html(order.customer.phone_no);
             $('#order-date').html(order.order_datetime);
             $('#order-status').html(order.status.title);
+            $('#table-no').html(order.table_no);
+
 
         }
+
 
         function foramtValue(val) {
             return 'Rs. ' + val;

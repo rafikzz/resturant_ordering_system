@@ -14,6 +14,7 @@ class OrderItem extends Model
 
     protected $fillable =['order_id','item_id','created_by','updated_by','price','total','removed_quantity','order_no','quantity'];
 
+
     public function order()
     {
         return $this->belongsTo(Order::class,'order_id');
@@ -37,6 +38,12 @@ class OrderItem extends Model
     public function last_updated_by()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function scopeCompleted($query)
+    {
+
+        return $query->where('is_completed',1);
     }
 
 }

@@ -121,6 +121,14 @@
         </ul>
     </li>
 @endcan
+@can('order_update')
+    <li class="nav-item ">
+        <a href="{{ url('/admin/kot') }}" class="nav-link {{ Request::is('admin/kot*') ? 'active' : '' }}">
+            <i class="nav-icon fa-fw nav-icon fa fa-list-alt"></i>
+            <p>KOT</p>
+        </a>
+    </li>
+@endcan
 @can('setting_create')
     <li class="nav-item ">
         <a href="{{ url('/admin/settings') }}" class="nav-link {{ Request::is('admin/settings*') ? 'active' : '' }}">

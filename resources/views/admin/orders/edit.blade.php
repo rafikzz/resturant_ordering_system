@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
 
             <form action="{{ route('admin.orders.update', $order->id) }}" id="order-form" method="POST">
                 @csrf
@@ -99,64 +99,62 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#orderModal">
-                            Add Item To Order
-                        </button>
+
                         <div class="row">
-                            @forelse ($orderItems as $order_no => $items)
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h3>Order List {{ $order_no }}</h3>
-                                        </div>
-                                        <div class="card-body">
-                                            <table class="table table-sm table-responsive">
-                                                <thead>
-                                                    <th>Item Name</th>
-                                                    <th>Quantity</th>
-                                                    <th>Price</th>
-                                                    <th>Action</th>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($items as $item)
-                                                        <tr>
-                                                            <td width="200px">{{ $item->item->name }}</td>
-                                                            <td width="200px" class="form-inline  col-xs-2">
-                                                                @if ($item->total > 1)
-                                                                    <input type="number"
-                                                                        id="order-item-quantity-{{ $item->id }}"
-                                                                        max="{{ $item->total }}" class="form-control form-control-sm"
-                                                                        step="1" min="0"
-                                                                        value="{{ $item->total }}">
-                                                                    <button type="button"
-                                                                        class="btn btn-outline-light update-item-quantity  ml-2 btn-sm"
-                                                                        rel="{{ $item->id }}"><i
-                                                                            class="fa fa-edit"></i>
-                                                                    </button>
-                                                                @else
-                                                                    1
-                                                                @endif
-                                                            </td>
-                                                            <td width="200px">Rs {{ $item->price }}</td>
-                                                            <td width="200px"><button type="button"
-                                                                    class="btn btn-sm btn-danger delete-ordered-item"
-                                                                    rel="{{ $item->id }}"><i class="fa fa-trash"></i>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                            <h3>Order List</h3>
+                            <table class="table table-hover table-sm" style="  min-height: 20vh; ">
+                                @foreach ($orderItems as $order_no => $items)
+                                    <thead>
+                                        <th>Order Slip {{ $order_no }}</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Action</th>
+                                    </thead>
+                                    @foreach ($items as $item)
+                                        <tr>
+                                            <td width="200px">{{ $item->item->name }}</td>
+                                            <td width="200px" class="form-inline  col-xs-2">
+                                                @if ($item->total > 1)
+                                                    <input type="number" id="order-item-quantity-{{ $item->id }}"
+                                                        max="{{ $item->total }}" class="form-control form-control-sm"
+                                                        step="1" min="0" value="{{ $item->total }}">
+                                                    <button type="button"
+                                                        class="btn btn-outline-light update-item-quantity  ml-2 btn-sm"
+                                                        rel="{{ $item->id }}"><i class="fa fa-edit"></i>
+                                                    </button>
+                                                @else
+                                                    1
+                                                @endif
+                                            </td>
+                                            <td width="200px">Rs {{ $item->price }}</td>
+                                            <td width="200px"><button type="button"
+                                                    class="btn btn-sm btn-danger delete-ordered-item"
+                                                    rel="{{ $item->id }}"><i class="fa fa-trash"></i>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endforeach
+                                <thead>
+                                    <th>Order Slip {{ isset($order_no) ? $order_no + 1 : 1 }}</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Action</th>
+                                </thead>
+                                <tbody id="order-list">
 
-                            @empty
-                                <div class="py-2">
-                                    <h2 class="text-center">No Orders Yet</h2>
-                                </div>
-                            @endforelse
+                                </tbody>
+                            </table>
                         </div>
-
+                        <hr />
+                        <div class="row">
+                            <div class="col-6">
+                                <b>Total</b>
+                            </div>
+                            <div class="col-5 ">
+                                <b class="float-right" id="totalAmount">Rs. {{ $order->total }}</b>
+                            </div>
+                        </div>
+                        <hr />
 
                         <div class="row">
                             <div class="col-12 ">
@@ -165,14 +163,47 @@
                         </div>
                     </div>
                 </div>
+
             </form>
         </div>
-    </div>
-    @include('admin.orders._addItemModal')
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Add Food Item</h2>
+                    <div class="card-tools">
+                        <a class="btn btn-primary" href="{{ route('admin.orders.index') }}"> Back</a></i></a>
+                    </div>
+                </div>
 
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group  ml-n2">
+                                <label for="category_id"> Category</label>
+                                <select class="form-control" id="category">
+                                    <option selected value="" disabled>--Select Category Number--</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="row py-3  d-flex" id="category-items" style="  min-height: 50vh; ">
+
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('js')
     <script>
+        let orderTotal = {{ $order->total }};
+        let cartTotal =0;
+
         $(function() {
             //Getting Items on changing category
             $('#category').on('change', function() {
@@ -231,6 +262,8 @@
                         }
 
                         // sweetAlert('Success',data.message,'success');
+                        cartTotal =parseFloat(data.total);
+                        setTotal();
 
 
                     } else {
@@ -263,8 +296,10 @@
                         },
                         success: function(data) {
                             if (data.status === 'success') {
-                                var message = data.message;
-                                sweetAlert('Success',data.message,'success');
+                                orderTotal = parseFloat(data.total);
+                                setTotal();
+
+                                sweetAlert('Success', data.message, 'success');
                                 if (quantity <= 1) {
                                     btn.closest('td').html(quantity);
                                 } else {
@@ -278,7 +313,7 @@
                                         "'><i class='fa fa-edit'></i></button>");
                                 }
                             } else {
-                                sweetAlert('Error', data.message,'error');
+                                sweetAlert('Error', data.message, 'error');
                             }
                         },
                         error: function(xhr) {
@@ -317,10 +352,12 @@
                             },
                             success: function(data) {
                                 if (data.status === 'success') {
-                                    var message = data.message;
+                                    orderTotal = parseFloat(data.total);
                                     btn.closest('tr').html('');
+                                    setTotal();
+
                                 } else {
-                                    sweetAlert('Error', data.message,'error');
+                                    sweetAlert('Error', data.message, 'error');
                                 }
                             },
                             error: function(xhr) {
@@ -374,9 +411,12 @@
                         },
                         success: function(data) {
                             if (data.status === 'success') {
-                                setTotal(data.total);
                                 removeItem(btn, item_id);
                                 sweetAlert('Success', data.message, 'success');
+                                cartTotal =parseFloat(data.total);
+                                setTotal();
+
+
                             } else {
                                 alert(data.message);
                             }
@@ -412,6 +452,11 @@
         function clearCategoryItems() {
             $('#category-items').html('');
         }
+        //For setting the total
+        function setTotal() {
+            let total = cartTotal + orderTotal;
+            $('#totalAmount').html('Rs. ' + total);
+        }
 
         //Template of category item
         function template(id, name, price, image) {
@@ -427,7 +472,7 @@
         //Template of table row
         function tableRowTemplate(id, name, price, quantity = '1') {
             return '<tr id="item-' + id + '" data-id="' + id + '"><td>' + name +
-                '</td><td class="form-inline col-xs-2"><input type="number" id="item-quantity-' + id +
+                '</td><td class="btn-group col-xs-2"><input type="number" id="item-quantity-' + id +
                 '" class="form-control form-control-sm"  step="1" min="1" value="' +
                 quantity +
                 '"><button type="button" class="btn btn-outline-light update-quantity ml-2 btn-sm" rel="' + id +
@@ -447,8 +492,8 @@
                 },
                 success: function(data) {
                     if (data.status === 'success') {
-
-                        setTotal(data.total);
+                        cartTotal = parseFloat(data.total);
+                        setTotal();
                     } else {
                         console.log(data.message);
                     }

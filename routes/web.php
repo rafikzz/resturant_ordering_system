@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\ItemSalesReportController;
+use App\Http\Controllers\Admin\KOTController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderItemController;
 use App\Http\Controllers\Admin\ReportController;
@@ -113,8 +114,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-item-sales-report-data', [ItemSalesReportController::class, 'getItemSalesData'])->name('reports.itemSalesData');
     Route::get('export-item-sales-report-data', [ItemSalesReportController::class, 'exportSales'])->name('reports.exportItemSales');
 
-
-
+    //KOT Controller
+    Route::get('kot',[KOTController::class,'index'])->name('kot.index');
+    Route::post('complete-order-item',[KOTController::class,'completeOrderItem'])->name('kot.completeOrderItem');
+    Route::get('get-order-data-for-kot', [KOTController::class, 'getData'])->name('kot.getData');
+    Route::get('get-order-detail-for-kot', [KOTController::class, 'getOrderDetail'])->name('kot.getOrderDetail');
 
 });
 

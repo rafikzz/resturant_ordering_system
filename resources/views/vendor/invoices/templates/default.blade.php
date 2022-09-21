@@ -333,6 +333,15 @@
                     </td>
                 </tr>
             @endif
+            @if ($invoice->service_charge)
+            <tr>
+                <td colspan="{{ $invoice->table_columns - 2 }}" class="border-0"></td>
+                <td class="text-right pl-0">Service Charge</td>
+                <td class="text-right pr-0">
+                    {{ $invoice->formatCurrency(floatval($invoice->service_charge)) }}
+                </td>
+            </tr>
+            @endif
             @if ($invoice->tax_rate)
                 <tr>
                     <td colspan="{{ $invoice->table_columns - 2 }}" class="border-0"></td>
@@ -342,21 +351,12 @@
                     </td>
                 </tr>
             @endif
-            @if ($invoice->hasItemOrInvoiceTax())
+            @if ($invoice->total_taxes)
                 <tr>
                     <td colspan="{{ $invoice->table_columns - 2 }}" class="border-0"></td>
-                    <td class="text-right pl-0">{{ __('invoices::invoice.total_taxes') }}</td>
+                    <td class="text-right pl-0">{{ __('invoices::invoice.tax') }}</td>
                     <td class="text-right pr-0">
                         {{ $invoice->formatCurrency(floatval($invoice->total_taxes)) }}
-                    </td>
-                </tr>
-            @endif
-            @if ($invoice->shipping_amount)
-                <tr>
-                    <td colspan="{{ $invoice->table_columns - 2 }}" class="border-0"></td>
-                    <td class="text-right pl-0">{{ __('invoices::invoice.shipping') }}</td>
-                    <td class="text-right pr-0">
-                        {{ $invoice->formatCurrency(floatval($invoice->shipping_amount)) }}
                     </td>
                 </tr>
             @endif

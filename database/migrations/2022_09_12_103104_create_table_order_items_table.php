@@ -24,7 +24,6 @@ class CreateTableOrderItemsTable extends Migration
             $table->integer('quantity');
             $table->integer('removed_quantity')->nullable()->default(0);
             $table->integer('total');
-            $table->foreignId('status_id')->nullable()->constrained('table_statuses');
             $table->timestamps();
         });
     }

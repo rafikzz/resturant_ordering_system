@@ -33,8 +33,8 @@
                                             <tr>
                                                 <td>{{ $item->item->name }}</td>
                                                 <td>{{ $item->total }}</td>
-                                                <td>{{ $item->price }}</td>
-                                                <td width="200px">{{ $item->sub_total }}</td>
+                                                <td>Rs. {{ $item->price }}</td>
+                                                <td width="200px">Rs. {{ $item->sub_total }}</td>
                                             </tr>
                                         @endforeach
                                     @endforeach
@@ -99,14 +99,19 @@
 
         $(function() {
             $('#apply-discount').on('click', function(e) {
-            let discount = parseFloat($('#discount').val());
-                if($('#discount')[0].checkValidity() && !isNaN(discount))
+                let discount = parseFloat($('#discount').val());
+                if(isNaN(discount))
+                {
+                    discount = 0;
+                }
+                if($('#discount')[0].checkValidity() )
                 {
                     $('#discount-amount').val(discount);
-                    calculateSetServiceChargeAndTax();
+                    calculateSetServiceChargeAndTax(discount);
 
                 }else
                 {
+
                     $("#discount")[0].reportValidity();
                 }
 
@@ -120,9 +125,8 @@
             }
         });
 
-        function calculateSetServiceChargeAndTax() {
+        function calculateSetServiceChargeAndTax(discount) {
 
-            let discount = parseFloat($('#discount').val());
             let net_total = parseFloat(total) - discount;
             if (net_total >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * net_total)).toFixed(2));

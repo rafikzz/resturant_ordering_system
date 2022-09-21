@@ -25,6 +25,7 @@ return [
     'sub_total'       => 'Sub total',
     'total_discount'  => 'Total discount',
     'taxable_amount'  => 'Taxable amount',
+    'tax'             =>  'Tax amount',
     'total_taxes'     => 'Total taxes',
     'tax_rate'        => 'Tax rate',
     'total_amount'    => 'Total amount',

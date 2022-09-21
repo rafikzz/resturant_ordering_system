@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             CreateUserSeeder::class,
             StatusSeeder::class,
             CategorySeeder::class,
+            ItemSeeder::class,
+            SettingSeeder::class,
+
         ]);
     }
 }

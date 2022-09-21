@@ -23,7 +23,6 @@ class CreateTableSettingsTable extends Migration
             $table->string('service_charge')->nullable()->default(0);
             $table->boolean('tax_status')->nullable()->default(0);
             $table->boolean('service_charge_status')->nullable()->default(0);
-            $table->boolean('enable_kot')->nullable()->default(0);
             $table->timestamps();
         });
     }

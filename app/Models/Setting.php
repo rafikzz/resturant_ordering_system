@@ -12,7 +12,7 @@ class Setting extends Model
 
     protected $table ='table_settings';
 
-    protected $fillable =['company_name','logo','contact_information','office_location','tax','tax_status','service_charge','service_charge_status','enable_kot'];
+    protected $fillable =['company_name','logo','contact_information','office_location','tax','tax_status','service_charge','service_charge_status'];
 
 
     public function logo()

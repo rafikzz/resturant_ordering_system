@@ -35,24 +35,30 @@ class OrderItemController extends Controller
             'message'=>'Order Item Edited Sucessfully',
         ]);
     }
-    public function destory(Request $request,OrderItem $order_item)
+    public function destory(Request $request,$id)
     {
-        $removedQuantity =$order_item->quantity;
-        $userId=auth()->id();
 
-        $order_item->update([
-            'updated_by' => $userId,
-            'removed_quantity' => $removedQuantity,
-            'total' => 0,
-        ]);
-        $order = Order::find($order_item->order_id);
+        $order_item =OrderItem::where('id',$id)->first();
+        if($order_item)
+        {
+            $removedQuantity =$order_item->quantity;
+            $userId=auth()->id();
 
-        $total =$order->setTotal($userId);
-        return response()->json([
-            'total' => $total,
-            'status'=>'success',
-            'message'=>'Order Item Edited Sucessfully',
-        ]);
+            $order_item->update([
+                'updated_by' => $userId,
+                'removed_quantity' => $removedQuantity,
+                'total' => 0,
+            ]);
+            $order = Order::find($order_item->order_id);
+
+            $total =$order->setTotal($userId);
+            return response()->json([
+                'total' => $total,
+                'status'=>'success',
+                'message'=>'Order Item Edited Sucessfully',
+            ]);
+        }
+
 
     }
 }

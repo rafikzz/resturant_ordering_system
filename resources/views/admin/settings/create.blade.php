@@ -77,6 +77,31 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="row py-2">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch  ">
+                                        <input type="checkbox" value="1" class="custom-control-input" name="service_charge_status"
+                                            id="service_charge_status" {{ (old('service_charge_status') ?: isset($setting)) ? $setting->service_charge_status?'checked':'' : '' }}>
+                                        <label class="custom-control-label" for="service_charge_status">Enable Service Charge</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="label" for="service_charge">Service Charge(%)</label>
+                                    <input type="number" name="service_charge"
+                                        value="{{ (old('service_charge') ?: isset($setting)) ? $setting->service_charge : '' }}"
+                                        class="form-control  @error('service_charge') is-invalid @enderror" autocomplete="off"
+                                        minlength="3" placeholder="Enter Service Charge(%)" required>
+                                    @error('service_charge')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-6  py-2">
                                 <div class="form-group">
@@ -103,31 +128,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row py-2">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <div class="custom-control custom-switch  ">
-                                        <input type="checkbox" value="1" class="custom-control-input" name="service_charge_status"
-                                            id="service_charge_status" {{ (old('service_charge_status') ?: isset($setting)) ? $setting->service_charge_status?'checked':'' : '' }}>
-                                        <label class="custom-control-label" for="service_charge_status">Enable Service Charge</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="label" for="service_charge">Service Charge(%)</label>
-                                    <input type="number" name="service_charge"
-                                        value="{{ (old('service_charge') ?: isset($setting)) ? $setting->service_charge : '' }}"
-                                        class="form-control  @error('service_charge') is-invalid @enderror" autocomplete="off"
-                                        minlength="3" placeholder="Enter Service Charge(%)" required>
-                                    @error('service_charge')
-                                        <span class=" text-danger" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="row">
                             <div class="col-md-12 text-center">
                                 <button type="submit" class="btn btn-primary  mt-3">Save Setting</button>

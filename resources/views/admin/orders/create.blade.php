@@ -106,7 +106,7 @@
                                 <b>Total</b>
                             </div>
                             <div class="col-5 ">
-                                <b class="float-right" id="totalAmount">Rs. {{ old('total') }}</b>
+                                <b class="float-right" id="totalAmount">Rs.0</b>
                             </div>
                         </div>
 
@@ -161,7 +161,6 @@
 @section('js')
     <script>
         $(function() {
-
             //Getting Items on changing category
             $('#category').on('change', function() {
                 let category_id = $(this).val();
@@ -274,7 +273,7 @@
                             if (data.status === 'success') {
                                 setTotal(data.total);
                                 removeItem(btn, item_id);
-                                sweetAlert('Success',data.message, 'success');
+                                sweetAlert('Success', data.message, 'success');
                             } else {
                                 alert(data.message);
                             }

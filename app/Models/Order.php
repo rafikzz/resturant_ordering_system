@@ -13,15 +13,18 @@ class Order extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'table_orders';
-    protected $fillable = ['customer_id', 'status_id', 'table_no', 'created_by', 'updated_by','tax','service_charge','payment_type', 'bill_no', 'table_no', 'discount', 'total','net_total', 'order_datetime'];
+    protected $fillable = [
+        'customer_id', 'status_id', 'table_no', 'created_by', 'updated_by', 'tax', 'service_charge', 'payment_type', 'bill_no', 'table_no', 'discount', 'total', 'net_total', 'order_datetime'
+    ];
 
 
-    protected $appends = ['net_total', 'order_date'];
+    protected $appends = ['order_date'];
 
     public function order_items()
     {
         return $this->hasMany(OrderItem::class);
     }
+
 
     public function status()
     {
@@ -43,11 +46,6 @@ class Order extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function getNetTotalAttribute()
-    {
-        return ($this->total - $this->discount);
-    }
-
     public function getOrderDateAttribute()
     {
         return Carbon::parse($this->order_datetime)->format('M d Y');
@@ -62,61 +60,55 @@ class Order extends Model
         }
     }
 
-    public function setTotal($user =null)
+    public function setTotal($user = null)
     {
         $orderTotal = $this->order_items()->sum(DB::raw('total * price'));
         $order = $this->update([
             'total' => $orderTotal,
-            'updated_by' => ($user)?$user:auth()->id(),
+            'updated_by' => ($user) ? $user : auth()->id(),
 
         ]);
         return $orderTotal;
     }
 
-    public function getTotal($user =null)
+    public function getTotal($user = null)
     {
 
-        return  $orderTotal = ($this->order_items()->count())? $this->order_items()->sum(DB::raw('total * price')) : 0;
+        return  $orderTotal = ($this->order_items()->count()) ? $this->order_items()->sum(DB::raw('total * price')) : 0;
     }
 
-    public function serviceCharge($discount =0)
+    public function serviceCharge($discount = 0)
     {
         $setting = Setting::first();
-        if(isset($setting))
-        {
-            return   round(($setting->getServiceCharge()/100 ) * ($this->total-$discount),2);
+        if (isset($setting)) {
+            return   round(($setting->getServiceCharge() / 100) * ($this->total - $discount), 2);
         }
         return 0;
     }
-    public function taxAmount($discount =0)
+    public function taxAmount($discount = 0)
     {
         $setting = Setting::first();
-        if(isset($setting))
-        {
-            return   round($this->totalWithTax($discount)- $this->totalWithServiceCharge($discount),2);
+        if (isset($setting)) {
+            return   round($this->totalWithTax($discount) - $this->totalWithServiceCharge($discount), 2);
         }
         return 0;
-
     }
 
     public function totalWithServiceCharge($discount = 0)
     {
         $setting = Setting::first();
-        if(isset($setting))
-        {
-            return   round((1+$setting->getServiceCharge()/100 )* ($this->total-$discount),2);
+        if (isset($setting)) {
+            return   round((1 + $setting->getServiceCharge() / 100) * ($this->total - $discount), 2);
         }
-        return ($this->total-$discount);
+        return ($this->total - $discount);
     }
 
     public function totalWithTax($discount = 0)
     {
         $setting = Setting::first();
-        if(isset($setting))
-        {
-            return   round((1+$setting->getTax()/100 )* ($this->totalWithServiceCharge($discount)),2);
+        if (isset($setting)) {
+            return   round((1 + $setting->getTax() / 100) * ($this->totalWithServiceCharge($discount)), 2);
         }
         return $this->totalWithServiceCharge($discount);
     }
-
 }

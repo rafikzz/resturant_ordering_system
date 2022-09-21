@@ -5,17 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderRequest;
-use App\Models\CancelledOrderItem;
-use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Setting;
 use App\Models\Status;
 use Carbon\Carbon;
 use Cart;
-use Darryldecode\Cart\Cart as CartCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -67,22 +65,23 @@ class OrderController extends Controller
                 ]);
                 $customerId = $customer->id;
             }
-            $billNo = time();
 
+            $billNo = time();
+            $total=Cart::getTotal();
             $order = Order::create([
                 'bill_no' => $billNo,
                 'table_no' => $request->table_no,
                 'customer_id' => $customerId,
-                'total' => Cart::getTotal(),
+                'total' =>  $total,
                 'status_id' => 1,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
                 'order_datetime' => now(),
             ]);
+
             $cartItems = Cart::getContent();
             $this->storeOrderItem($order, $cartItems);
         } catch (\Throwable $th) {
-            Cart::clear();
             DB::rollback();
             throw $th;
         }
@@ -303,7 +302,6 @@ class OrderController extends Controller
     public function storeOrderItem($order, $cartItems,$statusId = 1)
     {
         $orderNo = $order->getOrderNo();
-
         foreach ($cartItems as $item) {
             OrderItem::create([
                 'created_by' => auth()->id(),
@@ -314,8 +312,6 @@ class OrderController extends Controller
                 'quantity' => $item->quantity,
                 'total' => $item->quantity,
                 'order_id' => $order->id,
-                'status_id' => $statusId,
-
             ]);
         }
     }
