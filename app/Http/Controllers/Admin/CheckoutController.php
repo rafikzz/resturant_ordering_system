@@ -42,10 +42,12 @@ class CheckoutController extends Controller
 
     public function store(OrderCheckoutRequest $request,$id)
     {
+        // dd($request);
         DB::beginTransaction();
         try{
             $processingStatus =Status::where('title','Processing')->first()->id;
-            $order = Order::where('status_id','=',$processingStatus)->with('customer:id,name')->findOrFail($id);
+            $order = Order::where('status_id','=',$processingStatus)->with('status:id,title')->with('customer:id,name')->findOrFail($id);
+
             if($request->discount> $order->total){
                 return back()->with('success','Discount is greater than total');
             }
@@ -74,8 +76,28 @@ class CheckoutController extends Controller
         // foreach($orderItems as $item){
         //     $items[$item->id] =  (new InvoiceItem())->title($item->item->name)->pricePerUnit($item->price)->quantity($item->total)->subTotalPrice($item->price*$item->total);
         // }
-        $billRoute = route('orders.getBill',$order->id);
-        Session::flash('download.in.the.next.request',$billRoute);
+        if($request->ajax())
+        {
+            $order = Order::with('status:id,title')->with('customer:id,name')->findOrFail($id);
+            $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
+            $billRoute = route('orders.getBill',$order->id);
+            if ($order) {
+                return response()->json([
+                    'order' => $order,
+                    'billRoute' => $billRoute,
+                    'orderItems' => $orderItems,
+                    'status' => 'success',
+                    'message' => 'Order fetched successfully',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'No Order found',
+                ]);
+            }
+
+        }
+
 
         return redirect()->route('admin.orders.index')->with('success','Order Checked Out Successfully');
 

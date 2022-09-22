@@ -51,9 +51,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
         }
     </style>
     @yield('css')
-      @if(Session::has('download.in.the.next.request'))
+      {{-- @if(Session::has('download.in.the.next.request'))
          <meta http-equiv="refresh" content="5;url={{ Session::get('download.in.the.next.request') }}">
-      @endif
+      @endif --}}
 </head>
 
 <body class="hold-transition sidebar-mini">

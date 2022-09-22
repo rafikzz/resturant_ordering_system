@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col">
             <div class="card">
-                <form action="{{ route('admin.orders.checkout.store', $order->id) }}" method="POST">
+                <form action="{{ route('admin.orders.checkout.store', $order->id) }}" id="checkout-form" method="POST">
                     @csrf
                     <div class="card-header">
                         <h5 class="card-title">Checkout</h5>
@@ -44,10 +44,10 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3">Discount:</td>
-                                        <td class="btn-group"><input  id="discount" value="0"
+                                        <td class="btn-group"><input id="discount" value="0"
                                                 max="{{ $order->total }}" class="form-control form-control-sm "
                                                 type="number">
-                                                <input type="hidden" id="discount-amount" name="discount"/>
+                                            <input type="hidden" id="discount-amount" name="discount" />
                                             <button id="apply-discount" type="button"
                                                 class="btn btn-primary btn-sm ml-2">Apply</button>
                                         </td>
@@ -82,10 +82,12 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <button class="btn btn-primary">Checkout</button>
+                        <button id="print-bill" class="btn btn-primary">Checkout and Print Bill</button>
+                        <button type="submit" class="btn btn-primary">Checkout</button>
                     </div>
                 </form>
             </div>
+            @include('admin.orders._orderDetailModal')
         </div>
     </div>
 @endsection
@@ -95,22 +97,17 @@
         let tax = {!! $tax !!};
         let service_charge = {!! $service_charge !!};
 
-
-
         $(function() {
             $('#apply-discount').on('click', function(e) {
                 let discount = parseFloat($('#discount').val());
-                if(isNaN(discount))
-                {
+                if (isNaN(discount)) {
                     discount = 0;
                 }
-                if($('#discount')[0].checkValidity() )
-                {
+                if ($('#discount')[0].checkValidity()) {
                     $('#discount-amount').val(discount);
                     calculateSetServiceChargeAndTax(discount);
 
-                }else
-                {
+                } else {
 
                     $("#discount")[0].reportValidity();
                 }
@@ -124,6 +121,95 @@
                 return false;
             }
         });
+        $('#print-bill').on('click',function(e){
+            e.preventDefault();
+            $('#modal-lg').modal('toggle');
+            // $('.get-detail').attr('disabled', true);
+            clearModal();
+
+            // $(this).attr('disabled','disabled');
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('admin.orders.checkout.store', $order->id) }}',
+                data:  $('#checkout-form').serialize(),
+                beforeSend: function() {
+                    $('#overlay').show();
+                },
+                success: function(data) {
+                    if (data.status === 'success') {
+                        setModalData(data.order);
+
+                        $('#get-bill').attr('href', data.billRoute);
+
+                        data.orderItems.forEach(function(item) {
+                            $('#table-items').append(templateItem(item.item.name, item
+                                .total, item.price));
+                        });
+                        if (data.order.discount )  {
+                            $('#table-items').append(
+                                "<tr><td colspan='3'>Discount</td><td>" +
+                                foramtValue(data.order.discount) + "</td></tr>");
+                        }
+                        if (data.order.service_charge) {
+                            $('#table-items').append(
+                                "<tr><td colspan='3'>Service Charge</td><td>" +
+                                foramtValue(data.order.service_charge) + "</td></tr>");
+                        }
+                        if (data.order.tax) {
+                            $('#table-items').append(
+                                "<tr><td colspan='3'>Tax</td><td>" +
+                                foramtValue(data.order.tax) + "</td></tr>");
+                        }
+
+                        $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
+                            foramtValue(data.order.net_total) + "</td></tr>");
+
+                    } else {
+                        console.log('false');
+                    }
+                    $('#overlay').hide();
+                    $('.get-detail').attr('disabled', false);
+
+
+                },
+                error: function(xhr) {
+                    $(this).attr('disabled',false);
+                    $('#overlay').hide();
+                    $('.get-detail').attr('disabled', false);
+                    console.log('Internal Serve Error');
+                }
+            });
+        });
+
+
+        function templateItem(name, total_quantity, price) {
+
+            return '<tr><td>' + name + '</td><td>' + total_quantity + '</td><td>Rs. ' +
+                price + '</td><td>Rs. ' +
+                price * total_quantity + '</td><</tr>';
+        }
+
+        function clearModal() {
+            $('#bill-no').html('');
+            $('#customer-name').html('');
+            $('#customer-contact').html('');
+            $('#order-date').html('');
+
+            $('#order-status').html('');
+            $('#table-items').html('');
+            $('#get-bill').attr('href', 'javascript:void(0)');
+
+
+        }
+
+        function setModalData(order) {
+            $('#bill-no').html(order.bill_no);
+            $('#customer-name').html(order.customer.name);
+            $('#customer-contact').html(order.customer.phone_no);
+            $('#order-date').html(order.order_datetime);
+            $('#order-status').html(order.status.title);
+
+        }
 
         function calculateSetServiceChargeAndTax(discount) {
 
@@ -139,19 +225,13 @@
                 $('#service-charge').text(foramtValue(service_charge_amount));
                 $('#tax-amount').text(foramtValue(tax_amount));
                 $('#grand-total').text(foramtValue(grand_total));
-            }
-            else
-            {
+            } else {
                 alert('Discount cannot be greater than total')
             }
-
-
-
-
         }
-        function foramtValue(val)
-        {
-            return 'Rs. '+val;
+
+        function foramtValue(val) {
+            return 'Rs. ' + val;
         }
     </script>
 @endsection

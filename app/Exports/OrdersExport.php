@@ -29,8 +29,8 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
 
     public function collection()
     {
-        $this->count= Order::count();
-        return Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->get();
+        $this->count= Order::where('status_id',3)->count();
+        return Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->where('status_id',3)->get();
     }
     public function map($order): array
     {

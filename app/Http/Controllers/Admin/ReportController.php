@@ -25,8 +25,8 @@ class ReportController extends Controller
         $title = $this->title;
         $breadcrumbs =[ 'Sales Report'=>route('admin.reports.sales.index')];
 
-        $totalSales = DB::table('table_orders')->sum(DB::raw('total - discount'));
-        $todaysSales = DB::table('table_orders')->whereDate('order_datetime','=',Carbon::today())->sum(DB::raw('total - discount'));
+        $totalSales = DB::table('table_orders')->sum(DB::raw('net_total'));
+        $todaysSales = DB::table('table_orders')->whereDate('order_datetime','=',Carbon::today())->sum(DB::raw('net_total'));
 
 
         return view('admin.reports.sales.index', compact('title','totalSales','todaysSales','breadcrumbs'));
