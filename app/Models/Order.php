@@ -31,6 +31,10 @@ class Order extends Model
     {
         return $this->belongsTo(Status::class, 'status_id');
     }
+    public function payment_type()
+    {
+        return $this->belongsTo(PaymentType::class, 'payment_type_id');
+    }
 
     public function customer()
     {

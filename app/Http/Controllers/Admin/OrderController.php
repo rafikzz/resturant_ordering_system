@@ -281,7 +281,7 @@ class OrderController extends Controller
     public function getOrderDetail(Request $request)
     {
         if (request()->ajax()) {
-            $order = Order::with('status:id,title')->with('customer:id,name,phone_no')->where('id', $request->order_id)->first();
+            $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer:id,name,phone_no')->where('id', $request->order_id)->first();
             $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
             $billRoute = route('orders.getBill',$order->id);
 

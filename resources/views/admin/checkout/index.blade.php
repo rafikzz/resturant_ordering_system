@@ -257,9 +257,9 @@
             $('#customer-name').html(order.customer.name);
             $('#customer-contact').html(order.customer.phone_no);
             $('#order-date').html(order.order_datetime);
-            if (order.payment_type) {
+            if (order.payment_type_id) {
                 $('#paymentType').css('display', 'block');
-                $('#payment-type').html(order.payment_type);
+                $('#payment-type').html(order.payment_type.name);
             }
             $('#order-status').html(order.status.title);
         }
