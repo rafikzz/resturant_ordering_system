@@ -14,7 +14,8 @@ class Order extends Model
 
     protected $table = 'table_orders';
     protected $fillable = [
-        'customer_id', 'status_id', 'table_no', 'created_by', 'updated_by', 'tax', 'service_charge', 'payment_type', 'bill_no', 'table_no', 'discount', 'total', 'net_total', 'order_datetime'
+        'customer_id', 'status_id', 'table_no', 'created_by', 'updated_by', 'tax', 'service_charge', 'payment_type', 'bill_no', 'table_no', 'discount',
+        'total', 'net_total', 'order_datetime','is_take_away','payment_type_id'
     ];
 
 

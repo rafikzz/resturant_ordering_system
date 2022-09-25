@@ -197,10 +197,11 @@
                 }
             });
         });
+
         $(document).on('click','.print-this',function(){
             let key= $(this).attr('rel');
             $('#talbeNO, #orderDate, #order-list-'+key).printThis({
-                header: "<h1>Order Slip</h1>",
+                header: "<h1>KOT Slip</h1>",
                 importCSS: true,
                 printDelay: 1000,
 

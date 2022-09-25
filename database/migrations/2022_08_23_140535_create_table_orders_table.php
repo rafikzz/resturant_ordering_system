@@ -24,10 +24,11 @@ class CreateTableOrdersTable extends Migration
             $table->decimal('discount',10,2)->nullable()->default(0);
             $table->decimal('total',10,2);
             $table->timestamp('order_datetime')->nullable();
-            $table->string('payment_type')->nullable();
+            $table->foreignId('payment_type_id')->nullable()->constrained('table_payment_types');
             $table->string('tax')->nullable();
             $table->string('service_charge')->nullable();
             $table->string('net_total')->nullable();
+            $table->boolean('is_take_away')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

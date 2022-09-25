@@ -115,31 +115,7 @@
         let orderTotal = {{ $order->total }};
 
         $(function() {
-            //For getting Cart items in Session
-            $.ajax({
-                type: 'GET',
-                url: '{{ route('admin.cart.getCartItems') }}',
-                success: function(data) {
-                    if (data.status === 'success') {
-                        $('#order-list').html('');
-                        //Setting items in table
-                        for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item].id, data.items[
-                                    item].name, data.items[item].price, data.items[item]
-                                .quantity));
 
-                        }
-                        //Setting total
-                        setTotal(data.total);
-                    } else {
-                        console.log(data.message);
-
-                    }
-                },
-                error: function(xhr) {
-                    console.log('Internal Server Error')
-                }
-            });
             //Getting Items on changing category
             $('#category').on('change', function() {
                 let category_id = $(this).val();
@@ -189,9 +165,7 @@
                     if (data.status === 'success') {
                         $('#order-list').html('');
                         for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item]
-                                .id, data.items[
-                                    item].name, data.items[item].price, data
+                            $('#order-list').append(tableRowTemplate(data.items[item].id, data.items[item].name, data.items[item].price, data
                                 .items[item]
                                 .quantity));
 

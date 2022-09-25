@@ -29,6 +29,7 @@ class UpdateOrderRequest extends FormRequest
             'customer_name'=>'required_without:customer_id',
             'customer_phone_no'=>['required_without:customer_id','regex:/(?:\(?\+977\)?)?[9][6-9]\d{8}|01[-]?[0-9]{7}/','unique:table_customers,phone_no'],
             'discount'=>'nullable',
+            'is_take_away'=>'required',
          ];
     }
 }

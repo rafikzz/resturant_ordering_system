@@ -47,7 +47,7 @@
                                     @foreach ($customers as $customer)
                                         <option value="{{ $customer->id }}"
                                             {{ $customer->id == $order->customer_id ? 'selected' : '' }}>
-                                            {{ $customer->phone_no }}</option>
+                                            {{ $customer->phone_no }}({{ $customer->name }})</option>
                                     @endforeach
                                 </select>
                                 @error('customer_id')
@@ -92,6 +92,20 @@
                                         autocomplete="off" name="table_no"
                                         value="{{ old('table_no') ?: $order->table_no }}" required>
                                     @error('table_no')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group  ml-n2">
+                                    <label for="is_take_away">Type</label>
+                                    <select name="is_take_away" required class="form-control">
+                                        <option value="0">Dine In</option>
+                                        <option value="1"  {{ $order->is_take_away?'selected':'' }}>Take Away</option>
+                                    </select>
+                                    @error('is_take_away')
                                         <span class=" text-danger" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>

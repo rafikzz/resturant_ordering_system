@@ -168,7 +168,7 @@
                                 $('#table-items').append(template(item.item.name, item
                                     .total, item.price));
                             });
-                            if (data.order.discount) {
+                            if (data.order.discount && data.order.discount !=0 ) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Discount</td><td>" +
                                     foramtValue(data.order.discount) + "</td></tr>");
@@ -184,8 +184,15 @@
                                     foramtValue(data.order.tax) + "</td></tr>");
                             }
 
-                            $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
-                                foramtValue(data.order.net_total) + "</td></tr>");
+                            if (data.order.net_total) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Net Total</td><td>" +
+                                    foramtValue(data.order.net_total) + "</td></tr>");
+                            }else{
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Total</td><td>" +
+                                    foramtValue(data.order.total) + "</td></tr>");
+                            }
 
                         } else {
                             console.log('false');
@@ -222,6 +229,7 @@
             $('#order-status').html('');
             $('#table-items').html('');
             $('#get-bill').attr('href', 'javascript:void(0)');
+            $('#paymentType').css('display', 'none');
 
 
         }
@@ -232,6 +240,10 @@
             $('#customer-contact').html(order.customer.phone_no);
             $('#order-date').html(order.order_datetime);
             $('#order-status').html(order.status.title);
+            if (order.payment_type) {
+                $('#paymentType').css('display', 'block');
+                $('#payment-type').html(order.payment_type);
+            }
 
         }
 

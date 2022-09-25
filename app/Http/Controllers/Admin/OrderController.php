@@ -71,6 +71,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'bill_no' => $billNo,
                 'table_no' => $request->table_no,
+                'is_take_away' => $request->is_take_away,
                 'customer_id' => $customerId,
                 'total' =>  $total,
                 'status_id' => 1,
@@ -129,6 +130,7 @@ class OrderController extends Controller
             $order->update([
                 'table_no' => $request->table_no,
                 'customer_id' => $customerId,
+                'is_take_away' => $request->is_take_away,
                 'total' => $getTotal,
                 'updated_by' => auth()->id(),
                 'discount' => ($request->discount) ? $request->discount : 0,

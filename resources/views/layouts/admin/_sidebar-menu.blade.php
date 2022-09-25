@@ -72,6 +72,14 @@
         </ul>
     </li>
 @endcan
+@can('payment_type_list')
+    <li class="nav-item ">
+        <a href="{{ route('admin.payment_types.index') }}" class="nav-link {{ Request::is('admin/payment_types*') ? 'active' : '' }}">
+            <i class="nav-icon fa-fw nav-icon fa fa-dollar-sign"></i>
+            <p>Payment Types</p>
+        </a>
+    </li>
+@endcan
 @can('status_list')
     <li class="nav-item ">
         <a href="{{ url('/admin/statuses') }}" class="nav-link {{ Request::is('admin/statuses*') ? 'active' : '' }}">

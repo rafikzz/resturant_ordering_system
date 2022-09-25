@@ -25,7 +25,8 @@ class OrderCheckoutRequest extends FormRequest
     {
         return [
             'discount' => 'nullable',
-            'payment_type' => 'required',
+            'paid_amount' => 'required|numeric|min:0',
+            'payment_type_id' => 'required',
         ];
     }
 }

@@ -125,19 +125,38 @@
                     },
                     success: function(data) {
                         if (data.status === 'success') {
-
                             setModalData(data.order);
                             $('#get-bill').attr('href', data.billRoute);
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .quantity, item.price, item.deleted_at));
+                                    .total, item.price));
                             });
-                            $('#table-items').append("<tr><td colspan='3'>Discount</td><td>" +
-                                data.order.discount + "</td></tr>");
+                            if (data.order.discount && data.order.discount !=0 ) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Discount</td><td>" +
+                                    foramtValue(data.order.discount) + "</td></tr>");
+                            }
+                            if (data.order.service_charge) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Service Charge</td><td>" +
+                                    foramtValue(data.order.service_charge) + "</td></tr>");
+                            }
+                            if (data.order.tax) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Tax</td><td>" +
+                                    foramtValue(data.order.tax) + "</td></tr>");
+                            }
 
-                            $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
-                                data.order.net_total + "</td></tr>");
+                            if (data.order.net_total) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Net Total</td><td>" +
+                                    foramtValue(data.order.net_total) + "</td></tr>");
+                            }else{
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Total</td><td>" +
+                                    foramtValue(data.order.total) + "</td></tr>");
+                            }
 
                         } else {
                             console.log('false');
@@ -174,6 +193,7 @@
             $('#order-status').html('');
             $('#table-items').html('');
             $('#get-bill').attr('href', 'javascript:void(0)');
+            $('#paymentType').css('display', 'none');
 
 
         }
@@ -184,7 +204,15 @@
             $('#customer-contact').html(order.customer.phone_no);
             $('#order-date').html(order.order_datetime);
             $('#order-status').html(order.status.title);
+            if (order.payment_type) {
+                $('#paymentType').css('display', 'block');
+                $('#payment-type').html(order.payment_type);
+            }
 
+        }
+
+        function foramtValue(val) {
+            return 'Rs. ' + val;
         }
     </script>
 @endsection

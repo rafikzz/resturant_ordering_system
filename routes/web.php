@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ItemSalesReportController;
 use App\Http\Controllers\Admin\KOTController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderItemController;
+use App\Http\Controllers\Admin\PaymentTypeController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
@@ -94,8 +95,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('edit-cart-item-quantity', [CartController::class, 'editCartItemQuantity'])->name('cart.editCartItemQuantity');
 
     //Customer Controller
-    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
-    Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::resource('customers', CustomerController::class);
     Route::get('get-customer-data', [CustomerController::class, 'getData'])->name('customer.getData');
 
     //Setting Controller
@@ -119,6 +119,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::post('complete-order-item',[KOTController::class,'completeOrderItem'])->name('kot.completeOrderItem');
     Route::get('get-order-data-for-kot', [KOTController::class, 'getData'])->name('kot.getData');
     Route::get('get-order-detail-for-kot', [KOTController::class, 'getOrderDetail'])->name('kot.getOrderDetail');
+
+    //Payment Type Controller
+    Route::get('payment-types',[PaymentTypeController::class,'index'])->name('payment_types.index');
+    Route::get('payment-types/changeStatus', [PaymentTypeController::class, 'changeStatus'])->name('payment_types.changeStatus');
 
 });
 

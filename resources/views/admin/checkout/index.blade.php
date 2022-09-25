@@ -16,7 +16,12 @@
                         <div>
                             <div>
                                 <p>Bill No:{{ $order->bill_no }}</p>
-                                <p>Customer Name:{{ $order->customer->name }}</p>
+                                @isset($order->customer)
+                                    <p>Customer Name:{{ $order->customer->name }}</p>
+                                @endisset
+                                @isset($wallet_balance)
+                                    <p>Wallet Balance: {{ $wallet_balance }}</p>
+                                @endisset
 
                             </div>
                             <div class="row">
@@ -65,18 +70,34 @@
                                         </tr>
                                     @endif
                                     <tr>
-                                        <td colspan="3">Payment Type:</td>
-
-                                        <td> <select name="payment_type" required
-                                                class="form-control form-control-sm  float-right">
-                                                <option value="cash">Cash</option>
-                                                <option value="bank">Bank</option>
-                                            </select></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3">Total:</td>
+                                        <td colspan="3">Grand Total:</td>
                                         <td id="grand-total">Rs. {{ $order->totalWithTax() }}</td>
                                     </tr>
+                                    <tr>
+                                        <td colspan="3">Payment Type:</td>
+
+                                        <td> <select name="payment_type_id"
+                                                class="form-control form-control-sm  float-right" id="payment_type_id" required>
+                                                @foreach ($payment_types as $payment_type)
+                                                    <option value="{{ $payment_type->id }}">{{ $payment_type->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Paid Amount:</td>
+                                        <td> <input type="number" value="{{ $order->totalWithTax() }}" readonly
+                                                max="{{ $order->totalWithTax() }}" step="0.01" min="0"
+                                                class="form-control form-control-sm" name="paid_amount" id="paid_amount"
+                                                required></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Due Amount:</td>
+                                        <td> <input type="number" value="0" class="form-control form-control-sm"
+                                                min="0" max="{{ $order->totalWithTax() }}" readonly
+                                                name="due_amount" id="due_amount" required></td>
+                                    </tr>
+
                                 </table>
                             </div>
                         </div>
@@ -96,7 +117,13 @@
         let total = {!! $order->total !!};
         let tax = {!! $tax !!};
         let service_charge = {!! $service_charge !!};
-
+        let grand_total = {!! $order->totalWithTax() !!}
+        //For enabling paid amount
+        let payment_type_id = $('#payment_type_id').val();
+        if (payment_type_id == 3) {
+            $('#paid_amount').attr('readonly', false);
+        }
+        //For Applying Discount
         $(function() {
             $('#apply-discount').on('click', function(e) {
                 let discount = parseFloat($('#discount').val());
@@ -121,7 +148,26 @@
                 return false;
             }
         });
-        $('#print-bill').on('click',function(e){
+        $('#payment_type_id').change(function() {
+            if ($(this).val() != 3) {
+                $('#paid_amount').val(grand_total);
+                $('#due_amount').val(0);
+
+                $('#paid_amount').attr('readonly', 'readonly');
+            } else {
+                $('#paid_amount').val(grand_total);
+                $('#due_amount').val(0);
+
+                $('#paid_amount').attr('readonly', false);
+
+            }
+        });
+        $('#paid_amount').keyup(function() {
+            let due = (grand_total - parseFloat($(this).val()));
+            $('#due_amount').val(due.toFixed(2));
+
+        });
+        $('#print-bill').on('click', function(e) {
             e.preventDefault();
             $('#modal-lg').modal('toggle');
             // $('.get-detail').attr('disabled', true);
@@ -131,7 +177,7 @@
             $.ajax({
                 type: 'POST',
                 url: '{{ route('admin.orders.checkout.store', $order->id) }}',
-                data:  $('#checkout-form').serialize(),
+                data: $('#checkout-form').serialize(),
                 beforeSend: function() {
                     $('#overlay').show();
                 },
@@ -145,7 +191,7 @@
                             $('#table-items').append(templateItem(item.item.name, item
                                 .total, item.price));
                         });
-                        if (data.order.discount )  {
+                        if (data.order.discount) {
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Discount</td><td>" +
                                 foramtValue(data.order.discount) + "</td></tr>");
@@ -160,9 +206,11 @@
                                 "<tr><td colspan='3'>Tax</td><td>" +
                                 foramtValue(data.order.tax) + "</td></tr>");
                         }
+                        if (data.order.net_total) {
+                            $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
+                                foramtValue(data.order.net_total) + "</td></tr>");
+                        }
 
-                        $('#table-items').append("<tr><td colspan='3'>Net Total</td><td>" +
-                            foramtValue(data.order.net_total) + "</td></tr>");
 
                     } else {
                         console.log('false');
@@ -173,7 +221,7 @@
 
                 },
                 error: function(xhr) {
-                    $(this).attr('disabled',false);
+                    $(this).attr('disabled', false);
                     $('#overlay').hide();
                     $('.get-detail').attr('disabled', false);
                     console.log('Internal Serve Error');
@@ -198,7 +246,9 @@
             $('#order-status').html('');
             $('#table-items').html('');
             $('#get-bill').attr('href', 'javascript:void(0)');
-
+            $('#paymentType').css('display', 'none');
+            $('#payment_type').html('');
+            $('#order-status').html('');
 
         }
 
@@ -207,8 +257,11 @@
             $('#customer-name').html(order.customer.name);
             $('#customer-contact').html(order.customer.phone_no);
             $('#order-date').html(order.order_datetime);
+            if (order.payment_type) {
+                $('#paymentType').css('display', 'block');
+                $('#payment-type').html(order.payment_type);
+            }
             $('#order-status').html(order.status.title);
-
         }
 
         function calculateSetServiceChargeAndTax(discount) {
@@ -219,12 +272,17 @@
                 let tax_amount = parseFloat(((parseFloat(net_total) + parseFloat(service_charge_amount)) * (tax / 100))
                     .toFixed(2));
 
-                let grand_total = ((net_total + service_charge_amount) + tax_amount).toFixed(2);
-                console.log(net_total, service_charge_amount, tax_amount, grand_total);
+                grand_total = ((net_total + service_charge_amount) + tax_amount).toFixed(2);
 
                 $('#service-charge').text(foramtValue(service_charge_amount));
                 $('#tax-amount').text(foramtValue(tax_amount));
                 $('#grand-total').text(foramtValue(grand_total));
+                $('#paid_amount').attr('max', grand_total);
+                $('#paid_amount').val(grand_total);
+                $('#due_amount').attr('max', grand_total);
+                $('#due_amount').val(0);
+
+
             } else {
                 alert('Discount cannot be greater than total')
             }

@@ -35,7 +35,7 @@
                                     required {{ old('customer_type') == 'new' ? 'disabled' : '' }}>
                                     <option value="">--Please Select Customer--</option>
                                     @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}">{{ $customer->phone_no }}</option>
+                                        <option value="{{ $customer->id }}">{{ $customer->phone_no }} ({{ $customer->name }})</option>
                                     @endforeach
                                 </select>
                                 @error('customer_id')
@@ -75,9 +75,24 @@
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
                                     <label for="table_no"> Table No</label>
-                                    <input type="text" class="form-control" placeholder="Set Table No" id="table_no"
+                                    <input type="text" class="form-control " placeholder="Set Table No" id="table_no"
                                         autocomplete="off" name="table_no" value="{{ old('table_no') }}" required>
                                     @error('table_no')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group  ml-n2">
+                                    <label for="table_no">Type</label>
+                                    <select name="is_take_away" required class="form-control">
+                                        <option value="0">Dine In</option>
+                                        <option value="1">Take Away</option>
+                                    </select>
+                                    @error('is_take_away')
                                         <span class=" text-danger" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -136,7 +151,7 @@
                     <div class="col-md-6">
                         <div class="form-group  ml-n2">
                             <label for="category_id"> Category</label>
-                            <select class="form-control" id="category">
+                            <select class="form-control " id="category">
                                 <option selected value="" disabled>--Select Category Number--</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->title }}</option>

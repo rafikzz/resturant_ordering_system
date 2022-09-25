@@ -28,9 +28,12 @@
                     <div class="col-12">
                         <b>Status</b>: <b id="order-status"></b>
                     </div>
+                    <div class="col-12" id="paymentType" style="display: hidden">
+                        <b>Payment Type</b>: <b id="payment-type"></b>
+                    </div>
                 </div>
                 <div class="row mt-4">
-                    <table class="table table-stripped">
+                    <table class="table table-stripped table-sm">
                         <thead>
                             <th>Item Name</th>
                             <th>Quantity</th>

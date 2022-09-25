@@ -6,6 +6,12 @@
             <div class="card card-outline card-dark">
                 <div class="card-header">
                     <h2 class="card-title">Customer List</h2>
+                    <div class="card-tools form-inline">
+                        @can('customer_create')
+                            <a class="btn btn-success ml-3" href="{{ route('admin.customers.create') }}"> <i
+                                    class="fa fa-plus"></i></a>
+                        @endcan
+                    </div>
                 </div>
                 <div class="card-body table-responsive">
                     <table class="table table-bordered" id="table">
