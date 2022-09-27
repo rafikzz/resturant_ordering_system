@@ -205,31 +205,31 @@ class OrderController extends Controller
         if ($request->ajax()) {
             switch ($request->mode) {
                 case ('all'):
-                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color');
+                    $data = Order::select('table_orders.*')->with('customer:id,name')->with('status:id,title,color');
                     break;
                 case ('daily'):
                     $today = Carbon::today();
 
-                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color')->whereDate('order_datetime', $today);
+                    $data = Order::select('table_orders.*')->with('customer:id,name')->with('status:id,title,color')->whereDate('order_datetime', $today);
                     break;
                 case ('weekly'):
                     $startDate = Carbon::parse('last sunday')->startOfDay();
                     $endDate = Carbon::parse('next saturday')->endOfDay();
 
-                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
+                    $data = Order::select('table_orders.*')->with('customer:id,name')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
                     break;
                 case ('monthly'):
                     $startDate = Carbon::now()->firstOfMonth();
                     $endDate = Carbon::parse('this month')->now();
 
-                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
+                    $data = Order::select('table_orders.*')->with('customer:id,name')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
                     break;
                 case ('history'):
                     //For Customer History Page
-                    $data = Order::select('*')->with('status:id,title,color')->where('customer_id', $request->customer_id);
+                    $data = Order::select('table_orders.*')->with('status:id,title,color')->where('customer_id', $request->customer_id);
                     break;
                 default:
-                    $data = Order::select('*')->with('customer:id,name')->with('status:id,title,color');
+                    $data = Order::select('table_orders.*')->with('customer:id,name')->with('status:id,title,color');
             }
             $processingStatus = Status::where('title', 'processing')->first()->id;
 
@@ -240,7 +240,8 @@ class OrderController extends Controller
                         'display' => $order->created_at->diffForHumans(),
                         'timestamp' => $order->created_at
                     ];
-                })->addColumn(
+                })
+                ->addColumn(
                     'action',
                     function ($row, Request $request) use ($processingStatus) {
                         if ($row->status_id == $processingStatus && $request->mode !== 'history') {
@@ -268,10 +269,9 @@ class OrderController extends Controller
                             }
                         }
                     }
-                )->orderColumn('status', function ($query, $order) {
+                )
+                ->orderColumn('status', function ($query, $order) {
                     $query->orderBy('status_id', $order);
-                })->orderColumn('price', function ($query, $order) {
-                    $query->orderBy('price', $order);
                 })
                 ->rawColumns(['action'])
                 ->make(true);

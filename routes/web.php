@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CheckoutController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\CustomerWalletTransactionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\ItemSalesReportController;
@@ -97,6 +98,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Customer Controller
     Route::resource('customers', CustomerController::class);
     Route::get('get-customer-data', [CustomerController::class, 'getData'])->name('customer.getData');
+
+    //Customer Wallet Transacton
+    Route::get('customers/{customer}/wallet-transaction',[CustomerWalletTransactionController::class,'index'])->name('customers.wallet_transactions.index');
+    Route::get('customers/{customer}/wallet-transaction/create',[CustomerWalletTransactionController::class,'create'])->name('customers.wallet_transactions.create');
+    Route::post('customers/{customer}/wallet-transaction',[CustomerWalletTransactionController::class,'store'])->name('customers.wallet_transactions.store');
+
+    Route::get('get-customer-wallet-transaction-data', [CustomerWalletTransactionController::class, 'getData'])->name('customers.wallet_transactions.getData');
 
     //Setting Controller
     Route::get('/settings',[SettingController::class,'create'])->name('settings.create');

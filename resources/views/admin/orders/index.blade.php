@@ -71,12 +71,15 @@
                         name: 'bill_no'
                     },
                     {
-                        data: 'customer',
-                        name: 'customer',
-                        render: function($data) {
-                            return $data.name;
-                        },
-
+                        data: 'customer.name',
+                        name: 'customer.name',
+                        render: function(data){
+                            if(data){
+                                return data;
+                            }else{
+                                return 'N/a';
+                            }
+                        }
                     },
                     {
                         data: 'table_no',

@@ -82,6 +82,14 @@ class CustomerController extends Controller
        return view('admin.customers.show',compact('title','customer','breadcrumbs'));
     }
 
+    public function wallet_transaction($id)
+    {
+        $customer =Customer::findOrFail($id);
+        $title = $this->title;
+        $breadcrumbs =[ 'Customer'=>route('admin.customers.index'), 'Wallet Transaction'=>'#'];
+        return view('admin.customers.wallet_transaction',compact('customer','title','breadcrumbs'));
+    }
+
     public function getData(Request $request)
     {
         if ($request->ajax()) {
@@ -101,7 +109,9 @@ class CustomerController extends Controller
                         class="btn btn-xs btn-warning"><i class="fa fa-pencil-alt"></i></a>':'';
                         $showBtn ='<a href="'.route('admin.customers.show', $row->id).'"
                         class="btn btn-xs btn-info"><i class="fa fa-eye"></i></a>';
-                        return $showBtn.' '.$editBtn;
+                        $walletTransactionBtn = '<a href="'.route('admin.customers.wallet_transactions.index',$row->id).'"
+                        class="btn btn-xs btn-primary">Wallet History</a>';
+                        return $showBtn.' '.$walletTransactionBtn.' '.$editBtn;
                     }
                 )
                 ->make(true);
