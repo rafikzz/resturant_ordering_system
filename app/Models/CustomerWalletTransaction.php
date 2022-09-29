@@ -11,7 +11,7 @@ class CustomerWalletTransaction extends Model
 
     protected $table = 'table_customer_wallet_transactions';
     protected $fillable = [
-        'customer_id', 'order_id','transaction_type_id' ,'previous_amount','amount','current_amount','description','author_id'
+        'customer_id', 'order_id','transaction_type_id' ,'total_amount','previous_amount','amount','current_amount','description','author_id'
     ];
     /**
      * Get the Customer that owns the CustomerWalletTransaction
@@ -52,5 +52,8 @@ class CustomerWalletTransaction extends Model
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
-
+    public function customer_id()
+    {
+        return $this->current_amount?:0;
+    }
 }

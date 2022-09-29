@@ -62,7 +62,7 @@ class StatusController extends Controller
 
     public function update(UpdateStatusRequest $request, Status $status)
     {
-        $status->title = $request->title;
+        // $status->title = $request->title;
         $status->color = $request->color;
         $status->save();
 
@@ -82,7 +82,7 @@ class StatusController extends Controller
     {
         if ($request->ajax()) {
             $data = Status::select('*');
-
+            $canEdit =auth()->user()->can('status_edit');
             return DataTables::of($data)
                 ->editColumn('created_at', function (Status $status) {
                     return [
@@ -92,8 +92,8 @@ class StatusController extends Controller
                 })
                 ->addColumn(
                     'action',
-                    function ($row) {
-                        $editBtn =  auth()->user()->can('status_edit') ? '<a class="btn btn-xs btn-primary" href="' . route('admin.statuses.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : 'No Action';
+                    function ($row) use($canEdit) {
+                        $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.statuses.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : 'No Action';
                         return $editBtn;
                     }
                 )

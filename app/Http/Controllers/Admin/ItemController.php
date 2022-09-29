@@ -146,6 +146,9 @@ class ItemController extends Controller
             } else {
                 $data = Item::select('*')->with('category:id,title')->onlyTrashed();
             }
+            $canEdit =auth()->user()->can('item_edit');
+            $canDelete =auth()->user()->can('item_delete');
+
             return DataTables::of($data)
                 ->setRowClass('row1')
                 ->setRowAttr([
@@ -155,9 +158,6 @@ class ItemController extends Controller
                 ])
                 ->editColumn('image', function ($item) {
                     return $item->image();
-                })
-                ->addColumn('category', function ($item) {
-                    return $item->category->title;
                 })
                 ->editColumn('status', function ($item) {
 
@@ -180,11 +180,11 @@ class ItemController extends Controller
                 })
                 ->addColumn(
                     'action',
-                    function ($row, Request $request) {
-                        if (auth()->user()->can('item_edit') || auth()->user()->can('item_delete')) {
+                    function ($row, Request $request) use($canDelete,$canEdit) {
+                        if ($canEdit || $canDelete) {
                             if ($request->mode == 0) {
-                                $editBtn =  auth()->user()->can('item_edit') ? '<a class="btn btn-xs btn-primary" href="' . route('admin.items.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
-                                $deleteBtn =  auth()->user()->can('item_delete') ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.items.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
                                 $formStart = '<form action="' . route('admin.items.destroy', $row->id) . '" method="POST">
                                 <input type="hidden" name="_method" value="delete">' . csrf_field();
                                 $formEnd = '</form>';
@@ -193,11 +193,11 @@ class ItemController extends Controller
 
                                 return $btn;
                             } else {
-                                $deleteBtn =  auth()->user()->can('item_delete') ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
                                 $formStart = '<form action="' . route('admin.items.forceDelete', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                 <input type="hidden" name="_method" value="delete" />';
-                                $restoreBtn =  auth()->user()->can('item_delete') ? '<a class="btn btn-xs btn-success" href="' . route('admin.items.restore', $row->id) . '">Restore</a>' : '';
+                                $restoreBtn = $canDelete ? '<a class="btn btn-xs btn-success" href="' . route('admin.items.restore', $row->id) . '">Restore</a>' : '';
                                 $formEnd = '</form>';
                                 $btn = $formStart . $restoreBtn . '  ' . $deleteBtn . $formEnd;
 

@@ -15,7 +15,7 @@
                         @csrf
                         @method('PUT')
                         <div class="row">
-                            <div class="form-group col-md-6">
+                            {{-- <div class="form-group col-md-6">
                                 <label class="label" for="name">Status Name</label>
                                 <input type="text" name="title" value="{{ old('title') ?: $status->title }}" autocomplete="off"
                                     class="form-control  @error('title') is-invalid @enderror" minlength="3"
@@ -25,7 +25,7 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
-                            </div>
+                            </div> --}}
                             <div class="form-group col-md-6">
                                 <label>Status Color</label>
                                 <div class="input-group my-colorpicker2 colorpicker-element" data-colorpicker-id="2">

@@ -82,7 +82,7 @@ class CheckoutController extends Controller
             if ($request->payment_type_id == 3) {
                 if ($dueAmount != 0) {
 
-                    $this->store_customer_wallet_transacion($order, $dueAmount);
+                    $this->store_customer_wallet_transacion($order, $dueAmount,$request->paid_amount);
                 }
             }
         } catch (\Throwable $th) {
@@ -123,7 +123,7 @@ class CheckoutController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Order Checked Out Successfully');
     }
 
-    public function store_customer_wallet_transacion($order, $dueAmount)
+    public function store_customer_wallet_transacion($order, $dueAmount,$paidAmount)
     {
         $wallet_balance = isset($order->customer_id) ? $order->customer->wallet_balance() : 0;
         $current_balance = $wallet_balance - $dueAmount;
@@ -133,6 +133,7 @@ class CheckoutController extends Controller
             'order_id' => $order->id,
             'previous_amount' => $wallet_balance,
             'amount' => $dueAmount,
+            'total_amount'=>$paidAmount,
             'current_amount' => $current_balance,
             'transaction_type_id' => 3,
             'author_id' => auth()->id(),

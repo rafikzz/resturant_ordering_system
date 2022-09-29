@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateCustomerRequest;
 use App\Models\Customer;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class CustomerController extends Controller
@@ -24,9 +25,6 @@ class CustomerController extends Controller
     {
         $title = $this->title;
         $breadcrumbs =[ 'Customer'=>route('admin.customers.index')];
-
-        $data = Customer::select('*')->orderBy('id', 'desc')->get();
-
         return view('admin.customers.index', compact('title','breadcrumbs'));
     }
 
@@ -93,8 +91,21 @@ class CustomerController extends Controller
     public function getData(Request $request)
     {
         if ($request->ajax()) {
-            $data = Customer::select('*');
+            $data = Customer::select('table_customers.*')->with('last_transaction');
+            // $da= DB::select("Select table_customers.*,table_customer_wallet_transactions.current_amount from table_customers LEFT JOIN table_customer_wallet_transactions
+            // ON table_customers.id = table_customer_wallet_transactions.customer_id and table_customer_wallet_transactions.id IN (select MAX(a2.id) from table_customer_wallet_transactions as a2 join table_customers as u2 on u2.id = a2.customer_id group by u2.id)");
             $canEdit = auth()->user()->can('customer_edit');
+            // return DataTables::of($da)->addColumn(
+            //             'action',
+            //             function ($row)use ($canEdit) {
+            //                 $editBtn = $canEdit? '<a href="'.route('admin.customers.edit', $row->id).'"
+            //                 class="btn btn-xs btn-warning"><i class="fa fa-pencil-alt"></i></a>':'';
+            //                 $showBtn ='<a href="'.route('admin.customers.show', $row->id).'"
+            //                 class="btn btn-xs btn-info"><i class="fa fa-eye"></i></a>';
+            //                 $walletTransactionBtn = '<a href="'.route('admin.customers.wallet_transactions.index',$row->id).'"
+            //                 class="btn btn-xs btn-primary">Wallet History</a>';
+            //                 return $showBtn.' '.$walletTransactionBtn.' '.$editBtn;
+            //             })->make(true);
             return DataTables::of($data)
                 ->editColumn('created_at', function (Customer $status) {
                     return [
@@ -102,6 +113,7 @@ class CustomerController extends Controller
                         'timestamp' => $status->created_at
                     ];
                 })
+
                 ->addColumn(
                     'action',
                     function ($row)use ($canEdit) {

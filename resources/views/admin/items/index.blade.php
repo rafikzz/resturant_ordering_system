@@ -72,17 +72,15 @@
                     {
                         data: 'status',
                         name: 'status',
-
+                        searchable: false,
                         orderable: false,
                     },
                     {
-                        data: 'category',
-                        name: 'category',
+                        data: 'category.title',
+                        name: 'category.title',
                         render: function(data) {
                             return '<i class="badge badge-info">' + data + '</i>';
                         },
-                        searchable: false,
-                        orderable: false,
                     },
                     {
                         data: 'image',

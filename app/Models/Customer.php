@@ -27,16 +27,34 @@ class Customer extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function cusomter_wallet_transaction()
+    public function cusomter_wallet_transactions()
     {
         return $this->hasMany(CustomerWalletTransaction::class, 'customer_id');
     }
 
+    public function last_transaction()
+    {
+        return $this->hasOne(CustomerWalletTransaction::class)->latestOfMany()->withDefault([
+            'current_amount'=>0,
+        ]);;
+
+    }
+
+    public function getWalletBalanceAttribute()
+    {
+        if($this->cusomter_wallet_transactions()->count())
+        {
+            return $this->cusomter_wallet_transactions()->latest()->first()->current_amount;
+        }else{
+            return 0;
+        }
+    }
+
     public function wallet_balance()
     {
-        if($this->cusomter_wallet_transaction()->count())
+        if($this->cusomter_wallet_transactions()->count())
         {
-            return $this->cusomter_wallet_transaction()->latest()->first()->current_amount;
+            return $this->cusomter_wallet_transactions()->latest()->first()->current_amount;
         }else{
             return 0;
         }

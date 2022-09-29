@@ -20,6 +20,7 @@ class CreateTableCustomerWalletTransactionsTable extends Migration
             $table->foreignId('transaction_type_id')->constrained('table_transaction_types')->onDelete('cascade');
             $table->decimal('previous_amount',10,2);
             $table->decimal('amount',10,2);
+            $table->decimal('total_amount',10,2);
             $table->decimal('current_amount',10,2)->default(0);
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
             $table->text('description')->nullable();

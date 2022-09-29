@@ -88,19 +88,20 @@
 
                     },
                     {
-                        data: 'item',
-                        name: 'item',
-                        render: function(item){
-                            return  item.name;
-                        }
+                        data: 'item.name',
+                        name: 'item.name',
+
                     },
                     {
                         data: 'total_quantity',
-                        name: 'total_quantity'
+                        name: 'total_quantity',
+                        searchable:false,
                     },
                     {
                         data: 'total_price',
-                        name: 'total_price'
+                        name: 'total_price',
+                        searchable:false,
+
                     },
 
 

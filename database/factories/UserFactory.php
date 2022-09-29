@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -13,7 +14,9 @@ class UserFactory extends Factory
      *
      * @var string
      */
-    protected $model = User::class;
+    // protected $model = User::class;
+    protected $model = Customer::class;
+
 
     /**
      * Define the model's default state.
@@ -22,6 +25,11 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        return[
+            'name' => $this->faker->name,
+            'phone_no' => $this->faker->numerify('98########'),
+        ];
+
         return [
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,

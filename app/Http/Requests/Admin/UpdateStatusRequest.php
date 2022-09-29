@@ -24,7 +24,7 @@ class UpdateStatusRequest extends FormRequest
     public function rules()
     {
         return [
-            'title'=>'required|min:3|unique:table_categories,title,'.$this->status->id,
+            // 'title'=>'required|min:3|unique:table_categories,title,'.$this->status->id,
             'color'=>'required',
         ];
     }

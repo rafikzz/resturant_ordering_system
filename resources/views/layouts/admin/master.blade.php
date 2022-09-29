@@ -132,10 +132,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="container-fluid">
                     @if ($message = Session::get('success'))
                         <div class="alert alert-success alert-dismissible">
-                            <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <a class="close" data-dismiss="alert" aria-label="close" aria-hidden="true">&times;</a>
                             <p>{{ $message }}</p>
                         </div>
                     @endif
+                    @if ($message = Session::get('error'))
+                    <div class="alert alert-danger alert-dismissible" >
+                        <a class="close" data-dismiss="alert" aria-label="close" aria-hidden="true">&times;</a>
+                        <p>{{ $message }}</p>
+                    </div>
+                @endif
                     @yield('content')
                 </div>
             </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\ItemSalesReportController;
 use App\Http\Controllers\Admin\KOTController;
+use App\Http\Controllers\Admin\OrderBreakDownController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderItemController;
 use App\Http\Controllers\Admin\PaymentTypeController;
@@ -78,6 +79,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::put('orders/add/{order}', [OrderController::class,'updateMoreItem'])->name('orders.addItem.update');
     Route::get('get-order-data', [OrderController::class, 'getData'])->name('orders.getData');
     Route::get('get-order-detail', [OrderController::class, 'getOrderDetail'])->name('orders.getOrderDetail');
+    //Order Breakdown controller
+    Route::get('orders/breakdown/{order}',[OrderBreakDownController::class,'index'])->name('orders.breakdown.index');
+    Route::post('orders/breakdown/{order}',[OrderBreakDownController::class,'store'])->name('orders.breakdown.store');
 
     //OrderItem Route
     Route::get('order_items/',[ OrderItemController::class,'index'])->name('order_items.index');
@@ -105,6 +109,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::post('customers/{customer}/wallet-transaction',[CustomerWalletTransactionController::class,'store'])->name('customers.wallet_transactions.store');
 
     Route::get('get-customer-wallet-transaction-data', [CustomerWalletTransactionController::class, 'getData'])->name('customers.wallet_transactions.getData');
+
+
 
     //Setting Controller
     Route::get('/settings',[SettingController::class,'create'])->name('settings.create');

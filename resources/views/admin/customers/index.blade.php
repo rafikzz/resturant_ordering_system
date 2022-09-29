@@ -19,6 +19,7 @@
                             <th>Id</th>
                             <th>Name</th>
                             <th>Phone No.</th>
+                            <th>Wallet Balance</th>
                             <th>Created At</th>
                             <th>Action</th>
                         </thead>
@@ -41,7 +42,10 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                order: [[0, 'desc']],
+                searchDelay: 1000,
+                order: [
+                    [0, 'desc']
+                ],
                 ajax: {
                     url: "{{ route('admin.customer.getData') }}",
                     data: function(d) {
@@ -62,12 +66,20 @@
 
                     },
                     {
+                        data: 'last_transaction.current_amount',
+                        name: 'last_transaction.current_amount',
+                        render: function(data) {
+                            if (data) {
+                                return data;
+                            } else {
+                                return 0;
+                            }
+                        }
+
+                    },
+                    {
                         data: 'created_at',
                         name: 'created_at',
-                        render:{
-                            _:'display',
-                            sort:'timestamp'
-                        },
                         searchable: false
 
                     },

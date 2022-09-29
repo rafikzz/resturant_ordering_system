@@ -17,11 +17,12 @@
                     <table class="table table-bordered" id="table">
                         <thead>
                             <th>Id</th>
-                            <th>Previous Amount</th>
-                            <th>Amount </th>
-                            <th>Current Amount</th>
-                            <th>Transaction Type</th>
                             <th>Order</th>
+                            <th>Order Total</th>
+                            <th>Paid Amount </th>
+                            <th>Operation Amount</th>
+                            <th>Current Balance</th>
+                            <th>Transaction Type</th>
                             <th>Author</th>
                             <th>Created At</th>
                             <th>Action</th>
@@ -61,38 +62,60 @@
                         name: 'id'
                     },
                     {
-                        data: 'previous_amount',
-                        name: 'previous_amount'
+                        data: 'order.bill_no',
+                        name: 'order.bill_no',
+                        render: function(data){
+                            if(data)
+                            {
+                             return   data;
+                            }else{
+                             return 'N/A';
+                            }
+                        }
+
+                    },
+                    {
+                        data: 'order.net_total',
+                        name: 'order.net_total',
+                        render: function(data){
+                            if(data)
+                            {
+                             return   data;
+                            }else{
+                             return 'N/A';
+                            }
+                        }
+                    },
+                    {
+                        data: 'total_amount',
+                        name: 'total_amount',
                     },
                     {
                         data: 'amount',
-                        name: 'amount',
+                        name: 'amount'
                     },
                     {
                         data: 'current_amount',
                         name: 'current_amount'
                     },
                     {
-                        data: 'transaction_type',
-                        name: 'transaction_type',
-                        render: function(transaction_type){
-                            return transaction_type.name;
+                        data: 'transaction_type.name',
+                        name: 'transaction_type.name',
+                        render: function(data){
+                            if(data)
+                            {
+                             return   data;
+                            }else{
+                             return 'N/A';
+                            }
                         }
                     },
-                    {
-                        data: 'order',
-                        name: 'order',
-                        // render: function(order){
 
-                        //     return order.bill_no;
-                        // }
-                    },
+
+
                     {
-                        data: 'author',
-                        name: 'author',
-                        render: function(author){
-                            return author.name;
-                        }
+                        data: 'author.name',
+                        name: 'author.name',
                     },
                     {
                         data: 'created_at',

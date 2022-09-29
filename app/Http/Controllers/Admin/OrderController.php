@@ -96,8 +96,9 @@ class OrderController extends Controller
     {
         $title = $this->title;
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'Edit' => '#'];
+        $processingStatus = Status::where('title', 'processing')->first()->id;
 
-        $order = Order::findOrFail($id);
+        $order = Order::where('status_id',$processingStatus)->findOrFail($id);
         Cart::clear();
         $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get()->groupBy('order_no');
         $categories = Category::all();
@@ -107,9 +108,11 @@ class OrderController extends Controller
         return view('admin.orders.edit', compact('title', 'orderItems', 'order', 'categories', 'customers', 'statuses', 'breadcrumbs'));
     }
 
-    public function update(UpdateOrderRequest $request, Order $order)
+    public function update(UpdateOrderRequest $request, $id)
     {
+        $processingStatus = Status::where('title', 'processing')->first()->id;
 
+        $order = Order::where('status_id',$processingStatus)->findOrFail($id);
         DB::beginTransaction();
         try {
             if ($request->customer_id) {
@@ -155,8 +158,8 @@ class OrderController extends Controller
     {
         $title = $this->title;
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'AddItem' => '#'];
-
-        $order = Order::findOrFail($id);
+        $processingStatus = Status::where('title', 'processing')->first()->id;
+        $order = Order::where('status_id', $processingStatus)->findOrFail($id);
         Cart::clear();
         $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get()->groupBy('order_no');
 
@@ -168,8 +171,11 @@ class OrderController extends Controller
         return view('admin.orders.addItem', compact('title', 'order', 'categories', 'customers', 'statuses', 'breadcrumbs', 'orderItems'));
     }
 
-    public function updateMoreItem(Request $request, Order $order)
+    public function updateMoreItem(Request $request,$id)
     {
+        $processingStatus = Status::where('title', 'processing')->first()->id;
+        $order = Order::where('status_id',$processingStatus)->findOrFail($id);
+
         DB::beginTransaction();
         try {
 
@@ -232,6 +238,10 @@ class OrderController extends Controller
                     $data = Order::select('table_orders.*')->with('customer:id,name')->with('status:id,title,color');
             }
             $processingStatus = Status::where('title', 'processing')->first()->id;
+            $canEdit=auth()->user()->can('order_edit');
+            $canDelete=auth()->user()->can('order_delete');
+            $canAdd= auth()->user()->can('order_add');
+            $canCreate= auth()->user()->can('order_create');
 
 
             return DataTables::of($data)
@@ -243,21 +253,24 @@ class OrderController extends Controller
                 })
                 ->addColumn(
                     'action',
-                    function ($row, Request $request) use ($processingStatus) {
+                    function ($row, Request $request) use ($processingStatus,$canEdit,$canDelete,$canAdd,$canCreate) {
                         if ($row->status_id == $processingStatus && $request->mode !== 'history') {
-                            if (auth()->user()->can('order_edit') || auth()->user()->can('order_delete')) {
-                                $checkoutBtn=auth()->user()->can('order_create')?'<a href="' . route('admin.orders.checkout', $row->id) . '"  class="btn btn-secondary btn-xs">Checkout</a>':'';
-                                $editBtn =  auth()->user()->can('order_edit') ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
-                                $deleteBtn =  auth()->user()->can('order_delete') ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                            if ($canEdit|| $canDelete) {
+                                $checkoutBtn= $canCreate?'<a href="' . route('admin.orders.checkout', $row->id) . '"  class="btn bg-orange btn-xs"
+                                data-toggle="tooltip" title="Checkout"><i class="fa  fa-cash-register"></i> Checkout</a>':'';
+                                $breakdownBtn= $canCreate?'<a href="' . route('admin.orders.breakdown.index', $row->id) . '"  class="btn btn-secondary btn-xs"
+                                data-toggle="tooltip" title="Breakdown"><i class="fa  fa-sitemap"></i> Breakdown</a>':'';
+                                $editBtn =  $canEdit? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
                                 $formStart = '<form action="' . route('admin.orders.destroy', $row->id) . '" method="POST">
                                 <input type="hidden" name="_method" value="delete">' . csrf_field();
 
                                 $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
-                                $addBtn =  auth()->user()->can('order_add') ? '<a class="btn btn-xs btn-success"  href="' . route('admin.orders.addItem', $row->id) . '">Add More Item</a>' : '';
+                                $addBtn = $canAdd ? '<a class="btn btn-xs btn-success"  href="' . route('admin.orders.addItem', $row->id) . '"><i class="fa fa-plus"></i> Item</a>' : '';
 
 
                                 $formEnd = '</form>';
-                                $btn = $formStart . ' ' . $detail . ' '.$checkoutBtn.' '. $addBtn . ' ' . $editBtn .  ' ' . $deleteBtn . $formEnd;
+                                $btn = $formStart . ' ' . $detail . ' '.$checkoutBtn.' '. $addBtn . ' '. $breakdownBtn.' ' . $editBtn .  ' ' . $deleteBtn.  $formEnd;
 
                                 return $btn;
                             }

@@ -53,6 +53,7 @@ class CustomerWalletTransactionController extends Controller
         CustomerWalletTransaction::create([
             'previous_amount'=>$previous_amount,
             'amount'=>$request->amount,
+            'total_amount'=> $request->amount,
             'current_amount'=> $current_amount,
             'transaction_type_id'=>$transaction_type->id,
             'customer_id'=>$customer->id,
@@ -68,7 +69,7 @@ class CustomerWalletTransactionController extends Controller
     {
         if ($request->ajax()) {
 
-            $data = CustomerWalletTransaction::select('*')->with('transaction_type:id,name,is_add')->with('order:id,bill_no')->with('author:id,name')->where('customer_id',$request->customer_id);
+            $data = CustomerWalletTransaction::select('table_customer_wallet_transactions.*')->where('table_customer_wallet_transactions.customer_id',$request->customer_id)->with('transaction_type:id,name,is_add')->with('order:id,bill_no,net_total')->with('author:id,name');
             $canEdit = auth()->user()->can('customer_edit');
             return DataTables::of($data)
                 ->editColumn('created_at', function ($row) {
@@ -77,18 +78,6 @@ class CustomerWalletTransactionController extends Controller
                         'timestamp' => $row->created_at
                     ];
                 })
-                ->addColumn(
-                    'order',
-                    function($row)  {
-                        if($row->order)
-                        {
-                            return $row->order->bill_no ;
-                        }
-                        else{
-                            return 'N/A';
-                        }
-                    }
-                )
                 ->addColumn(
                     'action',
                     function ($row)use ($canEdit) {
