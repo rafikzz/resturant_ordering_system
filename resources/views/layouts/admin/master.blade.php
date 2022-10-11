@@ -132,13 +132,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="container-fluid">
                     @if ($message = Session::get('success'))
                         <div class="alert alert-success alert-dismissible">
-                            <a class="close" data-dismiss="alert" aria-label="close" aria-hidden="true">&times;</a>
+                            <a class="close" data-dismiss="alert"  aria-hidden="true">x</a>
                             <p>{{ $message }}</p>
                         </div>
                     @endif
                     @if ($message = Session::get('error'))
                     <div class="alert alert-danger alert-dismissible" >
-                        <a class="close" data-dismiss="alert" aria-label="close" aria-hidden="true">&times;</a>
+                        <a class="close" data-dismiss="alert"  aria-hidden="true">x</a>
                         <p>{{ $message }}</p>
                     </div>
                 @endif
@@ -176,6 +176,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{ asset('admin-lte/plugins/select2/js/select2.min.js') }}"></script>
     {{-- datatalbes --}}
     <script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
+    {{-- Jquery validation --}}
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
     {{-- Moment Js --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
     {{-- DateRange Picker --}}
@@ -194,9 +196,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     {{-- Print This Js --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.js" integrity="sha512-Fd3EQng6gZYBGzHbKd52pV76dXZZravPY7lxfg01nPx5mdekqS8kX4o1NfTtWiHqQyKhEGaReSf4BrtfKc+D5w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
-
 
     <script>
         $(document).ready(function() {

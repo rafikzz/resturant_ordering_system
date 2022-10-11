@@ -81,7 +81,6 @@ class CheckoutController extends Controller
 
             if ($request->payment_type_id == 3) {
                 if ($dueAmount != 0) {
-
                     $this->store_customer_wallet_transacion($order, $dueAmount,$request->paid_amount);
                 }
             }

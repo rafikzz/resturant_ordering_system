@@ -87,14 +87,14 @@
                                     <tr>
                                         <td colspan="3">Paid Amount:</td>
                                         <td> <input type="number" value="{{ $order->totalWithTax() }}" readonly
-                                                max="{{ $order->totalWithTax() }}" step="0.01" min="0"
+                                                 step="0.01" min="0"
                                                 class="form-control form-control-sm" name="paid_amount" id="paid_amount"
                                                 required></td>
                                     </tr>
                                     <tr>
                                         <td colspan="3">Due Amount:</td>
                                         <td> <input type="number" value="0" class="form-control form-control-sm"
-                                                min="0" max="{{ $order->totalWithTax() }}" readonly
+                                                min="0"  readonly
                                                 name="due_amount" id="due_amount" required></td>
                                     </tr>
 
@@ -155,8 +155,8 @@
 
                 $('#paid_amount').attr('readonly', 'readonly');
             } else {
-                $('#paid_amount').val(grand_total);
-                $('#due_amount').val(0);
+                $('#paid_amount').val(0);
+                $('#due_amount').val(grand_total);
 
                 $('#paid_amount').attr('readonly', false);
 
@@ -277,9 +277,7 @@
                 $('#service-charge').text(foramtValue(service_charge_amount));
                 $('#tax-amount').text(foramtValue(tax_amount));
                 $('#grand-total').text(foramtValue(grand_total));
-                $('#paid_amount').attr('max', grand_total);
                 $('#paid_amount').val(grand_total);
-                $('#due_amount').attr('max', grand_total);
                 $('#due_amount').val(0);
 
 

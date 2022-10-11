@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CheckoutController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\CustomerStatementController;
 use App\Http\Controllers\Admin\CustomerWalletTransactionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ItemController;
@@ -80,8 +81,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-order-data', [OrderController::class, 'getData'])->name('orders.getData');
     Route::get('get-order-detail', [OrderController::class, 'getOrderDetail'])->name('orders.getOrderDetail');
     //Order Breakdown controller
-    Route::get('orders/breakdown/{order}',[OrderBreakDownController::class,'index'])->name('orders.breakdown.index');
-    Route::post('orders/breakdown/{order}',[OrderBreakDownController::class,'store'])->name('orders.breakdown.store');
+    // Route::get('orders/breakdown/{order}',[OrderBreakDownController::class,'index'])->name('orders.breakdown.index');
+    Route::get('orders/breakdown/{order}',[OrderBreakDownController::class,'test'])->name('orders.breakdown.index');
+    Route::post('orders/breakdown/{order}/test',[OrderBreakDownController::class,'store_test'])->name('orders.breakdown.store.test');
+    // Route::post('orders/breakdown/{order}',[OrderBreakDownController::class,'store'])->name('orders.breakdown.store');
 
     //OrderItem Route
     Route::get('order_items/',[ OrderItemController::class,'index'])->name('order_items.index');
@@ -128,6 +131,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-item-sales-report-data', [ItemSalesReportController::class, 'getItemSalesData'])->name('reports.itemSalesData');
     Route::get('export-item-sales-report-data', [ItemSalesReportController::class, 'exportSales'])->name('reports.exportItemSales');
 
+    //Customer Statement Controller
+    Route::get('reports/customer-statement',[CustomerStatementController::class,'index'])->name('reports.customer_statement');
     //KOT Controller
     Route::get('kot',[KOTController::class,'index'])->name('kot.index');
     Route::post('complete-order-item',[KOTController::class,'completeOrderItem'])->name('kot.completeOrderItem');

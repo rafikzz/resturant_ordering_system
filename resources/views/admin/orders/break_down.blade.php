@@ -58,7 +58,7 @@
                     </div>
                     <div class="card-footer">
                         <div class="text-center">
-                            <button class="btn btn-primary btn-sm" name="new" type="submit">Save and Continue</button>
+                            <button class="btn btn-primary btn-sm" name="new" value="1" type="submit">Save and Continue</button>
                             <button class="btn btn-primary btn-sm" type="submit">Save and Exit</button>
                         </div>
                     </div>

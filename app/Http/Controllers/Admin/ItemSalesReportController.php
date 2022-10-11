@@ -45,12 +45,12 @@ class ItemSalesReportController extends Controller
             if(!$request->order){
                 $data = OrderItem::with('item:id,name')->select('item_id', DB::raw('sum(total * price) as total_price'),DB::raw('sum(total) as total_quantity'))
                 ->groupBy('item_id')->whereHas('order',function($q) use($startDate,$endDate){
-                    $q->whereBetween('order_datetime', [$startDate, $endDate]);
+                    $q->whereBetween('order_datetime', [$startDate, $endDate])->where('status_id',3);
                 })->orderBy('total_quantity','desc');
             }else{
                 $data = OrderItem::with('item:id,name')->select('item_id', DB::raw('sum(total * price) as total_price'),DB::raw('sum(total) as total_quantity'))
                 ->groupBy('item_id')->whereHas('order',function($q) use($startDate,$endDate){
-                    $q->whereBetween('order_datetime', [$startDate, $endDate]);
+                    $q->whereBetween('order_datetime', [$startDate, $endDate])->where('status_id',3);
                 });
             }
 

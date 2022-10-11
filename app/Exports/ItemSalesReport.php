@@ -18,7 +18,9 @@ class ItemSalesReport implements FromCollection,withMapping, WithHeadings
     public function collection()
     {
         return OrderItem::with('item:id,name')->select('item_id', DB::raw('sum(total * price) as total_price'),DB::raw('sum(total) as total_quantity'))
-        ->groupBy('item_id')->orderBy('total_quantity','desc')->get();
+        ->groupBy('item_id')->whereHas('order',function($q) {
+            $q->where('status_id',3);
+        })->orderBy('total_quantity','desc')->get();
     }
     public function map($orderItem): array
     {
