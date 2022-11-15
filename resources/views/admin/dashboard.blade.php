@@ -66,12 +66,7 @@
                 </div>
 
             </div>
-
         </div>
-
-
-
-
     </div>
     <div class="row">
         <section class="col-lg-6">
