@@ -85,10 +85,12 @@
 
             $('#customer-statement').click(function() {
                let customer_id= $('#customer').val();
-            //    $.ajax({
+               let startDate = $('#custom-date-range').val().split('-')[0].trim();
+               let endDate = $('#custom-date-range').val().split('-')[1].trim();
+               $.ajax({
 
 
-            //    });
+               });
             });
 </script>
 @endsection

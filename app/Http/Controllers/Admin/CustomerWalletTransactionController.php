@@ -60,6 +60,9 @@ class CustomerWalletTransactionController extends Controller
             'description'=>isset($request->description)?$request->description:null,
             'author_id'=>auth()->id(),
         ]);
+        $customer->update([
+            'balance'=> $current_amount
+        ]);
 
         return redirect()->route('admin.customers.wallet_transactions.index',$customer->id)->with("success", "Customer saved successfully");
 

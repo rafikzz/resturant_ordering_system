@@ -25,4 +25,9 @@ class CustomerStatementController extends Controller
         return view('admin.reports.customer_statement.index',compact('customers','title','breadcrumbs'));
 
     }
+
+    public function getReport(Request $request)
+    {
+        $customerId=$request->customer_id;
+    }
 }

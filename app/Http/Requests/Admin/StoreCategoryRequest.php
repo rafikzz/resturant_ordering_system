@@ -25,7 +25,7 @@ class StoreCategoryRequest extends FormRequest
     {
         return [
             'title'=>'required|min:3|unique:table_categories,title',
-            'image'=>'required|mimes:jpg,jpeg,png,bmp,tiff|image|max:4096',
+            'image'=>'nullable|mimes:jpg,jpeg,png,bmp,tiff|image',
             'status'=>''
 
         ];

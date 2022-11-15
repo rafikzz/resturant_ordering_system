@@ -23,6 +23,12 @@ class Category extends Model
     {
         return $this->hasMany(Item::class);
     }
+
+    public function active_items()
+    {
+        return $this->hasMany(Item::class)->where('status',1);
+    }
+
     public function setTitlesAttribute($value)
     {
         $this->attributes['title'] = strtolower($value);

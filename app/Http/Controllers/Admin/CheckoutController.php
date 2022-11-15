@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\OrderCheckoutRequest;
+use App\Models\Coupon;
+use App\Models\Customer;
 use App\Models\CustomerWalletTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -11,6 +13,7 @@ use App\Models\Payment;
 use App\Models\PaymentType;
 use App\Models\Setting;
 use App\Models\Status;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -39,15 +42,18 @@ class CheckoutController extends Controller
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
-        $payment_types = PaymentType::where('status', 1)->get();
-        $wallet_balance = isset($order->customer_id) ? $order->customer->wallet_balance() : null;
+        $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=',Carbon::today())->get();
+        $couponsDictionary = $coupons->pluck('discount', 'id');
 
 
-        return view('admin.checkout.index', compact('order', 'payment_types', 'order_items', 'wallet_balance', 'title', 'breadcrumbs', 'tax', 'service_charge'));
+        return view('admin.checkout.index', compact('order', 'coupons','couponsDictionary', 'order_items', 'title', 'breadcrumbs', 'tax', 'service_charge'));
     }
 
     public function store(OrderCheckoutRequest $request, $id)
     {
+        $setting = Setting::first();
+        $tax = isset($setting) ? $setting->getTax() : 0;
+        $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
         DB::beginTransaction();
         try {
             $processingStatus = Status::where('title', 'Processing')->first()->id;
@@ -64,24 +70,40 @@ class CheckoutController extends Controller
                 return back()->with('success', 'Discount is greater than total');
             }
             $completedStatus = Status::where('title', 'Completed')->first()->id;
-            $service_charge = $order->serviceCharge($request->discount ?: 0);
-            $tax_amount = $order->taxAmount($request->discount ?: 0);
-            $netTotal = $order->totalWithTax($request->discount ?: 0);
-            $dueAmount = round(($netTotal - $request->paid_amount), 2);
+            $coupon_amount = 0;
+            if ($request->coupon_id) {
+                $coupon = Coupon::where('id', $request->coupon_id)->where('expiry_date', '>=', Carbon::today())->first();
+                $coupon_amount = ($coupon) ? $coupon->discount : 0;
+            }
+            $total=$order->total;
+            $total_discount = $coupon_amount + $request->discount ?: 0;
+            if ($total_discount >= $total) {
+                $total_discount = $total;
+                $net_total = 0;
+                $service_charge_amount = 0;
+                $tax_amount = 0;
+            } else {
+                $net_total = $total - $total_discount;
+                $service_charge_amount =    round(($service_charge  / 100) * ($net_total), 2);
+                $tax_amount =    round(($tax / 100) * ($net_total + $service_charge_amount), 2);
+            }
+            $grand_total = $net_total + $service_charge_amount + $tax_amount;
 
             $order->update([
-                'discount' => $request->discount ?: 0,
+                'discount' => $total_discount ?: 0,
                 'service_charge' => $service_charge,
                 'tax' => $tax_amount,
                 'status_id' => $completedStatus,
                 'payment_type_id' => $request->payment_type_id,
-                'net_total' => $netTotal,
+                'net_total' => $grand_total,
                 'updated_by' => auth()->id(),
             ]);
 
-            if ($request->payment_type_id == 3) {
+            if ($request->payment_type == 1) {
+                $dueAmount = round(($grand_total - $request->paid_amount), 2);
+
                 if ($dueAmount != 0) {
-                    $this->store_customer_wallet_transacion($order, $dueAmount,$request->paid_amount);
+                    $this->store_customer_wallet_transacion($order, $dueAmount, $request->paid_amount);
                 }
             }
         } catch (\Throwable $th) {
@@ -126,6 +148,14 @@ class CheckoutController extends Controller
     {
         $wallet_balance = isset($order->customer_id) ? $order->customer->wallet_balance() : 0;
         $current_balance = $wallet_balance - $dueAmount;
+
+        $customer = Customer::where('id',$order->customer_id)->whereNotNull('is_staff')->first();
+        if($customer)
+        {
+            $customer->update([
+                'balance'=>$current_balance
+            ]);
+        }
 
         CustomerWalletTransaction::create([
             'customer_id' => $order->customer_id,

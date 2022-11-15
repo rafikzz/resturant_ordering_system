@@ -27,11 +27,15 @@ class DashboardController extends Controller
         // dd($this->getSalesChartData());
 
         $totalCustomers =Customer::count();
+        $totalStaffs =Customer::where('is_staff',1)->count();
+        $totalPatients =Customer::where('is_staff',0)->where('status',1)->count();
+
+
         $topSoldItems =OrderItem::with('item')->select('item_id', DB::raw('sum(quantity) as total'))
         ->groupBy('item_id')->orderBy('total','desc')->take(5)->get();
         $topSoldItem =($topSoldItems->first())? $topSoldItems->first()->item->name:null;
 
-        return view('admin.dashboard',compact('title','totalSales','todaysSales','totalCustomers','topSoldItems','topSoldItem'));
+        return view('admin.dashboard',compact('title','totalSales','todaysSales','totalStaffs','totalPatients','totalCustomers','topSoldItems','topSoldItem'));
     }
     public function getSalesChartData(){
         $totalSalesDataCount = [];

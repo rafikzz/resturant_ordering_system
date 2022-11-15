@@ -18,7 +18,7 @@ class TransactionTypeSeeder extends Seeder
             ['Crediting',  1],
             [ 'Deducting',  0],
             ['Order Payment', 0],
-
+            ['Patient Discharge', 1],
         ];
 
         foreach ($tansaction_types as $tansaction_type) {

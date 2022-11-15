@@ -25,7 +25,7 @@ class StoreItemRequest extends FormRequest
     {
         return [
             'name'=>'required|min:3',
-            'image'=>'required|mimes:jpg,jpeg,png,bmp,tiff|image|max:4096',
+            'image'=>'nullable|mimes:jpg,jpeg,png,bmp,tiff|image',
             'price'=>'required|min:0',
             'category_id'=>'required|exists:table_categories,id',
         ];

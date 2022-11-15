@@ -15,7 +15,7 @@ class CreateTableItemsTable extends Migration
     {
         Schema::create('table_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('table_categories')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->string('image')->nullable();
             $table->decimal('price',10,2);
@@ -23,6 +23,7 @@ class CreateTableItemsTable extends Migration
             $table->boolean('status')->nullable()->default(0);
             $table->softDeletes();
             $table->timestamps();
+            $table->foreign('category_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

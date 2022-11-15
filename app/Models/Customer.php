@@ -10,7 +10,7 @@ class Customer extends Model
     use HasFactory;
     protected $table = 'table_customers';
 
-    protected $fillable = ['name', 'phone_no'];
+    protected $fillable = ['name', 'phone_no','balance','is_staff','room_no','status'];
 
     public function setNameAttribute($value)
     {

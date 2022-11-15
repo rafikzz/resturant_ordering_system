@@ -14,7 +14,8 @@
                             </select>
                         @endcan
                         @can('item_create')
-                            <a class="btn btn-success ml-3" href="{{ route('admin.items.create') }}"> <i class="fa fa-plus"></i></a>
+                            <a class="btn btn-success ml-3" href="{{ route('admin.items.create') }}"> <i
+                                    class="fa fa-plus"></i></a>
                         @endcan
                     </div>
                 </div>
@@ -40,7 +41,7 @@
     </div>
 @endsection
 @section('js')
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="{{ asset('js/jQuery-ui.js') }}"></script>
     <script>
         $(document).ready(function() {
             // $('#table').DataTable({
@@ -73,7 +74,6 @@
                         data: 'status',
                         name: 'status',
                         searchable: false,
-                        orderable: false,
                     },
                     {
                         data: 'category.title',
@@ -94,9 +94,9 @@
                     {
                         data: 'created_at',
                         name: 'created_at',
-                        render:{
-                            _:'display',
-                            sort:'timestamp'
+                        render: {
+                            _: 'display',
+                            sort: 'timestamp'
                         },
                         searchable: false
 

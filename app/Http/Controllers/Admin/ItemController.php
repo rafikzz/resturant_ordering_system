@@ -139,9 +139,9 @@ class ItemController extends Controller
         if ($request->ajax()) {
             if ($request->mode == 0) {
                     if(!$request->order){
-                    $data = Item::select('*')->with('category:id,title')->orderBy('order');
+                    $data = Item::select('*')->with('category:id,title')->withCount('order_items')->orderBy('order');
                     }else{
-                        $data = Item::select('*')->with('category:id,title');
+                        $data = Item::select('*')->with('category:id,title')->withCount('order_items');
                     }
             } else {
                 $data = Item::select('*')->with('category:id,title')->onlyTrashed();
@@ -183,8 +183,16 @@ class ItemController extends Controller
                     function ($row, Request $request) use($canDelete,$canEdit) {
                         if ($canEdit || $canDelete) {
                             if ($request->mode == 0) {
-                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.items.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
-                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.items.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                if(!($row->order_items))
+                                {
+                                    $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+
+
+                                }
+                                else{
+                                    $deleteBtn = null;
+                                }
                                 $formStart = '<form action="' . route('admin.items.destroy', $row->id) . '" method="POST">
                                 <input type="hidden" name="_method" value="delete">' . csrf_field();
                                 $formEnd = '</form>';

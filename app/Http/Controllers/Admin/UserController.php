@@ -118,7 +118,7 @@ class UserController extends Controller
     {
         if ($request->ajax()) {
             if ($request->mode == 0) {
-                $data = User::select('*')->with('roles');
+                $data = User::select('*')->with('roles')->withCount('created_orders')->withCount('updated_orders');
             } else {
                 $data = User::select('*')->with('roles')->onlyTrashed();
             }
@@ -145,8 +145,15 @@ class UserController extends Controller
                     function ($row, Request $request) use($canEdit,$canDelete) {
                         if($canEdit){
                             if ($request->mode == 0) {
-                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.users.edit', $row->id) . '">Edit</a>' : '';
-                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
+                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.users.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                if(!($row->created_orders_count || $row->updated_orders_count))
+                                {
+                                    $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+
+                                }
+                                else{
+                                    $deleteBtn = null;
+                                }
                                 $formStart = '<form action="' . route('admin.users.destroy', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                  <input type="hidden" name="_method" value="delete" />';

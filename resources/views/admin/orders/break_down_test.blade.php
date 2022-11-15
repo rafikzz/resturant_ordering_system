@@ -100,6 +100,7 @@
                 $('#orderItems  .select2').attr({
                     'disabled': false
                 });
+                $('button').attr('disabled','disabled');
                 form.submit();
             }
         });

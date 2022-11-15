@@ -20,7 +20,8 @@ class CreateTableOrdersTable extends Migration
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('updated_by')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('bill_no');
-            $table->string('table_no')->nullable();
+            $table->string('destination')->nullable();
+            $table->string('destination_no')->nullable();
             $table->decimal('discount',10,2)->nullable()->default(0);
             $table->decimal('total',10,2);
             $table->timestamp('order_datetime')->nullable();
@@ -28,7 +29,6 @@ class CreateTableOrdersTable extends Migration
             $table->string('tax')->nullable();
             $table->string('service_charge')->nullable();
             $table->string('net_total')->nullable();
-            $table->boolean('is_take_away')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

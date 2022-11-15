@@ -40,4 +40,13 @@ class Item extends Model
     {
         return  ucwords($value);
     }
+    /**
+     * Get all of the order_items for the Item
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function order_items()
+    {
+        return $this->hasMany(OrderItem::class, 'item_id');
+    }
 }

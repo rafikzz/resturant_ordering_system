@@ -25,7 +25,7 @@ class UpdateCustomerRequest extends FormRequest
     {
         return [
             'name'=>'required',
-            'phone_no'=>['required_without:customer_id','regex:/(?:\(?\+977\)?)?[9][6-9]\d{8}|01[-]?[0-9]{7}/','unique:table_customers,phone_no,'.$this->customer->id],
+            'phone_no'=>['required_without:customer_id'],
         ];
     }
 }

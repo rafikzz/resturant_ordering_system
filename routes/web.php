@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CheckoutController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CustomerStatementController;
 use App\Http\Controllers\Admin\CustomerWalletTransactionController;
@@ -13,10 +14,12 @@ use App\Http\Controllers\Admin\KOTController;
 use App\Http\Controllers\Admin\OrderBreakDownController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderItemController;
+use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\Admin\PaymentTypeController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\StatusController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +62,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('categories/changeStatus', [CategoryController::class, 'changeStatus'])->name('category.changeStatus');
     Route::resource('categories', CategoryController::class);
 
+    //Coupon route
+    Route::resource('coupons', CouponController::class);
+
+
     //Item route
     Route::get('get-item-data', [ItemController::class, 'getData'])->name('items.getData');
     Route::delete('items/force-delete/{user}', [ItemController::class, 'forceDelete'])->name('items.forceDelete');
@@ -76,24 +83,26 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
 
     //Order route
     Route::resource('orders', OrderController::class);
-    Route::get('orders/add/{order}', [OrderController::class,'addMoreItem'])->name('orders.addItem');
-    Route::put('orders/add/{order}', [OrderController::class,'updateMoreItem'])->name('orders.addItem.update');
+    Route::get('orders/add/{order}', [OrderController::class, 'addMoreItem'])->name('orders.addItem');
+    Route::get('orders/create/test', [OrderController::class, 'test_create']);
+    Route::put('orders/add/{order}', [OrderController::class, 'updateMoreItem'])->name('orders.addItem.update');
     Route::get('get-order-data', [OrderController::class, 'getData'])->name('orders.getData');
     Route::get('get-order-detail', [OrderController::class, 'getOrderDetail'])->name('orders.getOrderDetail');
+
     //Order Breakdown controller
     // Route::get('orders/breakdown/{order}',[OrderBreakDownController::class,'index'])->name('orders.breakdown.index');
-    Route::get('orders/breakdown/{order}',[OrderBreakDownController::class,'test'])->name('orders.breakdown.index');
-    Route::post('orders/breakdown/{order}/test',[OrderBreakDownController::class,'store_test'])->name('orders.breakdown.store.test');
+    Route::get('orders/breakdown/{order}', [OrderBreakDownController::class, 'test'])->name('orders.breakdown.index');
+    Route::post('orders/breakdown/{order}/test', [OrderBreakDownController::class, 'store_test'])->name('orders.breakdown.store.test');
     // Route::post('orders/breakdown/{order}',[OrderBreakDownController::class,'store'])->name('orders.breakdown.store');
 
     //OrderItem Route
-    Route::get('order_items/',[ OrderItemController::class,'index'])->name('order_items.index');
-    Route::put('order_items/{order_item}',[ OrderItemController::class,'update'])->name('order_items.update');
-    Route::delete('order_items/{order_item}',[ OrderItemController::class,'destory'])->name('order_items.delete');
+    Route::get('order_items/', [OrderItemController::class, 'index'])->name('order_items.index');
+    Route::put('order_items/{order_item}', [OrderItemController::class, 'update'])->name('order_items.update');
+    Route::delete('order_items/{order_item}', [OrderItemController::class, 'destory'])->name('order_items.delete');
 
     //Checkout Route
-    Route::get('orders/checkout/{id}',[CheckoutController::class,'index'])->name('orders.checkout');
-    Route::post('orders/checkout/{id}',[CheckoutController::class,'store'])->name('orders.checkout.store');
+    Route::get('orders/checkout/{id}', [CheckoutController::class, 'index'])->name('orders.checkout');
+    Route::post('orders/checkout/{id}', [CheckoutController::class, 'store'])->name('orders.checkout.store');
 
 
     //Cart route
@@ -105,51 +114,61 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Customer Controller
     Route::resource('customers', CustomerController::class);
     Route::get('get-customer-data', [CustomerController::class, 'getData'])->name('customer.getData');
+    Route::get('get-order-type-data', [CustomerController::class, 'getType'])->name('customer.getType');
+
+
+    //Staff Controller
+    Route::resource('staffs', StaffController::class);
+    Route::get('get-staff-data', [StaffController::class, 'getData'])->name('staff.getData');
+    Route::get('staffs/{id}/walllet-transaction', [StaffController::class, 'wallet_transaction'])->name('staffs.wallet_transaction');
+    Route::post('staffs/{id}/wallet-transaction', [StaffController::class, 'store_wallet_transaction'])->name('staffs.wallet_transactions.store');
+
+    //Patient Controller
+    Route::resource('patients', PatientController::class);
+    Route::post('patients/{id}/discharge', [PatientController::class,'discharge'])->name('patients.discharge');
+
+    Route::get('get-patient-data', [PatientController::class, 'getData'])->name('patient.getData');
 
     //Customer Wallet Transacton
-    Route::get('customers/{customer}/wallet-transaction',[CustomerWalletTransactionController::class,'index'])->name('customers.wallet_transactions.index');
-    Route::get('customers/{customer}/wallet-transaction/create',[CustomerWalletTransactionController::class,'create'])->name('customers.wallet_transactions.create');
-    Route::post('customers/{customer}/wallet-transaction',[CustomerWalletTransactionController::class,'store'])->name('customers.wallet_transactions.store');
+    Route::get('customers/{customer}/wallet-transaction', [CustomerWalletTransactionController::class, 'index'])->name('customers.wallet_transactions.index');
+    Route::get('customers/{customer}/wallet-transaction/create', [CustomerWalletTransactionController::class, 'create'])->name('customers.wallet_transactions.create');
+    Route::post('customers/{customer}/wallet-transaction', [CustomerWalletTransactionController::class, 'store'])->name('customers.wallet_transactions.store');
 
     Route::get('get-customer-wallet-transaction-data', [CustomerWalletTransactionController::class, 'getData'])->name('customers.wallet_transactions.getData');
 
 
 
     //Setting Controller
-    Route::get('/settings',[SettingController::class,'create'])->name('settings.create');
-    Route::post('/settings',[SettingController::class,'store'])->name('settings.store');
+    Route::get('/settings', [SettingController::class, 'create'])->name('settings.create');
+    Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 
 
 
     //Report Controller
-    Route::get('reports/sales',[ReportController::class,'index'])->name('reports.sales.index');
+    Route::get('reports/sales', [ReportController::class, 'index'])->name('reports.sales.index');
     Route::get('get-sales-report-data', [ReportController::class, 'getSalesData'])->name('reports.salesData');
     Route::get('export-sales-report-data', [ReportController::class, 'exportSales'])->name('reports.exportSales');
 
     //ItemSalesReport Controller
-    Route::get('reports/item-sales',[ItemSalesReportController::class,'index'])->name('reports.item_sales.index');
+    Route::get('reports/item-sales', [ItemSalesReportController::class, 'index'])->name('reports.item_sales.index');
     Route::get('get-item-sales-report-data', [ItemSalesReportController::class, 'getItemSalesData'])->name('reports.itemSalesData');
     Route::get('export-item-sales-report-data', [ItemSalesReportController::class, 'exportSales'])->name('reports.exportItemSales');
 
     //Customer Statement Controller
-    Route::get('reports/customer-statement',[CustomerStatementController::class,'index'])->name('reports.customer_statement');
+    Route::get('reports/customer-statement', [CustomerStatementController::class, 'index'])->name('reports.customer_statement');
     //KOT Controller
-    Route::get('kot',[KOTController::class,'index'])->name('kot.index');
-    Route::post('complete-order-item',[KOTController::class,'completeOrderItem'])->name('kot.completeOrderItem');
+    Route::get('kot', [KOTController::class, 'index'])->name('kot.index');
+    Route::post('complete-order-item', [KOTController::class, 'completeOrderItem'])->name('kot.completeOrderItem');
     Route::get('get-order-data-for-kot', [KOTController::class, 'getData'])->name('kot.getData');
     Route::get('get-order-detail-for-kot', [KOTController::class, 'getOrderDetail'])->name('kot.getOrderDetail');
 
     //Payment Type Controller
-    Route::get('payment-types',[PaymentTypeController::class,'index'])->name('payment_types.index');
+    Route::get('payment-types', [PaymentTypeController::class, 'index'])->name('payment_types.index');
     Route::get('payment-types/changeStatus', [PaymentTypeController::class, 'changeStatus'])->name('payment_types.changeStatus');
-
 });
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //Invoice Controller
 Route::get('/order/invoice/{order}', [App\Http\Controllers\InvoiceController::class, 'index'])->name('orders.getBill');
-
-
-

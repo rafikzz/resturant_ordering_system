@@ -87,6 +87,20 @@ class CustomerController extends Controller
         $breadcrumbs =[ 'Customer'=>route('admin.customers.index'), 'Wallet Transaction'=>'#'];
         return view('admin.customers.wallet_transaction',compact('customer','title','breadcrumbs'));
     }
+    public function getType(Request $request)
+    {
+        if(true)
+        {
+            $customers =Customer::select('id','name','phone_no')->where('is_staff',$request->customer_type)->where('status',1)->orderBy('name')->get();
+
+            return response()->json([
+                'status'=>'success',
+                'message'=>'Customer data fetched successfully',
+                'customers'=>$customers
+            ]);
+        }
+
+    }
 
     public function getData(Request $request)
     {

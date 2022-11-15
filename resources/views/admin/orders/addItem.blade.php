@@ -1,7 +1,61 @@
-@extends('layouts.admin.master')
+@extends('layouts.admin.orders.master')
 
 @section('content')
     <div class="row">
+        <div class="col-lg-6">
+            <div class="">
+                <div class="card-header">
+                    <div class="card-tools mt-1" style="float: left;">
+                        <div class="input-group mb-3">
+                            <input type="text" id="search-items" class="form-control" placeholder="Search"
+                                style="border-radius: 0.57rem ">
+                            {{-- <div class="input-group-append">
+                                <button type="button" class="btn input-group-text"><i class="fas fa-search"></i></button>
+                            </div> --}}
+                        </div>
+                    </div>
+                    <div class="card-tools">
+
+
+                        <div class="form-group">
+                            <select class="form-control " id="category">
+                                <option selected value="">All</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body " id="menu-items">
+                    @foreach ($categories as $category)
+                        <div class="row menu-category" data-category="{{ $category->id }}">
+                            <div class="col-12">
+                                <h6>{{ $category->title }}</h6>
+                            </div>
+                            @foreach ($category->active_items as $item)
+                                <div class="col-md-6 menu-items">
+                                    <div class="food-item-card text-center">
+                                        <div class="food-item-image">
+                                            <img src="{{ $item->image() }}" alt="food-item"></a>
+                                        </div>
+                                        <div class="food-item-content">
+                                            <h6 class="food-item-name">{{ $item->name }}</h6>
+                                            <h6 class="food-item-price"><span>Rs. {{ $item->price }}</h6><button
+                                                data-id="{{ $item->id }}" data-price="{{ $item->price }}"
+                                                data-name="{{ $item->name }}" class="food-item-add  btn-success add-item"
+                                                title="Add to Cart"><i class="fas fa-cart-plus"></i><span>
+                                                    Add</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
         <div class="col-lg-6">
             <form action="{{ route('admin.orders.addItem', $order->id) }}" id="order-form" method="POST">
                 @csrf
@@ -11,11 +65,60 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
-                                    <label for="table_no"> Table No</label>
-                                    <input type="text" class="form-control" placeholder="Set Table No" id="table_no"
-                                        autocomplete="off" name="table_no" value="{{ old('table_no') ?: $order->table_no }}"
-                                        required readonly>
-                                    @error('table_no')
+                                    <label for="customer_id"> Customer</label>
+                                    <input type="text" class="form-control" placeholder="Set Table No" id="customer_id"
+                                        autocomplete="off" name="customer_id"
+                                        value="{{ $order->customer->name }} ({{ $order->customer->phone_no }})" required
+                                        readonly>
+                                    @error('customer_id')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group  ml-n2">
+                                    <label for="customer_type">Customer Type</label>
+                                    <select name="customer_type" id="customer_type" class="form-control" disabled>
+                                        <option value="" {{ $order->customer->is_staff === null ? 'selected' : '' }}>
+                                            Walking Cutomer</option>
+                                        <option value="1" {{ $order->customer->is_staff === 1 ? 'selected' : '' }}>
+                                            Staff</option>
+                                        <option value="0" {{ $order->customer->is_staff === 0 ? 'selected' : '' }}>
+                                            Patient</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group  ml-n2">
+                                    <label for="destination">Order Destination</label>
+                                    <select value="" name="destination" class="form-control" disabled>
+                                        <option value="" {{ $order->destination == null ? 'selected' : '' }}>None
+                                        </option>
+                                        <option value="table" {{ $order->destination == 'table' ? 'selected' : '' }}>Table
+                                        </option>
+                                        <option value="room" {{ $order->destination == 'room' ? 'selected' : '' }}>Room
+                                        </option>
+                                    </select>
+                                    @error('destination')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group  ml-n2">
+                                    <label for="destination_no">Destination No</label>
+                                    <input type="text" class="form-control " placeholder="Set Destination No"
+                                        id="destination_no" autocomplete="off" value="{{ $order->destination_no }}"
+                                        name="destination_no" value="{{ old('destination_no') }}" readonly>
+                                    @error('destination_no')
                                         <span class=" text-danger" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -23,6 +126,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="row">
                             <h3>Order List</h3>
@@ -32,7 +136,7 @@
                                         <th>Order Slip {{ $order_no }}</th>
                                         <th>Quantity</th>
                                         <th>Price</th>
-                                        <th>Action</th>
+                                        <th width="150px">Action</th>
                                     </thead>
                                     @foreach ($items as $item)
                                         <tr>
@@ -44,104 +148,152 @@
                                     @endforeach
                                 @endforeach
                                 <thead>
-                                    <th>Order Slip {{ isset($order_no)?$order_no+1: 1 }}</th>
+                                    <th>Order Slip {{ isset($order_no) ? $order_no + 1 : 1 }}</th>
                                     <th>Quantity</th>
                                     <th>Price</th>
-                                    <th>Action</th>
+                                    <th width="150px">Action</th>
                                 </thead>
                                 <tbody id="order-list">
 
                                 </tbody>
+                                <tr>
+                                    <td colspan="3">Total</td>
+                                    <td> <b id="totalAmount">Rs. {{ $order->total }}</b></td>
+                                </tr>
+                                <tr>
+                                    <th colspan="4">Checkout Information</th>
+                                </tr>
+                                <tbody id="checkout">
+                                    <tr>
+                                        <td colspan="3">Coupon</td>
+                                        <td> <select name="coupon_id" class="form-control form-control-sm  float-right"
+                                                id="coupon_id">
+                                                <option value="">None</option>
+                                                @foreach ($coupons as $coupon)
+                                                    <option value="{{ $coupon->id }}" rel="{{ $coupon->discount }}">
+                                                        {{ $coupon->title }} :Rs
+                                                        {{ $coupon->discount }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Discount:</td>
+                                        <td class="btn-group"><input id="discount" value="0" max="{{ $order->total }}"
+                                                step=".01" class="form-control form-control-sm " type="number">
+                                            <input type="hidden" id="discount-amount" name="discount">
+                                            <button id="apply-discount" type="button"
+                                                class="btn btn-primary btn-sm ml-2">Apply</button>
+                                        </td>
+                                    </tr>
+                                    @if ($service_charge)
+                                        <tr>
+                                            <td colspan="3">Service Charge:</td>
+                                            <td id="service-charge">Rs. {{ $order->serviceCharge() }}</td>
+                                        </tr>
+                                    @endif
+                                    @if ($tax)
+                                        <tr>
+                                            <td colspan="3">Tax Amount:</td>
+                                            <td id="tax-amount">Rs. {{ $order->taxAmount() }}</td>
+                                        </tr>
+                                    @endif
+                                    <tr>
+                                        <td colspan="3">Grand Total:</td>
+                                        <td id="grand-total">Rs. {{ $order->totalWithTax() }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Payment Type:</td>
+
+                                        <td> <select name="payment_type" class="form-control form-control-sm  float-right"
+                                                id="payment_type" required="">
+                                                @isset($order->customer->is_staff)
+                                                <option value="0" >Cash</option>
+                                                <option value="1" {{ ($order->customer->is_staff == 0)?'selected': ''}}>Account
+                                                </option>
+                                                @else
+                                                    <option value="0" selected>Cash</option>
+                                                @endisset
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Paid Amount:</td>
+                                        <td> <input type="number"value="{{ ($order->customer->is_staff ==0)? 0:$order->totalWithTax() }}" {{ ($order->customer->is_staff == 0)?'': 'readonly'}}
+                                                step="0.01" min="0" class="form-control form-control-sm"
+                                                name="paid_amount" id="paid_amount" required></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">Due Amount:</td>
+                                        <td> <input type="number" value="{{ ($order->customer->is_staff ==0)? $order->totalWithTax():0 }}" class="form-control form-control-sm"
+                                                min="0" readonly name="due_amount" id="due_amount" required></td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-6">
-                                <b>Total</b>
-                            </div>
-                            <div class="col-5 ">
-                                <b class="float-right" id="totalAmount">Rs. {{ $order->total }}</b>
-                            </div>
-                        </div>
-                        <hr />
-                        <hr />
-                        <div class="row">
+                        <div class="row text-center">
                             <div class="col-12 ">
-                                <button id="order-submit" class="btn btn-primary float-right">Add to Order</button>
+                                <button id="order-checkout" name="checkout" value="1"
+                                    class="btn btn-primary ">Checkout</button>
+
+                                <button id="order-submit" class="btn btn-primary ">Add to Order</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Add Food Item</h2>
-                    <div class="card-tools">
-                        <a class="btn btn-primary" href="{{ route('admin.orders.index') }}"> Back</a></i></a>
-                    </div>
-                </div>
-
-                <div class="card-body ">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group  ml-n2">
-                                <label for="category_id"> Category</label>
-                                <select class="form-control" id="category">
-                                    <option selected value="" disabled>--Select Category Number--</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->title }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-                <div class="row py-3  d-flex" id="category-items" style="  min-height: 50vh; ">
-
-                </div>
-            </div>
-        </div>
-
-
 
     </div>
 @endsection
 @section('js')
     <script>
         let orderTotal = {{ $order->total }};
+        let tax = {!! $tax !!};
+        let service_charge = {!! $service_charge !!};
+        var total = {{ $order->total }};
+        var net_total ={{$order->total}};
+        var grand_total = {{ $order->totalWithTax() }};
+        let couponDictionary = {!! $couponsDictionary !!};
+        let coupon_discount = 0;
 
         $(function() {
 
             //Getting Items on changing category
             $('#category').on('change', function() {
                 let category_id = $(this).val();
-                //Clearing previous category items
-                clearCategoryItems();
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('admin.item.getCategoryItemsData') }}',
-                    data: {
-                        'category_id': category_id
-                    },
-                    success: function(data) {
-                        if (data.message === 'success') {
-                            //Getting food items
-                            data.items.forEach(function(item) {
-                                $('#category-items').append(template(item.id, item.name,
-                                    item.price, item.image));
-                            })
-                        } else {
-                            console.log(data.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        console.log('Internal Server Error')
-                    }
-                });
+
+                if (category_id) {
+                    $('.menu-category').hide();
+                    $('.menu-category[data-category="' + category_id + '"]').show();
+                } else {
+                    $('.menu-category').show();
+
+                }
+
+            });
+            //For Coupon Discount
+            $('#coupon_id').on('change', function() {
+                coupon_discount = 0;
+                if ($(this).val()) {
+                    coupon_discount = couponDictionary[$(this).val()];
+                }
+                applyCouponDiscount(coupon_discount);
+
+            });
+
+            //Getting Items on changing category
+            $('#search-items').on('keyup', function() {
+                let search = $(this).val();
+                if (search) {
+                    $('.menu-items').hide();
+                    $('.menu-items').filter(function() {
+                        console.log($(this).closest().text().toLowerCase());
+                        return $(this).text().toLowerCase().indexOf(search.toLowerCase()) >= 0;
+                    }).show();
+                } else {
+                    $('.menu-items').show();
+                }
             });
         });
 
@@ -165,7 +317,8 @@
                     if (data.status === 'success') {
                         $('#order-list').html('');
                         for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item].id, data.items[item].name, data.items[item].price, data
+                            $('#order-list').append(tableRowTemplate(data.items[item].id, data.items[
+                                    item].name, data.items[item].price, data
                                 .items[item]
                                 .quantity));
 
@@ -245,7 +398,8 @@
         }
         //For setting the total
         function setTotal(totalAmount) {
-            var total = totalAmount + orderTotal;
+            total = totalAmount + orderTotal;
+            $('#coupon_id').trigger('change');
             $('#totalAmount').html('Rs. ' + total);
         }
         //Template of category item
@@ -304,6 +458,83 @@
                 text: text,
                 icon: icon,
             });
+        }
+
+        function applyCouponDiscount(discount) {
+            if (discount < total) {
+                net_total = total - discount;
+
+            } else {
+                net_total = 0;
+
+            }
+
+            $('#grand-total').text(foramtValue(net_total));
+            $('#discount').attr('max', net_total);
+            resetAppliedDiscount();
+            calculateSetServiceChargeAndTax()
+
+
+        }
+        //for applying discount
+        $('#apply-discount').on('click', function(e) {
+            let discount = parseFloat($('#discount').val());
+            if (isNaN(discount)) {
+                discount = 0;
+            }
+            if ($('#discount')[0].checkValidity()) {
+                $('#discount-amount').val(discount);
+                calculateSetServiceChargeAndTax(discount);
+
+            } else {
+
+                $("#discount")[0].reportValidity();
+            }
+
+        });
+        //for resseting applied discount
+        function resetAppliedDiscount() {
+            $('#discount').val(0);
+            $('#discount-amount').val(0);
+        }
+
+        function calculateSetServiceChargeAndTax(discount = 0) {
+            temp_total = parseFloat(net_total) - discount;
+            if (temp_total >= 0) {
+                let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
+                let tax_amount = parseFloat(((parseFloat(temp_total) + parseFloat(service_charge_amount)) * (tax / 100))
+                    .toFixed(2));
+
+                grand_total = ((temp_total + service_charge_amount) + tax_amount).toFixed(2);
+
+                $('#service-charge').text(foramtValue(service_charge_amount));
+                $('#tax-amount').text(foramtValue(tax_amount));
+                $('#grand-total').text(foramtValue(grand_total));
+                $('#paid_amount').val(grand_total);
+                $('#payment_type').trigger('change');
+
+
+            } else {
+                alert('Discount cannot be greater than total')
+            }
+        }
+        $('#payment_type').change(function() {
+            if ($(this).val() != 1) {
+                $('#paid_amount').val(grand_total);
+                $('#due_amount').val(0);
+
+                $('#paid_amount').attr('readonly', 'readonly');
+            } else {
+                $('#paid_amount').val(0);
+                $('#due_amount').val(grand_total);
+
+                $('#paid_amount').attr('readonly', false);
+
+            }
+        });
+
+        function foramtValue(val) {
+            return 'Rs. ' + val;
         }
     </script>
 @endsection

@@ -74,12 +74,17 @@
                             } else {
                                 return 0;
                             }
-                        }
+                        },
+
 
                     },
                     {
                         data: 'created_at',
                         name: 'created_at',
+                        render: {
+                            _: 'display',
+                            sort: 'timestamp'
+                        },
                         searchable: false
 
                     },

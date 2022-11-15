@@ -129,9 +129,9 @@ class CategoryController extends Controller
         if ($request->ajax()) {
             if ($request->mode == 0) {
                 if(!$request->order){
-                    $data = Category::select('*')->orderBy('order');
+                    $data = Category::select('*')->withCount('items')->orderBy('order');
                 }else{
-                    $data = Category::select('*');
+                    $data = Category::select('*')->withCount('items');
                 }
             } else {
                 $data = Category::select('*')->onlyTrashed()->orderBy('order');
@@ -174,8 +174,15 @@ class CategoryController extends Controller
                     function ($row, Request $request) use(  $canEdit,$canDelete) {
                         if (  $canEdit||$canDelete) {
                             if ($request->mode == 0) {
-                                $editBtn =    $canEdit? '<a class="btn btn-xs btn-primary" href="' . route('admin.categories.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
-                                $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $editBtn =    $canEdit? '<a class="btn btn-xs btn-warning" href="' . route('admin.categories.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                if(!($row->items_count))
+                                {
+                                    $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+
+                                }
+                                else{
+                                    $deleteBtn = null;
+                                }
                                 $formStart = '<form action="' . route('admin.categories.destroy', $row->id) . '" method="POST">
                                 <input type="hidden" name="_method" value="delete">' . csrf_field();
                                 $formEnd = '</form>';

@@ -27,7 +27,6 @@
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
-                            <th>Table No</th>
                             <th>Discount</th>
                             <th>Total</th>
                             <th>Order Datetime</th>
@@ -42,7 +41,6 @@
     </div>
 @endsection
 @section('js')
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script>
         $(document).ready(function() {
             // $('#table').DataTable({
@@ -91,10 +89,7 @@
                         data: 'bill_no',
                         name: 'bill_no'
                     },
-                    {
-                        data: 'table_no',
-                        name: 'table_no',
-                    },
+
                     {
                         data: 'discount',
                         name: 'discount'

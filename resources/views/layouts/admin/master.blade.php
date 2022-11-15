@@ -15,7 +15,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+        href="{{ asset('css/fonts.googleapis.css') }}">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('admin-lte/plugins/fontawesome-free/css/all.min.css') }}">
     <!-- Theme style -->
@@ -75,7 +75,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <div class="image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">{{ config('app.name', 'Laravel') }}</a>
+                        <a href="{{ route('dashboard') }}" class="d-block">{{ config('app.name', 'Laravel') }}</a>
                     </div>
                 </div>
 
@@ -93,7 +93,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </div>
 
                 <!-- Sidebar Menu -->
-                <nav class="mt-2">
+                <nav class="mt-2 text-sm">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                         data-accordion="false">
                         @include('layouts.admin._sidebar-menu')
@@ -177,25 +177,31 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {{-- datatalbes --}}
     <script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
     {{-- Jquery validation --}}
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+    <script src="{{ asset('js/jquery-validation-1.19.5/dist/jquery.validate.min.js') }}"></script>
     {{-- Moment Js --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+
     {{-- DateRange Picker --}}
     <script src="{{ asset('admin-lte/plugins/daterangepicker/daterangepicker.js') }}"></script>
+
+     {{-- jQuery Ui --}}
+     <script src="{{ asset('js/jQuery-ui.js') }}"></script>
     {{-- Bs custom file Input --}}
     <script src="{{ asset('admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
     {{-- Owl Carousel --}}
     <script src="{{ asset('js/owl.carousel.js') }}"></script>
     {{-- Ck Editor --}}
-    <script src="https://cdn.ckeditor.com/4.12.1/standard/ckeditor.js"></script>
+    <script src="{{ asset('js/ckeditor/ckeditor.js') }}"></script>
     {{-- BsColorPicker --}}
     <script src="{{ asset('admin-lte/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
     {{-- Sweet Alert --}}
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/sweetAlert.js') }}"></script>
+
     {{-- Chart Js --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    {{-- Print This Js --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.js" integrity="sha512-Fd3EQng6gZYBGzHbKd52pV76dXZZravPY7lxfg01nPx5mdekqS8kX4o1NfTtWiHqQyKhEGaReSf4BrtfKc+D5w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ asset('js/chartJs.js') }}"></script>
+
+    {{-- Print This Js v1.15--}}
+    <script src="{{ asset('js/printThis.js') }}"></script>
 
     <script>
         $(document).ready(function() {

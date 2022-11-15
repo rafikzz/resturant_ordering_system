@@ -26,7 +26,7 @@ class OrderBreakDownController extends Controller
         $processingStatus = Status::where('title', 'processing')->first()->id;
 
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
-        $orderItems = OrderItem::select('item_id', DB::raw('sum(quantity) as total_quantity'))->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->orderBy('total_quantity')->get();
+        $orderItems = OrderItem::select('item_id', DB::raw('sum(total) as total_quantity'))->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->orderBy('total_quantity')->get();
         $customers = Customer::where('id', '!=', $order->customer_id)->get();
 
         return view('admin.orders.break_down', compact('order', 'orderItems', 'breadcrumbs', 'title', 'customers', 'title'));
@@ -39,7 +39,7 @@ class OrderBreakDownController extends Controller
         $processingStatus = Status::where('title', 'processing')->first()->id;
 
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
-        $orderItems = OrderItem::select('item_id', DB::raw('sum(quantity) as quantity'))->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->orderBy('quantity')->get();
+        $orderItems = OrderItem::select('item_id', DB::raw('sum(total) as quantity'))->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->orderBy('quantity')->get();
         $customers = Customer::select('id', 'name', 'phone_no')->where('id', '!=', $order->customer_id)->get();
         $itemQuantityDictionary = [];
         $itemDictionary = [];
@@ -89,8 +89,8 @@ class OrderBreakDownController extends Controller
                 $newOrder->update([
                     'bill_no' => $order->bill_no,
                     'customer_id' => $request->customer_id,
-                    'is_take_away' => $order->is_take_away,
-                    'table_no' => $order->table_no,
+                    'destination' => $order->destination,
+                    'destination_no' => $order->destination_no,
                     'total' =>  0,
                     'status_id' => 1,
                     'created_by' => auth()->id(),
@@ -102,8 +102,8 @@ class OrderBreakDownController extends Controller
                 $newOrder = Order::create([
                     'bill_no' => $order->bill_no,
                     'customer_id' => $request->customer_id,
-                    'is_take_away' => $order->is_take_away,
-                    'table_no' => $order->table_no,
+                    'destination' => $order->destination,
+                    'destination_no' => $order->destination_no,
                     'total' =>  0,
                     'status_id' => 1,
                     'created_by' => auth()->id(),
@@ -122,6 +122,7 @@ class OrderBreakDownController extends Controller
                 }
             }
             $newOrder->setTotal();
+            $order->setTotal();
 
             // if($orderTotal ==0)
             // {
@@ -160,8 +161,8 @@ class OrderBreakDownController extends Controller
                 if ($newOrder) {
                     $newOrder->update([
                         'bill_no' => $order->bill_no,
-                        'is_take_away' => $order->is_take_away,
-                        'table_no' => $order->table_no,
+                        'destination' => $order->destination,
+                        'destination_no' => $order->destination_no,
                         'total' =>  0,
                         'status_id' => 1,
                         'created_by' => auth()->id(),
@@ -174,8 +175,8 @@ class OrderBreakDownController extends Controller
                     $newOrder = Order::create([
                         'bill_no' => $order->bill_no,
                         'customer_id' => $key,
-                        'is_take_away' => $order->is_take_away,
-                        'table_no' => $order->table_no,
+                        'destination' => $order->destination,
+                        'destination_no' => $order->destination_no,
                         'total' =>  0,
                         'status_id' => 1,
                         'created_by' => auth()->id(),
@@ -218,7 +219,11 @@ class OrderBreakDownController extends Controller
                     $this->storeOrderItem($order->id, $item->item_id, $item->total_quantity, $item->item->price);
                 }
             }
-            $order->setTotal();
+           $orderAmount = $order->setTotal();
+           if($orderAmount == 0)
+           {
+            $order->delete();
+           }
 
         } catch (\Throwable $th) {
             DB::rollback();

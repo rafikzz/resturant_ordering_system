@@ -5,7 +5,7 @@
         <div class="col">
             <div class="card card-outline card-success ">
                 <div class="card-header">
-                    <h2 class="card-title">Add User</h2>
+                    <h2 class="card-title">Add Role</h2>
                     <div class="card-tools">
                         <a class="btn btn-primary" href="{{ route('admin.roles.index') }}"> Back</a></i></a>
                     </div>
