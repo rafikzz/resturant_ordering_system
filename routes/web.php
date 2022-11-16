@@ -112,8 +112,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('edit-cart-item-quantity', [CartController::class, 'editCartItemQuantity'])->name('cart.editCartItemQuantity');
 
     //Customer Controller
-    Route::resource('customers', CustomerController::class);
-    Route::get('get-customer-data', [CustomerController::class, 'getData'])->name('customer.getData');
+    // Route::resource('customers', CustomerController::class);
+    // Route::get('get-customer-data', [CustomerController::class, 'getData'])->name('customer.getData');
     Route::get('get-order-type-data', [CustomerController::class, 'getType'])->name('customer.getType');
 
 
@@ -130,9 +130,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-patient-data', [PatientController::class, 'getData'])->name('patient.getData');
 
     //Customer Wallet Transacton
-    Route::get('customers/{customer}/wallet-transaction', [CustomerWalletTransactionController::class, 'index'])->name('customers.wallet_transactions.index');
-    Route::get('customers/{customer}/wallet-transaction/create', [CustomerWalletTransactionController::class, 'create'])->name('customers.wallet_transactions.create');
-    Route::post('customers/{customer}/wallet-transaction', [CustomerWalletTransactionController::class, 'store'])->name('customers.wallet_transactions.store');
+    // Route::get('customers/{customer}/wallet-transaction', [CustomerWalletTransactionController::class, 'index'])->name('customers.wallet_transactions.index');
+    // Route::get('customers/{customer}/wallet-transaction/create', [CustomerWalletTransactionController::class, 'create'])->name('customers.wallet_transactions.create');
+    // Route::post('customers/{customer}/wallet-transaction', [CustomerWalletTransactionController::class, 'store'])->name('customers.wallet_transactions.store');
 
     Route::get('get-customer-wallet-transaction-data', [CustomerWalletTransactionController::class, 'getData'])->name('customers.wallet_transactions.getData');
 

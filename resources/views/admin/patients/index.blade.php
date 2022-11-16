@@ -7,7 +7,13 @@
                 <div class="card-header">
                     <h2 class="card-title">Patient List</h2>
                     <div class="card-tools form-inline">
-                        @can('customer_create')
+                        @can('patients_list')
+                            <select id="mode" class="form-control">
+                                <option value="1" selected>Acitve</option>
+                                <option value="0">Discharged</option>
+                            </select>
+                        @endcan
+                        @can('patients_create')
                             <a class="btn btn-success ml-3" href="{{ route('admin.patients.create') }}"> <i
                                     class="fa fa-plus"></i></a>
                         @endcan
@@ -65,7 +71,7 @@
                         data: 'phone_no',
                         name: 'phone_no',
 
-                    },    {
+                    }, {
                         data: 'room_no',
                         name: 'room_no',
 
@@ -73,10 +79,10 @@
                     {
                         data: 'balance',
                         name: 'balance',
-                        render:function(balance) {
-                            if( balance < 0) {
+                        render: function(balance) {
+                            if (balance < 0) {
                                 return -balance;
-                            }else  {
+                            } else {
                                 return balance;
                             }
                         }
@@ -99,6 +105,9 @@
                     },
                 ]
 
+            });
+            $(document).on('change', '#mode', function() {
+                table.draw();
             });
 
             //for delete btn

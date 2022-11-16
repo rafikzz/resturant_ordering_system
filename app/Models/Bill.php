@@ -5,6 +5,7 @@ namespace App\Models;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use LaravelDaily\Invoices\Contracts\PartyContract;
 use LaravelDaily\Invoices\Facades\Invoice as FacadesInvoice;
 use LaravelDaily\Invoices\Invoice;
 
@@ -14,6 +15,25 @@ class Bill extends Invoice
      * @var float
      */
     public $service_charge;
+    public $payment_type;
+    public $cashier;
+    public $time;
+
+
+    public function cashier(PartyContract $cashier)
+    {
+        $this->cashier = $cashier;
+
+        return $this;
+    }
+    public function time($time)
+    {
+        if($time)
+        {
+            $this->time = $time;
+        }
+        return $this;
+    }
 
 
     public function serviceCharge(float $service_charge)
@@ -21,6 +41,15 @@ class Bill extends Invoice
         if($service_charge)
         {
             $this->service_charge = $service_charge;
+        }
+        return $this;
+    }
+
+    public function paymentType(float $payment_type)
+    {
+        if($payment_type)
+        {
+            $this->payment_type = $payment_type;
         }
         return $this;
     }

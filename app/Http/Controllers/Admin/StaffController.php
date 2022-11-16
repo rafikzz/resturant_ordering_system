@@ -20,19 +20,21 @@ class StaffController extends Controller
     {
         $this->middleware('permission:staff_list|staff_create|staff_edit|staff_delete', ['only' => ['index','show','getData']]);
         $this->middleware('permission:staff_create', ['only' => ['create','store']]);
+        $this->middleware('permission:staff_wallet_transaction', ['only' => ['wallet_transaction','store_wallet_transaction']]);
+
         $this->title = 'Staff Management';
     }
     public function index(Request $request)
     {
         $title = $this->title;
-        $breadcrumbs =[ 'Customer'=>route('admin.staffs.index')];
+        $breadcrumbs =[ 'Staff'=>route('admin.staffs.index')];
         return view('admin.staffs.index', compact('title','breadcrumbs'));
     }
 
     public function create()
     {
         $title = $this->title;
-        $breadcrumbs =[ 'Customer'=>route('admin.staffs.index'),'Create'=>'#'];
+        $breadcrumbs =[ 'Staff'=>route('admin.staffs.index'),'Create'=>'#'];
 
         return view('admin.staffs.create', compact('title','breadcrumbs'));
 
@@ -61,7 +63,7 @@ class StaffController extends Controller
     {
         $customer=Customer::findOrFail($id);
         $title = $this->title;
-        $breadcrumbs =[ 'Customer'=>route('admin.staffs.index'),'Edit'=>'#'];
+        $breadcrumbs =[ 'Staff'=>route('admin.staffs.index'),'Edit'=>'#'];
 
         return view('admin.staffs.edit', compact('title','customer','breadcrumbs'));
 
@@ -80,7 +82,7 @@ class StaffController extends Controller
     public function show($id)
     {
         $title = $this->title;
-        $breadcrumbs =[ 'Customer'=>route('admin.staffs.index'), 'Show'=>'#'];
+        $breadcrumbs =[ 'Staff'=>route('admin.staffs.index'), 'Show'=>'#'];
 
         $customer =Customer::where('is_staff',1)->findOrFail($id);
 
@@ -93,7 +95,7 @@ class StaffController extends Controller
         $customer =Customer::findOrFail($id);
         $transaction_types =TransactionType::whereIn('id',[1,2])->get();
         $title = $this->title;
-        $breadcrumbs =[ 'Customer'=>route('admin.customers.index'), 'Wallet Transaction'=>'#'];
+        $breadcrumbs =[ 'Staff'=>route('admin.staffs.index'), 'Wallet Transaction'=>'#'];
         return view('admin.staffs.wallet_transaction',compact('customer','transaction_types','title','breadcrumbs'));
     }
 

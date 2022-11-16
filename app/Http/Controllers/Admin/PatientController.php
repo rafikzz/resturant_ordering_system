@@ -93,7 +93,13 @@ class PatientController extends Controller
     public function getData(Request $request)
     {
         if ($request->ajax()) {
-            $data = Customer::select('table_customers.*')->where('is_staff',0);
+            if($request->mode)
+            {
+                $data = Customer::select('table_customers.*')->where('is_staff',0)->where('status',1);
+            }else{
+                $data = Customer::select('table_customers.*')->where('is_staff',0)->where('status',0);
+
+            }
             $canEdit = auth()->user()->can('patient_edit');
             $canDischarge = auth()->user()->can('patient_discharge');
 

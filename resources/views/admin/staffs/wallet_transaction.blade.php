@@ -6,7 +6,7 @@
             <div class="card-header">
                 <h2 class="card-title">Add Staff Wallet Transaction</h2>
                 <div class="card-tools">
-                    <a class="btn btn-primary" href="{{ route('admin.customers.index',$customer->id) }}"> Back</a></i></a>
+                    <a class="btn btn-primary" href="{{ route('admin.staffs.index',$customer->id) }}"> Back</a></i></a>
                 </div>
             </div>
             <div class="card-body ">

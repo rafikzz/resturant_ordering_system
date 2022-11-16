@@ -8,8 +8,8 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'serial'          => 'Serial No.',
-    'date'            => 'Invoice date',
+    'serial'          => 'Bill No.',
+    'date'            => 'Date',
     'seller'          => 'Seller',
     'buyer'           => 'Buyer',
     'address'         => 'Address',
@@ -20,6 +20,9 @@ return [
     'units'           => 'Units',
     'quantity'        => 'Qty',
     'price'           => 'Price',
+    'rate'            => 'Rate',
+    'amount'          => 'Amount',
+    'particulars'     => 'Particulars',
     'discount'        => 'Discount',
     'tax'             => 'Tax',
     'sub_total'       => 'Sub total',
@@ -33,5 +36,8 @@ return [
     'amount_in_words' => 'Amount in words',
     'notes'           => 'Notes',
     'shipping'        => 'Shipping',
+    'time'            =>  'Time',
+    'cashier'         =>  'Cashier',
+    'thanks_for_visiting'=>'Thanks For Visiting !!'
 
 ];
