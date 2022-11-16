@@ -379,7 +379,6 @@
                             if (data.status === 'success') {
                                 setTotal(data.total);
                                 removeItem(btn, item_id);
-                                sweetAlert('Success', data.message, 'success');
                             } else {
                                 alert(data.message);
                             }

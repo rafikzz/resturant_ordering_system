@@ -36,7 +36,7 @@ return [
     'amount_in_words' => 'Amount in words',
     'notes'           => 'Notes',
     'shipping'        => 'Shipping',
-    'time'            =>  'Time',
+    'time'            =>  'Published On',
     'cashier'         =>  'Cashier',
     'thanks_for_visiting'=>'Thanks For Visiting !!'
 

@@ -123,7 +123,7 @@ class OrderController extends Controller
 
                 'bill_no' => $billNo,
                 'destination_no' => $request->destination_no,
-                'destination' => $request->destination,
+                'destination' => ucfirst($request->destination),
                 'customer_id' => $customerId,
                 'total' =>  $total,
                 'service_charge' =>  $service_charge_amount,
@@ -136,7 +136,7 @@ class OrderController extends Controller
                 'order_datetime' => Carbon::now(),
             ]);
 
-            if (isset($request->customer_type) && $request->payment_type == 1 && $request->checkout ==1) {
+            if (isset($request->customer_type) && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -168,12 +168,12 @@ class OrderController extends Controller
         $processingStatus = Status::where('title', 'processing')->first()->id;
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
 
-        $customer =Customer::where('id',$order->customer_id)->first();
+        $customer = Customer::where('id', $order->customer_id)->first();
 
         $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=', Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
         $categories = Category::with('active_items')->whereHas('active_items')->orderBy('order')->get();
-        $customers = Customer::where('is_staff', $customer->is_staff)->where('status',1)->orderBy('name')->get();
+        $customers = Customer::where('is_staff', $customer->is_staff)->where('status', 1)->orderBy('name')->get();
 
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
@@ -181,8 +181,20 @@ class OrderController extends Controller
         $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get()->groupBy('order_no');
 
 
-        return view('admin.orders.edit', compact('title', 'orderItems', 'setting','tax','service_charge',
-        'order','customer','coupons','couponsDictionary' , 'categories','customers', 'breadcrumbs'));
+        return view('admin.orders.edit', compact(
+            'title',
+            'orderItems',
+            'setting',
+            'tax',
+            'service_charge',
+            'order',
+            'customer',
+            'coupons',
+            'couponsDictionary',
+            'categories',
+            'customers',
+            'breadcrumbs'
+        ));
     }
 
 
@@ -237,7 +249,7 @@ class OrderController extends Controller
             $order->update([
                 'customer_id' =>  $customerId,
                 'destination_no' => $request->destination_no,
-                'destination' => $request->destination,
+                'destination' => ucfirst($request->destination),
                 'total' =>  $total,
                 'service_charge' =>  $service_charge_amount,
                 'tax' =>  $tax_amount,
@@ -247,7 +259,7 @@ class OrderController extends Controller
                 'updated_by' => auth()->id(),
             ]);
 
-            if (isset($request->customer_type) && $request->payment_type == 1 && $request->checkout ==1) {
+            if (isset($request->customer_type) && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -280,7 +292,7 @@ class OrderController extends Controller
         $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=', Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
         $categories = Category::with('active_items')->whereHas('active_items')->orderBy('order')->get();
-        $customers = Customer::where('is_staff', null)->where('status',1)->orderBy('name')->get();
+        $customers = Customer::where('is_staff', null)->where('status', 1)->orderBy('name')->get();
 
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
@@ -292,8 +304,18 @@ class OrderController extends Controller
         // $categories = Category::all();
         // $customers = Customer::all();
 
-        return view('admin.orders.addItem', compact('title','coupons','couponsDictionary','service_charge','tax',
-         'order', 'categories', 'customers', 'breadcrumbs', 'orderItems'));
+        return view('admin.orders.addItem', compact(
+            'title',
+            'coupons',
+            'couponsDictionary',
+            'service_charge',
+            'tax',
+            'order',
+            'categories',
+            'customers',
+            'breadcrumbs',
+            'orderItems'
+        ));
     }
 
     public function updateMoreItem(Request $request, $id)
@@ -303,7 +325,7 @@ class OrderController extends Controller
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
         $processingStatus = Status::where('title', 'processing')->first()->id;
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
-        $customer=Customer::where('id',$order->customer_id)->first();
+        $customer = Customer::where('id', $order->customer_id)->first();
         DB::beginTransaction();
         try {
 
@@ -319,7 +341,7 @@ class OrderController extends Controller
                     'quantity' => $item->total
                 ));
             }
-            $total =Cart::getTotal();
+            $total = Cart::getTotal();
             $coupon_amount = 0;
             if ($request->coupon_id) {
                 $coupon = Coupon::where('id', $request->coupon_id)->where('expiry_date', '>=', Carbon::today())->first();
@@ -350,7 +372,7 @@ class OrderController extends Controller
                 'status_id' => $request->checkout ? $completedStatus : 1,
                 'updated_by' => auth()->id(),
             ]);
-            if (isset($customer->is_staff) && $request->payment_type == 1 && $request->checkout ==1)  {
+            if (isset($customer->is_staff) && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -406,12 +428,17 @@ class OrderController extends Controller
 
 
             return DataTables::of($data)
+                ->editColumn('destination', function ($order) {
+                    return [
+                        'display' => $order->destination.' '.$order->destination_no,
+                        'order' => $order->destination
+                    ];
+                })
                 ->editColumn('created_at', function ($order) {
                     return [
                         'display' => $order->created_at->diffForHumans(),
                         'timestamp' => $order->created_at
                     ];
-
                 })
                 ->addColumn(
                     'action',
@@ -497,11 +524,10 @@ class OrderController extends Controller
     {
         $wallet_balance = isset($order->customer_id) ? $order->customer->wallet_balance() : 0;
         $current_balance = $wallet_balance - $dueAmount;
-        $customer = Customer::where('id',$order->customer_id)->whereNotNull('is_staff')->first();
-        if($customer)
-        {
+        $customer = Customer::where('id', $order->customer_id)->whereNotNull('is_staff')->first();
+        if ($customer) {
             $customer->update([
-                'balance'=>$current_balance
+                'balance' => $current_balance
             ]);
         }
 

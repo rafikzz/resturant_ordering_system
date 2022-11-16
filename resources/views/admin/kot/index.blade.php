@@ -24,7 +24,8 @@
                             <th>Id</th>
                             <th>Bill No</th>
                             <th>Customer Name</th>
-                            <th>Table No</th>
+                            <th>Destination</th>
+                            <th>Destination No</th>
                             <th>Created At</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -76,8 +77,12 @@
 
                     },
                     {
-                        data: 'table_no',
-                        name: 'table_no',
+                        data: 'destination',
+                        name: 'destination',
+                    },
+                    {
+                        data: 'destination_no',
+                        name: 'destination_no',
                     },
                     {
                         data: 'created_at',

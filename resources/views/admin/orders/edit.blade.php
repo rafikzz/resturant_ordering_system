@@ -602,7 +602,6 @@
                         success: function(data) {
                             if (data.status === 'success') {
                                 removeItem(btn, item_id);
-                                sweetAlert('Success', data.message, 'success');
                                 cartTotal =parseFloat(data.total);
                                 setTotal();
 

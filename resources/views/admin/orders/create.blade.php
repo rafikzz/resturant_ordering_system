@@ -210,7 +210,7 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3">Discount:</td>
-                                        <td class="btn-group"><input id="discount" value="0" max="0"
+                                        <td class="btn-group"><input id="discount" value="0" max="0" min="0"
                                                 step=".01" class="form-control form-control-sm " type="number">
                                             <input type="hidden" id="discount-amount" name="discount">
                                             <button id="apply-discount" type="button"
@@ -455,7 +455,7 @@
                             if (data.status === 'success') {
                                 setTotal(data.total);
                                 removeItem(btn, item_id);
-                                sweetAlert('Success', data.message, 'success');
+
                             } else {
                                 alert(data.message);
                             }

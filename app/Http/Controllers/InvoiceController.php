@@ -26,7 +26,7 @@ class InvoiceController extends Controller
         $cashier = new Party([
             'name'          =>  auth()->user()->name?:'Cashier',
         ]);
-        $time =Carbon::now()->format('H:i A');
+        $time =Carbon::now()->format('Y/m/d H:i A');
         $seller = new Party([
             'name'          =>  isset($setting)? $setting->company_name:'Seller',
             'address'       =>   isset($setting)? $setting->office_location:'XYZ Address',
@@ -54,7 +54,7 @@ class InvoiceController extends Controller
             ->totalDiscount($order->discount)
             ->totalAmount( $totalAmount)
             ->addItems($items)->template('invoice');
-        return view('vendor.invoices.templates.invoice',compact('invoice'));
+        // return view('vendor.invoices.templates.invoice',compact('invoice'));
 
         return $invoice->stream();
     }

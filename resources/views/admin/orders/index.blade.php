@@ -84,6 +84,10 @@
                     {
                         data: 'destination',
                         name: 'destination',
+                        render: {
+                            _: 'display',
+                            sort: 'order'
+                        },
                     },
                     {
                         data: 'discount',
