@@ -61,7 +61,6 @@ class PatientController extends Controller
                 'phone_no' => $request->phone_no,
                 'is_staff' => 0,
                 'status' => 1,
-                'room_no' => $request->room_no,
             ]);
             Patient::create([
                 'customer_id' => $customer->id,
@@ -102,7 +101,6 @@ class PatientController extends Controller
 
         $customer->name = $request->name;
         $customer->phone_no = $request->phone_no;
-        $customer->room_no = $request->room_no;
         $customer->save();
         Patient::updateOrCreate(
             ['customer_id' => $id],
