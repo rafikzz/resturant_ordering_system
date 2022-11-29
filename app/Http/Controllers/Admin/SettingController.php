@@ -52,9 +52,14 @@ class SettingController extends Controller
         }
         $setting->tax_status = $request->tax_status ?: 0;
         $setting->service_charge_status = $request->service_charge_status ?: 0;
+        $setting->delivery_charge_status = $request->delivery_charge_status ?: 0;
+
 
         if (isset($request->service_charge)) {
             $setting->service_charge = $request->service_charge;
+        }
+        if (isset($request->delivery_charge)) {
+            $setting->delivery_charge = $request->delivery_charge;
         }
         if ($logo = $request->file('logo')) {
             $path = 'images/logo/';

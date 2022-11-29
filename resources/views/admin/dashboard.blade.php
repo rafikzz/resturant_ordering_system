@@ -155,7 +155,6 @@
             dataType: 'json',
             success: function(dataResult) {
                 const ctx = document.getElementById('sales1').getContext('2d');
-                console.log(Object.values(dataResult.salesData));
 
                 var sales1 = new Chart(ctx, {
                     type: 'bar',

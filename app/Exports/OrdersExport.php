@@ -45,6 +45,7 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
                 $order->discount,
                 $order->tax,
                 $order->service_charge,
+                $order->delivery_charge,
                 $order->net_total,
                 $order->created_at,
                 $order->order_taken_by->name,
@@ -66,6 +67,7 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
             'Discount',
             'Tax',
             'Service Charge',
+            'Delivery Charge',
             'Net Total',
             'Created At',
             'Created By',
@@ -88,6 +90,8 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
         $sheet->setCellValue("G{$totalRow}", "=SUM(G2:G{$numOfRows})");
         $sheet->setCellValue("H{$totalRow}", "=SUM(H2:H{$numOfRows})");
         $sheet->setCellValue("I{$totalRow}", "=SUM(I2:I{$numOfRows})");
+        $sheet->setCellValue("J{$totalRow}", "=SUM(J2:J{$numOfRows})");
+
 
 
 

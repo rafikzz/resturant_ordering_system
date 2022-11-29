@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\OrderBreakDownController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderItemController;
 use App\Http\Controllers\Admin\PatientController;
+use App\Http\Controllers\Admin\PatientDischargePaymentRecordController;
 use App\Http\Controllers\Admin\PaymentTypeController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
@@ -120,12 +121,18 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Staff Controller
     Route::resource('staffs', StaffController::class);
     Route::get('get-staff-data', [StaffController::class, 'getData'])->name('staff.getData');
+
     Route::get('staffs/{id}/walllet-transaction', [StaffController::class, 'wallet_transaction'])->name('staffs.wallet_transaction');
     Route::post('staffs/{id}/wallet-transaction', [StaffController::class, 'store_wallet_transaction'])->name('staffs.wallet_transactions.store');
 
     //Patient Controller
     Route::resource('patients', PatientController::class);
     Route::post('patients/{id}/discharge', [PatientController::class,'discharge'])->name('patients.discharge');
+    Route::get('patients/{id}/discharge', [PatientController::class,'discharge_show'])->name('patients.discharge');
+    Route::get('patients/{id}/export', [PatientController::class,'export'])->name('patients.export');
+
+
+    Route::get('get-patient-order-item-data', [PatientController::class, 'getOrderItemData'])->name('patient.getOrderItemData');
 
     Route::get('get-patient-data', [PatientController::class, 'getData'])->name('patient.getData');
 
@@ -165,10 +172,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Payment Type Controller
     Route::get('payment-types', [PaymentTypeController::class, 'index'])->name('payment_types.index');
     Route::get('payment-types/changeStatus', [PaymentTypeController::class, 'changeStatus'])->name('payment_types.changeStatus');
+    //Patient Discharge Payment Record Controller
+    Route::get('/patient-discharge-payments', [PatientDischargePaymentRecordController::class, 'index'])->name('patient_discharge_payments.index');
+    Route::get('/get-payment-discharge-payments-data', [PatientDischargePaymentRecordController::class, 'getData'])->name('patient_discharge_payment.getData');
+
 });
 
 Auth::routes(['register' => false]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', function(){
+    return redirect()->route('dashboard');
+})->name('home');
 //Invoice Controller
 Route::get('/order/invoice/{order}', [App\Http\Controllers\InvoiceController::class, 'index'])->name('orders.getBill');

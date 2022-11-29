@@ -27,8 +27,8 @@ class DashboardController extends Controller
         // dd($this->getSalesChartData());
 
         $totalCustomers =Customer::count();
-        $totalStaffs =Customer::where('is_staff',1)->count();
-        $totalPatients =Customer::where('is_staff',0)->where('status',1)->count();
+        $totalStaffs =Customer::where('customer_type_id',2)->where('status',1)->count();
+        $totalPatients =Customer::where('customer_type_id',3)->where('status',1)->count();
 
 
         $topSoldItems =OrderItem::with('item')->select('item_id', DB::raw('sum(quantity) as total'))

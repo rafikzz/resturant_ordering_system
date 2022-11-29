@@ -27,7 +27,7 @@ class OrderBreakDownController extends Controller
 
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
         $orderItems = OrderItem::select('item_id', DB::raw('sum(total) as total_quantity'))->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->orderBy('total_quantity')->get();
-        $customers = Customer::where('id', '!=', $order->customer_id)->get();
+        $customers = Customer::where('id', '!=', $order->customer_id)->where('customer_type)id',2)->get();
 
         return view('admin.orders.break_down', compact('order', 'orderItems', 'breadcrumbs', 'title', 'customers', 'title'));
     }

@@ -32,11 +32,14 @@
                                     <td>{{ $coupon->expiry_date }}</td>
                                     <td>{{ $coupon->created_at->diffForHumans() }}</td>
                                     <td class="form-inline">
-                                        <form action="{{ route('admin.coupons.destroy',$coupon->id) }}" method="DELETE">
-                                        <a href="{{ route('admin.coupons.edit',$coupon->id) }}" class="btn btn-warning btn-xs">
-                                        <i class="fa fa-pencil-alt"></i>
-                                        </a>
-                                        <button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>
+                                        <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="DELETE">
+                                            @can('coupon_edit')
+                                                <a href="{{ route('admin.coupons.edit', $coupon->id) }}"
+                                                    class="btn btn-warning btn-xs">
+                                                    <i class="fa fa-pencil-alt"></i>
+                                                </a>
+                                            @endcan
+                                            {{-- <button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button> --}}
                                         </form>
                                     </td>
                                 </tr>
@@ -55,23 +58,23 @@
             "aaSorting": []
         });
 
-         //for delete btn
-         $(document).on('click', '.btn-delete', function(e) {
-                e.preventDefault();
-                let form = $(this);
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Do you want to  delete category?",
-                    icon: 'danger',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $(this).closest("form").submit();
-                    }
-                });
+        //for delete btn
+        $(document).on('click', '.btn-delete', function(e) {
+            e.preventDefault();
+            let form = $(this);
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to  delete category?",
+                icon: 'danger',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).closest("form").submit();
+                }
             });
+        });
     </script>
 @endsection

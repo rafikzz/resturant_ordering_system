@@ -18,10 +18,11 @@
                                 <p>Bill No:{{ $order->bill_no }}</p>
                                 @isset($order->customer)
                                     <p>Customer Name:{{ $order->customer->name }}</p>
+                                    <p>Customer Type:{{ $order->customer->customer_type->name }}</p>
                                 @endisset
-                                @isset($order->customer->is_staff)
+                                @if ($order->customer->customer_type_id !== 1)
                                     <p>Wallet Balance: {{ $order->customer->balance }}</p>
-                                @endisset
+                                @endif
 
                             </div>
                             <div class="row">
@@ -83,6 +84,27 @@
                                             <td id="tax-amount">Rs. {{ $order->taxAmount() }}</td>
                                         </tr>
                                     @endif
+                                    @if ($delivery_charge)
+                                        <tr>
+                                            <td colspan="3">Take Delivery Charge</td>
+                                            <td><select name="is_delivery" id="is_delivery"
+                                                    class="form-control form-control-sm  float-right">
+                                                    <option value="0">No</option>
+                                                    <option value="1">Yes</option>
+                                                </select>
+                                                @error('is_delivery')
+                                                    <span class=" text-danger" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </td>
+
+                                        </tr>
+                                        <tr id="delivery-charge" style="display:none">
+                                            <td colspan="3">Delivery Charge Amount:</td>
+                                            <td>Rs. {{ $delivery_charge }}</td>
+                                        </tr>
+                                    @endif
                                     <tr>
                                         <td colspan="3">Grand Total:</td>
                                         <td id="grand-total">Rs. {{ $order->totalWithTax() }}</td>
@@ -92,26 +114,32 @@
 
                                         <td> <select name="payment_type" class="form-control form-control-sm  float-right"
                                                 id="payment_type" required="">
-                                                @isset($order->customer->is_staff)
-                                                <option value="0" >Cash</option>
-                                                <option value="1" {{ ($order->customer->is_staff == 0)?'selected': ''}}>Account
-                                                </option>
+                                                @if ($order->customer->customer_type_id != 1)
+                                                    <option value="0">Cash</option>
+                                                    <option value="1"
+                                                        {{ $order->customer->customer_type_id == 3 ? 'selected' : '' }}>
+                                                        Account
+                                                    </option>
                                                 @else
                                                     <option value="0" selected>Cash</option>
-                                                @endisset
+                                                @endif
                                             </select>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td colspan="3">Paid Amount:</td>
-                                        <td> <input type="number"value="{{ ($order->customer->is_staff ==0)? 0:$order->totalWithTax() }}" {{ ($order->customer->is_staff == 0)?'': 'readonly'}}
+                                        <td> <input type="number"
+                                                type="number"value="{{ $order->customer->customer_type_id == 3 ? 0 : $order->totalWithTax() }}"
+                                                {{ $order->customer->customer_type_id == 3 ? '' : 'readonly' }}
                                                 step="0.01" min="0" class="form-control form-control-sm"
                                                 name="paid_amount" id="paid_amount" required></td>
                                     </tr>
                                     <tr>
                                         <td colspan="3">Due Amount:</td>
-                                        <td> <input type="number" value="{{ ($order->customer->is_staff ==0)? $order->totalWithTax():0 }}" class="form-control form-control-sm"
-                                                min="0" readonly name="due_amount" id="due_amount" required></td>
+                                        <td> <input type="number"
+                                                value="{{ $order->customer->customer_type_id == 3 ? $order->totalWithTax() : 0 }}"
+                                                class="form-control form-control-sm" min="0" readonly
+                                                name="due_amount" id="due_amount" required></td>
                                     </tr>
 
                                 </table>
@@ -133,10 +161,13 @@
         let tax = {!! $tax !!};
         let service_charge = {!! $service_charge !!};
         var total = {{ $order->total }};
-        var net_total ={{ $order->total }};
+        var net_total = {{ $order->total }};
         var grand_total = {{ $order->totalWithTax() }};
         let couponDictionary = {!! $couponsDictionary !!};
         let coupon_discount = 0;
+        let delivery_charge = {!! $delivery_charge !!};
+        let is_delivery = 0;
+        let discount = 0;
         //For enabling paid amount
         let payment_type_id = $('#payment_type_id').val();
         if (payment_type_id == 3) {
@@ -159,15 +190,43 @@
                 }
 
             })
+            //For Delivery
+            $('#is_delivery').on('change', function() {
+                let destination = $(this).val();
+                if (delivery_charge) {
+                    if (destination == 1) {
+                        is_delivery = 1;
+                        $('#delivery-charge').show();
+                    } else {
+                        $('#delivery-charge').hide();
+                        is_delivery = 0;
+                    }
+                    calculateSetServiceChargeAndTax(discount);
+                }
+
+
+            });
         });
 
 
+
+        //For Coupon Discount
         $('#coupon_id').on('change', function() {
             coupon_discount = 0;
             if ($(this).val()) {
                 coupon_discount = couponDictionary[$(this).val()];
+                if (coupon_discount >= total) {
+                    coupon_discount = 0;
+                    $('#coupon_id').val("");
+                    sweetAlert('Error', 'Coupon Amount Should Not Be Greater Than Total Amount', 'error');
+
+                    $('#discount').attr('max', 0);
+                } else {
+                    $('#discount').attr('max', total - coupon_discount);
+                }
             }
-            applyCouponDiscount(coupon_discount);
+            resetAppliedDiscount();
+            calculateSetServiceChargeAndTax();
 
         });
         //for applying coupon discount
@@ -193,13 +252,15 @@
         }
         //Calculate
         function calculateSetServiceChargeAndTax(discount = 0) {
-            temp_total = parseFloat(net_total) - discount;
-            if (temp_total >= 0) {
+            let deliveryCharge = (is_delivery) ? parseFloat(delivery_charge) : 0;
+            let temp_total = total - coupon_discount - discount;
+            if (temp_total + deliveryCharge >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
-                let tax_amount = parseFloat(((parseFloat(temp_total) + parseFloat(service_charge_amount)) * (tax / 100))
+                let tax_amount = parseFloat(((parseFloat(temp_total) + parseFloat(service_charge_amount)) * (
+                        tax / 100))
                     .toFixed(2));
 
-                grand_total = ((temp_total + service_charge_amount) + tax_amount).toFixed(2);
+                grand_total = ((temp_total + service_charge_amount) + tax_amount + deliveryCharge).toFixed(2);
 
                 $('#service-charge').text(foramtValue(service_charge_amount));
                 $('#tax-amount').text(foramtValue(tax_amount));
@@ -209,7 +270,9 @@
 
 
             } else {
-                alert('Discount cannot be greater than total')
+                alert('Discount cannot be greater than total');
+                $('#coupon_id').val("");
+
             }
         }
         $(window).keydown(function(event) {
@@ -219,8 +282,8 @@
                 return false;
             }
         });
-        $('#payment_type_id').change(function() {
-            if ($(this).val() != 3) {
+        $('#payment_type').change(function() {
+            if ($(this).val() != 1) {
                 $('#paid_amount').val(grand_total);
                 $('#due_amount').val(0);
 
@@ -270,6 +333,7 @@
                                 "<tr><td colspan='3'>Discount</td><td>" +
                                 foramtValue(data.order.discount) + "</td></tr>");
                         }
+
                         if (data.order.service_charge && data.order.service_charge != 0) {
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Service Charge</td><td>" +
@@ -279,6 +343,11 @@
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Tax</td><td>" +
                                 foramtValue(data.order.tax) + "</td></tr>");
+                        }
+                        if (data.order.delivery_charge && data.order.delivery_charge != 0) {
+                            $('#table-items').append(
+                                "<tr><td colspan='3'>Delivery Charge</td><td>" +
+                                foramtValue(data.order.delivery_charge) + "</td></tr>");
                         }
                         if (data.order.net_total) {
                             $('#table-items').append(
@@ -322,7 +391,7 @@
             $('#table-items').html('');
             $('#get-bill').attr('href', 'javascript:void(0)');
             $('#paymentType').css('display', 'none');
-            $('#payment_type').html('');
+            $('#payment-type').html('');
             $('#order-status').html('');
 
         }

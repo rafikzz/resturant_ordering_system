@@ -37,16 +37,18 @@ class CheckoutController extends Controller
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'Checkout' => '#'];
         $title = $this->title;
         $processingStatus = Status::where('title', 'Processing')->first()->id;
-        $order = Order::where('status_id', '=', $processingStatus)->with('customer:id,name')->findOrFail($id);
+        $order = Order::where('status_id', '=', $processingStatus)->with('customer')->findOrFail($id);
         $order_items = OrderItem::where('order_id', $order->id)->with('item:id,name')->where('total', '>', 0)->get()->groupBy('order_no');
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
+
         $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=',Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
 
 
-        return view('admin.checkout.index', compact('order', 'coupons','couponsDictionary', 'order_items', 'title', 'breadcrumbs', 'tax', 'service_charge'));
+        return view('admin.checkout.index', compact('order', 'coupons','delivery_charge','couponsDictionary', 'order_items', 'title', 'breadcrumbs', 'tax', 'service_charge'));
     }
 
     public function store(OrderCheckoutRequest $request, $id)
@@ -54,11 +56,12 @@ class CheckoutController extends Controller
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
         DB::beginTransaction();
         try {
             $processingStatus = Status::where('title', 'Processing')->first()->id;
 
-            $order = Order::where('status_id', '=', $processingStatus)->with('status:id,title')->with('customer:id,name')->findOrFail($id);
+            $order = Order::where('status_id', '=', $processingStatus)->with('status:id,title')->with('customer')->findOrFail($id);
 
             if ($request->discount > $order->total) {
                 if($request->ajax){
@@ -87,7 +90,12 @@ class CheckoutController extends Controller
                 $service_charge_amount =    round(($service_charge  / 100) * ($net_total), 2);
                 $tax_amount =    round(($tax / 100) * ($net_total + $service_charge_amount), 2);
             }
-            $grand_total = $net_total + $service_charge_amount + $tax_amount;
+            $delivery_charge_amount =0;
+            if($request->is_delivery)
+            {
+                $delivery_charge_amount =$delivery_charge;
+            }
+            $grand_total = $net_total + $service_charge_amount + $tax_amount+$delivery_charge_amount;
 
             $order->update([
                 'discount' => $total_discount ?: 0,
@@ -97,9 +105,13 @@ class CheckoutController extends Controller
                 'payment_type_id' => $request->payment_type_id,
                 'net_total' => $grand_total,
                 'updated_by' => auth()->id(),
+                'coupon_id'=>$request->coupon_id,
+                'delivery_charge' => $delivery_charge_amount,
+                'is_delivery'=>  $request->is_delivery,
+
             ]);
 
-            if ($request->payment_type == 1) {
+            if ($request->payment_type == 1 && $order->customer->customer_type_id !=1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -121,7 +133,7 @@ class CheckoutController extends Controller
 
         if ($request->ajax()) {
 
-            $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer:id,name')->findOrFail($id);
+            $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->findOrFail($id);
             $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
             $billRoute = route('orders.getBill', $order->id);
             if ($order) {

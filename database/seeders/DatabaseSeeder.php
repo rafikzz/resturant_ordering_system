@@ -23,7 +23,9 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             PaymentTypeSeeder::class,
             TransactionTypeSeeder::class,
+            CustomerTypeSeeder::class,
             CustomerSeeder::class
+
         ]);
     }
 }

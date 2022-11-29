@@ -7,13 +7,13 @@
                 <div class="card-header">
                     <h2 class="card-title">Patient List</h2>
                     <div class="card-tools form-inline">
-                        @can('patients_list')
+                        @can('patient_list')
                             <select id="mode" class="form-control">
                                 <option value="1" selected>Acitve</option>
                                 <option value="0">Discharged</option>
                             </select>
                         @endcan
-                        @can('patients_create')
+                        @can('patient_create')
                             <a class="btn btn-success ml-3" href="{{ route('admin.patients.create') }}"> <i
                                     class="fa fa-plus"></i></a>
                         @endcan
@@ -25,7 +25,7 @@
                             <th>Id</th>
                             <th>Name</th>
                             <th>Phone No.</th>
-                            <th>Room No.</th>
+                            <th>Register No</th>
                             <th>Due</th>
                             <th>Created At</th>
                             <th>Action</th>
@@ -72,8 +72,8 @@
                         name: 'phone_no',
 
                     }, {
-                        data: 'room_no',
-                        name: 'room_no',
+                        data: 'patient.register_no',
+                        name: 'patient.register_no',
 
                     },
                     {

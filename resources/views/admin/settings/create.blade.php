@@ -127,6 +127,30 @@
                                     @enderror
                                 </div>
                             </div>
+                            <div class="col-md-6  py-2">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch  ">
+                                        <input type="checkbox" value="1" class="custom-control-input" name="delivery_charge_status"
+                                        {{ (old('delivery_charge_status') ?: isset($setting)) ? $setting->delivery_charge_status?'checked':'' : '' }}
+                                            id="delivery_charge_status">
+                                        <label class="custom-control-label" for="delivery_charge_status">Enable Delivery Charge</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="label" for="delivery_charge">Delivery Charge</label>
+                                    <input type="number" name="delivery_charge"
+                                        value="{{ (old('delivery_charge') ?: isset($setting)) ? $setting->delivery_charge : '' }}"
+                                        class="form-control  @error('delivery_charge') is-invalid @enderror" autocomplete="off"
+                                        minlength="3" placeholder="Enter delivery_charge in rs" required>
+                                    @error('delivery_charge')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">

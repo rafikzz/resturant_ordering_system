@@ -18,6 +18,11 @@ class Bill extends Invoice
     public $payment_type;
     public $cashier;
     public $time;
+    public $total_discount;
+    public $delivery_charge;
+
+
+
 
 
     public function cashier(PartyContract $cashier)
@@ -45,6 +50,15 @@ class Bill extends Invoice
         return $this;
     }
 
+    public function deliveryCharge(float $delivery_charge)
+    {
+        if($delivery_charge)
+        {
+            $this->delivery_charge = $delivery_charge;
+        }
+        return $this;
+    }
+
     public function paymentType(float $payment_type)
     {
         if($payment_type)
@@ -65,11 +79,18 @@ class Bill extends Invoice
 
         return $this;
     }
+    public function totalDiscount(float $amount, bool $byPercent = false)
+    {
+        if($amount)
+        {
+            $this->total_discount = $amount;
+        }
+        return $this;
+    }
 
     protected function calculate()
     {
         $total_amount   = null;
-        $total_discount = null;
         $total_taxes    = null;
 
         $this->items->each(
@@ -109,7 +130,6 @@ class Bill extends Invoice
          * or use values calculated from items.
          */
         $this->hasTotalAmount() ?: $this->total_amount                            = $total_amount;
-        $this->total_discount = $total_discount;
         // $this->total_taxes              = $total_taxes;
         // !$this->hasShipping() ?: $this->calculateShipping();
 

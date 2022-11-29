@@ -14,8 +14,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-        href="{{ asset('css/fonts.googleapis.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/fonts.googleapis.css') }}">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('admin-lte/plugins/fontawesome-free/css/all.min.css') }}">
     <!-- Theme style -->
@@ -51,7 +50,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         }
     </style>
     @yield('css')
-      {{-- @if(Session::has('download.in.the.next.request'))
+    {{-- @if (Session::has('download.in.the.next.request'))
          <meta http-equiv="refresh" content="5;url={{ Session::get('download.in.the.next.request') }}">
       @endif --}}
 </head>
@@ -132,16 +131,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="container-fluid">
                     @if ($message = Session::get('success'))
                         <div class="alert alert-success alert-dismissible">
-                            <a class="close" data-dismiss="alert"  aria-hidden="true">x</a>
+                            <a class="close" data-dismiss="alert" aria-hidden="true">x</a>
                             <p>{{ $message }}</p>
                         </div>
                     @endif
                     @if ($message = Session::get('error'))
-                    <div class="alert alert-danger alert-dismissible" >
-                        <a class="close" data-dismiss="alert"  aria-hidden="true">x</a>
-                        <p>{{ $message }}</p>
-                    </div>
-                @endif
+                        <div class="alert alert-danger alert-dismissible">
+                            <a class="close" data-dismiss="alert" aria-hidden="true">x</a>
+                            <p>{{ $message }}</p>
+                        </div>
+                    @endif
                     @yield('content')
                 </div>
             </div>
@@ -184,8 +183,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {{-- DateRange Picker --}}
     <script src="{{ asset('admin-lte/plugins/daterangepicker/daterangepicker.js') }}"></script>
 
-     {{-- jQuery Ui --}}
-     <script src="{{ asset('js/jQuery-ui.js') }}"></script>
+    {{-- jQuery Ui --}}
+    <script src="{{ asset('js/jQuery-ui.js') }}"></script>
     {{-- Bs custom file Input --}}
     <script src="{{ asset('admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
     {{-- Owl Carousel --}}
@@ -200,7 +199,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {{-- Chart Js --}}
     <script src="{{ asset('js/chartJs.js') }}"></script>
 
-    {{-- Print This Js v1.15--}}
+    {{-- Print This Js v1.15 --}}
     <script src="{{ asset('js/printThis.js') }}"></script>
 
     <script>

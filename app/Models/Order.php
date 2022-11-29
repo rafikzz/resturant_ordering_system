@@ -15,7 +15,7 @@ class Order extends Model
     protected $table = 'table_orders';
     protected $fillable = [
         'customer_id', 'status_id', 'location', 'created_by', 'updated_by', 'tax', 'service_charge', 'payment_type', 'bill_no', 'location_no', 'discount',
-        'total', 'net_total', 'order_datetime','payment_type_id','is_credit','destination_no','destination'
+        'total', 'net_total', 'order_datetime','payment_type_id','is_credit','destination_no','destination','is_delivery','delivery_charge'
     ];
 
 
@@ -110,10 +110,20 @@ class Order extends Model
 
     public function totalWithTax($discount = 0)
     {
+
         $setting = Setting::first();
-        if (isset($setting)) {
-            return   round((1 + $setting->getTax() / 100) * ($this->totalWithServiceCharge($discount)), 2);
+        $delivery_charge=0;
+        if(isset($setting))
+        {
+            if($this->is_delivery)
+            {
+                $delivery_charge=$setting->delivery_charge?:0;
+            }
         }
-        return $this->totalWithServiceCharge($discount);
+
+        if (isset($setting)) {
+            return   round((1 + $setting->getTax() / 100) * ($this->totalWithServiceCharge($discount)), 2) +$delivery_charge;
+        }
+        return $this->totalWithServiceCharge($discount) +$delivery_charge;
     }
 }

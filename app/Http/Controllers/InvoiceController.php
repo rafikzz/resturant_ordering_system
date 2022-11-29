@@ -38,8 +38,10 @@ class InvoiceController extends Controller
         ]);
 
         $serviceCharge =$order->service_charge?:0.00;
-        $totalAmount =$order->net_total?:$order->total;
+        $deliveryCharge =$order->delivery_charge?:0.00;
 
+        $totalAmount =$order->net_total?:$order->total;
+        $orderDiscount=$order->discount?$order->discount:0;
 
         $invoice = Bill::make('receipt')
             ->filename('Order_' . $order->bill_no)
@@ -51,7 +53,8 @@ class InvoiceController extends Controller
             ->cashier($cashier)
             ->serviceCharge($serviceCharge)
             ->totalTaxes($order->tax?:0)
-            ->totalDiscount($order->discount)
+            ->totalDiscount($orderDiscount)
+            ->deliveryCharge($deliveryCharge)
             ->totalAmount( $totalAmount)
             ->addItems($items)->template('invoice');
         // return view('vendor.invoices.templates.invoice',compact('invoice'));

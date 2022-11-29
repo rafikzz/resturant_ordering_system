@@ -30,7 +30,7 @@ class LoginController extends Controller
 
     public function redirectTo(){
         if(auth()->user()->hasAnyRole(['Superadmin','Admin','Staff'])){
-            return '/admin';
+            return '/dashboard';
         }
 
     }

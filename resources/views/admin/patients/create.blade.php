@@ -37,11 +37,11 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="room_no">Room No.</label>
-                                <input type="text" name="room_no" value="{{ old('room_no') }}"
-                                    class="form-control  @error('room_no') is-invalid @enderror" autocomplete="off"
-                                    placeholder="Enter Room No" required>
-                                @error('room_no')
+                                <label class="label" for="register_no">Register No.</label>
+                                <input type="text" name="register_no" value="{{ old('register_no') }}"
+                                    class="form-control  @error('register_no') is-invalid @enderror" autocomplete="off"
+                                    placeholder="Enter Register No" required>
+                                @error('register_no')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

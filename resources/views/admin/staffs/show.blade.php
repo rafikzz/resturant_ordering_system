@@ -295,12 +295,13 @@
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Total</td><td>" +
                                 foramtValue(data.order.total) + "</td></tr>");
-                            if (data.order.discount && data.order.discount != 0) {
+                            if (data.order.discount && data.order.discount != 0 || data.order.status_id ==3) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Discount</td><td>" +
                                     foramtValue(data.order.discount) + "</td></tr>");
                             }
-                            if (data.order.service_charge && data.order.service_charge != 0) {
+
+                            if (data.order.service_charge && data.order.service_charge != 0 ) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Service Charge</td><td>" +
                                     foramtValue(data.order.service_charge) + "</td></tr>");
@@ -309,6 +310,11 @@
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Tax</td><td>" +
                                     foramtValue(data.order.tax) + "</td></tr>");
+                            }
+                            if (data.order.delivery_charge && data.order.delivery_charge != 0) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Delivery Charge</td><td>" +
+                                    foramtValue(data.order.delivery_charge) + "</td></tr>");
                             }
                             if (data.order.net_total) {
                                 $('#table-items').append(

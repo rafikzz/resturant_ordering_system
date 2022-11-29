@@ -8,15 +8,12 @@
                     <td>Patient Name </td>
                     <td>{{ $customer->name }}</td>
                 </tr>
+                @isset($customer_orders_total)
                 <tr>
-                    @if ($customer->balance < 0)
-                        <td>Balance</td>
-                        <td>Rs {{ -$customer->balance }}(Due)</td>
-                    @else
-                        <td>Balance</td>
-                        <td>Rs {{ $customer->balance }}(Payable)</td>
-                    @endif
+                    <td>Order Total</td>
+                    <td>Rs {{ $customer_orders_total }}</td>
                 </tr>
+                @endisset
             </table>
         </div>
     </div>
@@ -30,7 +27,7 @@
                             <a href="#tab-table1" class="nav-link active" data-toggle="tab">Order History</a>
                         </li>
                         <li class="nav-item">
-                            <a href="#tab-table2" class="nav-link" data-toggle="tab">Wallet History</a>
+                            <a href="#tab-table2" class="nav-link" data-toggle="tab">Ordered Items</a>
                         </li>
 
                     </ul>
@@ -42,8 +39,8 @@
                                 <table id="myTable1" class="table table-striped table-bordered" cellspacing="0"
                                     width="100%">
                                     <thead>
-                                        <th>Id</th>
                                         <th>Bill No</th>
+                                        <th>Order Total</th>
                                         <th>Discount</th>
                                         <th>Net Total</th>
                                         <th>Created At</th>
@@ -59,18 +56,14 @@
                                 <table id="myTable2" class="table table-striped table-bordered" cellspacing="0"
                                     width="100%">
                                     <thead>
-                                        <th>Id</th>
-                                        <th>Order</th>
-                                        <th>Order Total</th>
-                                        <th>Paid Amount </th>
-                                        <th>Operation Amount</th>
-                                        <th>Current Balance</th>
-                                        <th>Transaction Type</th>
-                                        <th>Operation Type</th>
-                                        <th>Author</th>
-                                        <th>Created At</th>
+                                        <th>Bill No</th>
+                                        <th>Item Name</th>
+                                        <th>Total Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total Price</th>
+                                        <th>Ordered Date</th>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="tablecontents">
 
                                     </tbody>
                                 </table>
@@ -107,13 +100,14 @@
 
                     }
                 },
-                columns: [{
-                        data: 'id',
-                        name: 'id'
-                    },
+                columns: [
                     {
                         data: 'bill_no',
                         name: 'bill_no'
+                    },
+                    {
+                        data: 'total',
+                        name: 'total'
                     },
                     {
                         data: 'discount',
@@ -157,97 +151,43 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                order: [
-                    [9, 'desc']
-                ],
+                "aaSorting":[],
                 ajax: {
-                    url: "{{ route('admin.customers.wallet_transactions.getData') }}",
+                    url: "{{ route('admin.patient.getOrderItemData') }}",
                     data: function(d) {
-                        d.mode = 'history',
-                            d.customer_id = {{ $customer->id }};
+                        d.customer_id = {{ $customer->id }};
                     }
                 },
                 columns: [{
-                        data: 'id',
-                        name: 'id'
-                    },
-                    {
                         data: 'order.bill_no',
                         name: 'order.bill_no',
-                        render: function(data) {
-                            if (data) {
-                                return data;
-                            } else {
-                                return 'N/A';
-                            }
-                        }
 
                     },
                     {
-                        data: 'order.net_total',
-                        name: 'order.net_total',
-                        render: function(data) {
-                            if (data) {
-                                return data;
-                            } else {
-                                return 'N/A';
-                            }
-                        }
-                    },
-                    {
-                        data: 'total_amount',
-                        name: 'total_amount',
-                    },
-                    {
-                        data: 'amount',
-                        name: 'amount'
-                    },
-                    {
-                        data: 'current_amount',
-                        name: 'current_amount',
-                        render: function(current_amount) {
-                            if (current_amount < 0) {
-                                return -current_amount + '(Due)';
-                            } else {
-                                return current_amount;
-                            }
-                        }
-                    },
-                    {
-                        data: 'transaction_type.name',
-                        name: 'transaction_type.name',
-                        render: function(data) {
-                            if (data) {
-                                return data;
-                            } else {
-                                return 'N/A';
-                            }
-                        }
-                    },
-                    {
-                        data: 'transaction_type.is_add',
-                        name: 'transaction_type.is_add',
-                        searchable: false,
-                        render: function(data) {
-                            if (data) {
-                                return 'Add';
-                            } else {
-                                return 'Subtract';
-                            }
-                        }
-                    },
+                        data: 'item.name',
+                        name: 'item.name',
 
+                    },
                     {
-                        data: 'author.name',
-                        name: 'author.name',
+                        data: 'total',
+                        name: 'total',
+                        searchable:false,
+                    },
+                    {
+                        data: 'price',
+                        name: 'price',
+                        searchable:false,
+
+                    },
+                    {
+                        data: 'total_price',
+                        name: 'total_price',
+                        searchable:false,
+
                     },
                     {
                         data: 'created_at',
                         name: 'created_at',
-                        render: {
-                            _: 'display',
-                            sort: 'timestamp'
-                        },
                         searchable: false
 
                     },
@@ -293,12 +233,13 @@
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Total</td><td>" +
                                 foramtValue(data.order.total) + "</td></tr>");
-                            if (data.order.discount && data.order.discount != 0) {
+                            if (data.order.discount && data.order.discount !=  0 || data.order.status_id ==3) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Discount</td><td>" +
                                     foramtValue(data.order.discount) + "</td></tr>");
                             }
-                            if (data.order.service_charge && data.order.service_charge != 0) {
+
+                            if (data.order.service_charge && data.order.service_charge != 0 ) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Service Charge</td><td>" +
                                     foramtValue(data.order.service_charge) + "</td></tr>");
@@ -307,6 +248,11 @@
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Tax</td><td>" +
                                     foramtValue(data.order.tax) + "</td></tr>");
+                            }
+                            if (data.order.delivery_charge && data.order.delivery_charge != 0) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Delivery Charge</td><td>" +
+                                    foramtValue(data.order.delivery_charge) + "</td></tr>");
                             }
                             if (data.order.net_total) {
                                 $('#table-items').append(

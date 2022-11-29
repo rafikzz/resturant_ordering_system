@@ -3,9 +3,9 @@
 @section('content')
     <div class="row">
         <div class="col">
-            <div class="card card-outline card-success ">
+            <div class="card card-outline card-warning ">
                 <div class="card-header">
-                    <h2 class="card-title">Edit Customer</h2>
+                    <h2 class="card-title">Edit Patient</h2>
                     <div class="card-tools">
                         <a class="btn btn-primary" href="{{ route('admin.patients.index') }}"> Back</a></i></a>
                     </div>
@@ -32,6 +32,17 @@
                                     class="form-control  @error('phone_no') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter phone_no" required>
                                 @error('phone_no')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="label" for="register_no">Register No.</label>
+                                <input type="text" name="register_no" value="{{ old('register_no')?:($customer->patient)?$customer->patient->register_no:'' }}"
+                                    class="form-control  @error('register_no') is-invalid @enderror" autocomplete="off"
+                                    placeholder="Enter Register No" required>
+                                @error('register_no')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

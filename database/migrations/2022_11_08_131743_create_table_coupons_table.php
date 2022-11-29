@@ -18,6 +18,7 @@ class CreateTableCouponsTable extends Migration
             $table->string('title');
             $table->decimal('discount',10,2)->nullable();
             $table->date('expiry_date');
+            $table->integer('max_uses_per_day')->nullable();
             $table->timestamps();
         });
     }

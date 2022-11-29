@@ -26,6 +26,7 @@
                             <th>Bill No</th>
                             <th>Customer Name</th>
                             <th>Destination</th>
+                            <th>Order Total</th>
                             <th>Discount</th>
                             <th>Net Total</th>
                             <th>Created At</th>
@@ -73,10 +74,10 @@
                     {
                         data: 'customer.name',
                         name: 'customer.name',
-                        render: function(data){
-                            if(data){
+                        render: function(data) {
+                            if (data) {
                                 return data;
-                            }else{
+                            } else {
                                 return 'N/a';
                             }
                         }
@@ -88,6 +89,10 @@
                             _: 'display',
                             sort: 'order'
                         },
+                    },
+                    {
+                        data: 'total',
+                        name: 'total'
                     },
                     {
                         data: 'discount',
@@ -176,22 +181,28 @@
                                     .total, item.price));
                             });
                             $('#table-items').append(
-                                    "<tr><td colspan='3'>Total</td><td>" +
-                                    foramtValue(data.order.total) + "</td></tr>");
-                            if (data.order.discount && data.order.discount !=0 ) {
+                                "<tr><td colspan='3'>Total</td><td>" +
+                                foramtValue(data.order.total) + "</td></tr>");
+                            if (data.order.discount && data.order.discount != 0 ||data.order.status_id ==3) {
                                 $('#table-items').append(
-                                    "<tr><td colspan='3'>Discount</td><td>" +
-                                    foramtValue(data.order.discount) + "</td></tr>");
+                                "<tr><td colspan='3'>Discount</td><td>" +
+                                foramtValue(data.order.discount) + "</td></tr>");
                             }
-                            if (data.order.service_charge && data.order.service_charge!=0) {
+
+                            if (data.order.service_charge && data.order.service_charge != 0) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Service Charge</td><td>" +
                                     foramtValue(data.order.service_charge) + "</td></tr>");
                             }
-                            if (data.order.tax && data.order.tax!=0) {
+                            if (data.order.tax && data.order.tax != 0) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Tax</td><td>" +
                                     foramtValue(data.order.tax) + "</td></tr>");
+                            }
+                            if (data.order.delivery_charge && data.order.delivery_charge != 0) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Delivery Charge</td><td>" +
+                                    foramtValue(data.order.delivery_charge) + "</td></tr>");
                             }
                             if (data.order.net_total) {
                                 $('#table-items').append(

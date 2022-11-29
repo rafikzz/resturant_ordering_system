@@ -27,6 +27,9 @@ class OrderCheckoutRequest extends FormRequest
             'discount' => 'nullable',
             'paid_amount' => 'required|numeric|min:0',
             'payment_type' => 'required',
+            'is_delivery'=>'nullable',
+            'coupon_id'=>'nullable',
+
         ];
     }
 }

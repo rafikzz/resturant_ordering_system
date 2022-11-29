@@ -7,7 +7,9 @@ use App\Http\Requests\Admin\StoreCustomerRequest;
 use App\Http\Requests\Admin\StoreWalletTransactionRequest;
 use App\Http\Requests\Admin\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\Models\CustomerType;
 use App\Models\CustomerWalletTransaction;
+use App\Models\OrderItem;
 use App\Models\TransactionType;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -42,9 +44,12 @@ class StaffController extends Controller
 
     public function store(StoreCustomerRequest $request)
     {
+        $customer_type =CustomerType::where('name','Staff')->first();
+        $customer_type_id= $customer_type? $customer_type->id:null;
 
         Customer::create([
             'name' => $request->name,
+            'customer_type_id' => $customer_type_id,
             'phone_no'=> $request->phone_no,
             'is_staff'=> 1,
             'status'=>1,
@@ -71,7 +76,9 @@ class StaffController extends Controller
 
     public function update(UpdateCustomerRequest $request, $id)
     {
-        $customer =Customer::findOrFail($id);
+        $customer_type =CustomerType::where('name','Staff')->first();
+        $customer_type_id= $customer_type? $customer_type->id:null;
+        $customer =Customer::where('customer_type_id',$customer_type_id)->findOrFail($id);
 
         $customer->name =$request->name;
         $customer->phone_no =$request->phone_no;
@@ -84,7 +91,9 @@ class StaffController extends Controller
         $title = $this->title;
         $breadcrumbs =[ 'Staff'=>route('admin.staffs.index'), 'Show'=>'#'];
 
-        $customer =Customer::where('is_staff',1)->findOrFail($id);
+        $customer_type =CustomerType::where('name','Staff')->first();
+        $customer_type_id= $customer_type? $customer_type->id:null;
+        $customer =Customer::where('customer_type_id',$customer_type_id)->findOrFail($id);
 
 
        return view('admin.staffs.show',compact('title','customer','breadcrumbs'));
@@ -92,7 +101,10 @@ class StaffController extends Controller
 
     public function wallet_transaction($id)
     {
-        $customer =Customer::findOrFail($id);
+
+        $customer_type =CustomerType::where('name','Staff')->first();
+        $customer_type_id= $customer_type? $customer_type->id:null;
+        $customer =Customer::where('customer_type_id',$customer_type_id)->findOrFail($id);
         $transaction_types =TransactionType::whereIn('id',[1,2])->get();
         $title = $this->title;
         $breadcrumbs =[ 'Staff'=>route('admin.staffs.index'), 'Wallet Transaction'=>'#'];
@@ -101,7 +113,9 @@ class StaffController extends Controller
 
     public function store_wallet_transaction($id,StoreWalletTransactionRequest $request)
     {
-        $customer =Customer::where('is_staff',1)->findOrFail($id);
+        $customer_type =CustomerType::where('name','Staff')->first();
+        $customer_type_id= $customer_type? $customer_type->id:null;
+        $customer =Customer::where('customer_type_id',$customer_type_id)->findOrFail($id);
         $transaction_type = TransactionType::whereIn('id',[1,2])->find($request->transaction_type_id);
         if(!$transaction_type)
         {
@@ -130,14 +144,16 @@ class StaffController extends Controller
             'balance'=> $current_amount
         ]);
 
-        return redirect()->route('admin.staffs.index',$customer->id)->with("success", "Staff Transaction created successfully");
+        return redirect()->route('admin.staffs.index')->with("success", "Staff Transaction created successfully");
 
     }
 
     public function getData(Request $request)
     {
         if ($request->ajax()) {
-            $data = Customer::select('table_customers.*')->where('is_staff',1);
+            $customer_type =CustomerType::where('name','Staff')->first();
+            $customer_type_id= $customer_type? $customer_type->id:null;
+            $data = Customer::select('table_customers.*')->where('customer_type_id',$customer_type_id);
             $canEdit = auth()->user()->can('staff_edit');
             $canShow = auth()->user()->can('staff_list');
             $canWalllettransaction = auth()->user()->can('staff_wallet_transaction');
@@ -170,4 +186,5 @@ class StaffController extends Controller
                 ->make(true);
         }
     }
+
 }

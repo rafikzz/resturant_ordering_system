@@ -7,7 +7,7 @@
                 <div class="card-header">
                     <h2 class="card-title">Staff List</h2>
                     <div class="card-tools form-inline">
-                        @can('customer_create')
+                        @can('staff_create')
                             <a class="btn btn-success ml-3" href="{{ route('admin.staffs.create') }}"> <i
                                     class="fa fa-plus"></i></a>
                         @endcan

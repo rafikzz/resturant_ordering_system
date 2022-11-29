@@ -91,7 +91,7 @@ class CustomerController extends Controller
     {
         if(true)
         {
-            $customers =Customer::select('id','name','phone_no')->where('is_staff',$request->customer_type)->where('status',1)->orderBy('name')->get();
+            $customers =Customer::select('id','name','phone_no')->where('customer_type_id',$request->customer_type)->where('status',1)->orderBy('name')->get();
 
             return response()->json([
                 'status'=>'success',

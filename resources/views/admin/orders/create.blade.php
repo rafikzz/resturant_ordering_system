@@ -34,21 +34,8 @@
                                 <h6>{{ $category->title }}</h6>
                             </div>
                             @foreach ($category->active_items as $item)
-                                <div class="col-md-6 menu-items">
-                                    <div class="food-item-card text-center">
-                                        <div class="food-item-image">
-                                            <img src="{{ $item->image() }}" alt="food-item"></a>
-                                        </div>
-                                        <div class="food-item-content">
-                                            <h6 class="food-item-name">{{ $item->name }}</h6>
-                                            <h6 class="food-item-price"><span>Rs. {{ $item->price }}</h6><button
-                                                data-id="{{ $item->id }}" data-price="{{ $item->price }}"
-                                                data-name="{{ $item->name }}" class="food-item-add  btn-success add-item"
-                                                title="Add to Cart"><i class="fas fa-cart-plus"></i><span>
-                                                    Add</span></button>
-                                        </div>
-                                    </div>
-                                </div>
+                                @component('admin.orders.components._menu-items', ['item' => $item])
+                                @endcomponent
                             @endforeach
                         </div>
                     @endforeach
@@ -68,9 +55,13 @@
                                 <div class="form-group  ml-n2">
                                     <label for="customer_type">Customer Type</label>
                                     <select name="customer_type" id="customer_type" class="form-control">
-                                        <option value="" selected>Walking Cutomer</option>
-                                        <option value="1">Staff</option>
-                                        <option value="0">Patient</option>
+                                        @foreach ($customer_types as $customer_type)
+                                            <option value="{{ $customer_type->id }}"
+                                                {{ $customer_type->id == $default_customer_type_id ? 'selected' : '' }}>
+                                                {{ $customer_type->name }}
+                                            </option>
+                                        @endforeach
+
                                     </select>
                                     @error('customer_type')
                                         <span class=" text-danger" role="alert">
@@ -79,76 +70,19 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-12 my-2 d-flex">
-                                <label for="">New or Existing: </label>
-                                <div class="form-check mx-2">
-                                    <input class="form-check-input" type="radio" name="new_or_old" id="existingCustomer"
-                                        value="existing" {{ old('new_or_old') !== 'new' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="existing">
-                                        Existing
-                                    </label>
-                                </div>
-                                <div class="form-check mx-2">
-                                    <input class="form-check-input" type="radio" name="new_or_old" id="newCustomer"
-                                        value="new" {{ old('new_or_old') == 'new' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="new">
-                                        New
-                                    </label>
-                                </div>
-                            </div>
-                            <div id="old" class="col-12 form-group  py-3"
-                                style="display:  {{ old('new_or_old') !== 'new' ? 'block' : 'none' }}">
-                                <select name="customer_id" class="form-control select2" style="width: 50%" id="oldCustomer"
-                                    required {{ old('new_or_old') == 'new' ? 'disabled' : '' }}>
-                                    <option value="">--Please Select Customer--</option>
-                                    @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}">
-                                            {{ $customer->name }}({{ $customer->phone_no }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('customer_id')
-                                    <span class="text-danger" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div id="new" class="col-12  py-3 form-group"
-                                style="display: {{ old('new_or_old') === 'new' ? 'block' : 'none' }};">
-                                <div class="d-flex">
-                                    <div class="col-6">
-                                        <label for="customer_name">Customer Name</label>
-                                        <input class="form-control" name="customer_name" value="{{ old('customer_name') }}"
-                                            type="text" placeholder="Enter Customer Name" autocomplete="off"
-                                            {{ old('new_or_old') !== 'new' ? 'disabled' : '' }}>
-                                        @error('customer_name')
-                                            <span class=" text-danger" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="customer_phone_no">Customer Number</label>
-                                        <input class="form-control" name="customer_phone_no" type="text"
-                                            value="{{ old('customer_phone_no') }}" placeholder="Enter Customer Phone No"
-                                            autocomplete="off" {{ old('new_or_old') !== 'new' ? 'disabled' : '' }}>
-                                        @error('customer_phone_no')
-                                            <span class=" text-danger" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
+                            @component('admin.orders.components._add_customers',
+                                ['customers' => $customers, 'customer_type_id' => $default_customer_type_id, 'customer_id' => null])
+                            @endcomponent
 
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
                                     <label for="destination">Order Destination</label>
-                                    <select name="destination" class="form-control">
+                                    <select name="destination" id="destination" class="form-control">
                                         <option value="">None</option>
-                                        <option value="table">Table</option>
-                                        <option value="room">Room</option>
+                                        <option value="Table" {{ old('destination') == 'Table' ? 'selected' : '' }}>Table
+                                        </option>
+                                        <option value="Room" {{ old('destination') == 'Table' ? 'selected' : '' }}>Room
+                                        </option>
                                     </select>
                                     @error('destination')
                                         <span class=" text-danger" role="alert">
@@ -157,6 +91,7 @@
                                     @enderror
                                 </div>
                             </div>
+
 
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
@@ -171,8 +106,6 @@
                                     @enderror
                                 </div>
                             </div>
-
-
                         </div>
 
                         <div class="row">
@@ -191,8 +124,13 @@
                                     <td colspan="3">Total</td>
                                     <td> <b id="totalAmount">Rs.0</b></td>
                                 </tr>
-                                <tr>
-                                    <th colspan="4">Checkout Information</th>
+                                <tr class="checkout">
+                                    <th colspan="4">Add Checkout Information
+                                        <span class="custom-control custom-switch float-right ">
+                                            <input type="checkbox" class="custom-control-input" value="1" checked
+                                                id="toggle-checkout">
+                                            <label class="custom-control-label" for="toggle-checkout"></label></span>
+                                    </th>
                                 </tr>
                                 <tbody id="checkout">
                                     <tr>
@@ -210,8 +148,9 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3">Discount:</td>
-                                        <td class="btn-group"><input id="discount" value="0" max="0" min="0"
-                                                step=".01" class="form-control form-control-sm " type="number">
+                                        <td class="btn-group"><input id="discount" value="0" max="0"
+                                                min="0" step=".01" class="form-control form-control-sm "
+                                                type="number">
                                             <input type="hidden" id="discount-amount" name="discount">
                                             <button id="apply-discount" type="button"
                                                 class="btn btn-primary btn-sm ml-2">Apply</button>
@@ -229,6 +168,27 @@
                                             <td id="tax-amount">Rs. 0</td>
                                         </tr>
                                     @endif
+                                    @if ($delivery_charge)
+                                        <tr>
+                                            <td colspan="3">Take Delivery Charge</td>
+                                            <td><select name="is_delivery" id="is_delivery"
+                                                    class="form-control form-control-sm  float-right">
+                                                    <option value="0">No</option>
+                                                    <option value="1">Yes</option>
+                                                </select>
+                                                @error('is_delivery')
+                                                    <span class=" text-danger" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </td>
+
+                                        </tr>
+                                        <tr id="delivery-charge" style="display:none">
+                                            <td colspan="3">Delivery Charge Amount:</td>
+                                            <td>Rs. {{ $delivery_charge }}</td>
+                                        </tr>
+                                    @endif
                                     <tr>
                                         <td colspan="3">Grand Total:</td>
                                         <td id="grand-total">Rs. 0</td>
@@ -240,7 +200,7 @@
                                                 id="payment_type" required="">
                                                 <option value="0" selected>Cash</option>
                                                 <option value="1"
-                                                    {{ old('customer_type') !== 0 || old('customer_type') !== 1 ? 'disabled' : '' }}>
+                                                    {{ $default_customer_type_id == 1 ? 'disabled' : '' }}>
                                                     Account</option>
                                             </select>
                                         </td>
@@ -274,19 +234,31 @@
 
         </div>
     </div>
-
 @endsection
 @section('js')
     <script>
         let tax = {!! $tax !!};
         let service_charge = {!! $service_charge !!};
         var total = 0;
+        let is_delivery = 0;
         var net_total = 0;
         var grand_total = 0;
         let couponDictionary = {!! $couponsDictionary !!};
         let coupon_discount = 0;
+        let discount = 0;
+        let delivery_charge = {!! $delivery_charge !!};
 
+        $('#toggle-checkout').click(function() {
+            if ($(this).is(':checked')) {
+                $('#checkout').show();
+                $('#order-checkout').show().attr('disabled', false);
 
+            } else {
+
+                $('#checkout').hide();
+                $('#order-checkout').hide().attr('disabled', 'disabled');
+            }
+        });
         $(function() {
             //Getting Items on changing category
             $('#category').on('change', function() {
@@ -295,6 +267,7 @@
                 if (category_id) {
                     $('.menu-category').hide();
                     $('.menu-category[data-category="' + category_id + '"]').show();
+
                 } else {
                     $('.menu-category').show();
 
@@ -306,66 +279,45 @@
                 coupon_discount = 0;
                 if ($(this).val()) {
                     coupon_discount = couponDictionary[$(this).val()];
+                    if (coupon_discount >= total) {
+                        coupon_discount = 0;
+                        $('#coupon_id').val("");
+                        sweetAlert('Error', 'Coupon Amount Should Not Be Greater Than Total Amount',
+                            'error');
+
+                        $('#discount').attr('max', 0);
+                    } else {
+                        $('#discount').attr('max', total - coupon_discount);
+                    }
                 }
-                applyCouponDiscount(coupon_discount);
+                resetAppliedDiscount();
+                calculateSetServiceChargeAndTax();
+
+            });
+            //For Delivery
+            $('#is_delivery').on('change', function() {
+                let destination = $(this).val();
+                if (delivery_charge) {
+                    if (destination == 1) {
+                        is_delivery = 1;
+                        $('#delivery-charge').show();
+                    } else {
+                        $('#delivery-charge').hide();
+                        is_delivery = 0;
+                    }
+                    calculateSetServiceChargeAndTax(discount);
+                }
+
 
             });
 
-            //Getting Customer Type
-            $('#customer_type').on('change', function() {
-                let customer_type = parseInt($(this).val());
-                $("#payment_type option[value='1']").attr("disabled", false);
 
-                if (customer_type === 0 || customer_type === 1) {
-                    if(customer_type === 0 )
-                    {
-                        $("#payment_type").val('1').trigger('change');
-                    }
-
-                }
-                 else {
-                    $("#payment_type").val(0).trigger('change');
-                    $("#payment_type option[value='1']").attr("disabled", "disabled");
-                    customer_type = null;
-                }
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('admin.customer.getType') }}',
-                    data: {
-                        'customer_type': customer_type,
-                    },
-                    success: function(data) {
-
-                        if (data.status === 'success') {
-                            $('#oldCustomer').find('option').not(':first').remove();
-                            data.customers.forEach(function(customer) {
-                                let text = customer.name + '(' + customer.phone_no +
-                                    ')';
-                                let newOption = new Option(text, customer.id, true,
-                                    true);
-                                $('#oldCustomer').append(newOption);
-                            });
-                            $('#oldCustomer').val(null);
-
-                        } else {
-                            console.log(data.message);
-
-                        }
-                    },
-                    error: function(xhr) {
-                        console.log('Internal Sever Error');
-
-                    }
-                });
-
-            });
             //Getting Items on changing category
             $('#search-items').on('keyup', function() {
                 let search = $(this).val();
                 if (search) {
                     $('.menu-items').hide();
                     $('.menu-items').filter(function() {
-                        console.log($(this).closest().text().toLowerCase());
                         return $(this).text().toLowerCase().indexOf(search.toLowerCase()) >= 0;
                     }).show();
                 } else {
@@ -382,6 +334,7 @@
             let itemId = $(this).data('id');
             let itemName = $(this).data('name');
             let itemPrice = $(this).data('price');
+
             $.ajax({
                 type: 'GET',
                 url: '{{ route('admin.cart.addCartItem') }}',
@@ -444,7 +397,6 @@
                 if (result.isConfirmed) {
                     let btn = $(this);
                     let item_id = $(this).attr('rel');
-                    console.log(item_id);
                     $.ajax({
                         type: 'GET',
                         url: '{{ route('admin.cart.removeCartItem') }}',
@@ -453,9 +405,8 @@
                         },
                         success: function(data) {
                             if (data.status === 'success') {
-                                setTotal(data.total);
                                 removeItem(btn, item_id);
-
+                                setTotal(data.total);
                             } else {
                                 alert(data.message);
                             }
@@ -468,24 +419,7 @@
             });
         });
 
-        //For Inputing Existing Customer
-        $('#existingCustomer').click(function() {
-            if ($(this).is(':checked')) {
-                $('#old').css('display', 'block');
-                $('#new').css('display', 'none');
-                $('#old :input').prop('disabled', false);
-                $('#new :input').prop('disabled', true);
-            }
-        });
-        //For Inputing New Customer
-        $('#newCustomer').click(function() {
-            if ($(this).is(':checked')) {
-                $('#old').css('display', 'none');
-                $('#new').css('display', 'block');
-                $('#old :input').prop('disabled', true);
-                $('#new :input').prop('disabled', false);
-            }
-        });
+
 
         //For clearing Category Items
         function clearCategoryItems() {
@@ -494,8 +428,10 @@
         //For setting the total
         function setTotal(totalAmount) {
             total = totalAmount;
-            $('#coupon_id').trigger('change');
+            net_total = totalAmount;
             $('#totalAmount').html('Rs. ' + totalAmount);
+            calculateSetServiceChargeAndTax(discount);
+
         }
 
         //Template of table row
@@ -534,12 +470,14 @@
         }
         //for applying discount
         $('#apply-discount').on('click', function(e) {
-            let discount = parseFloat($('#discount').val());
+            discount = parseFloat($('#discount').val());
             if (isNaN(discount)) {
                 discount = 0;
             }
             if ($('#discount')[0].checkValidity()) {
+
                 $('#discount-amount').val(discount);
+
                 calculateSetServiceChargeAndTax(discount);
 
             } else {
@@ -559,9 +497,6 @@
             }
 
             $('#grand-total').text(foramtValue(net_total));
-            $('#discount').attr('max', net_total);
-            resetAppliedDiscount();
-            calculateSetServiceChargeAndTax()
 
 
         }
@@ -584,13 +519,13 @@
         }
 
         function calculateSetServiceChargeAndTax(discount = 0) {
-            temp_total = parseFloat(net_total) - discount;
-            if (temp_total >= 0) {
+            let deliveryCharge = (is_delivery) ? parseFloat(delivery_charge) : 0;
+            let temp_total = total - coupon_discount - discount;
+            if (temp_total + deliveryCharge >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
                 let tax_amount = parseFloat(((parseFloat(temp_total) + parseFloat(service_charge_amount)) * (tax / 100))
                     .toFixed(2));
-
-                grand_total = ((temp_total + service_charge_amount) + tax_amount).toFixed(2);
+                grand_total = ((temp_total + service_charge_amount) + tax_amount + deliveryCharge).toFixed(2);
 
                 $('#service-charge').text(foramtValue(service_charge_amount));
                 $('#tax-amount').text(foramtValue(tax_amount));
@@ -600,6 +535,7 @@
 
 
             } else {
+                $('#coupon_id').val("");
                 alert('Discount cannot be greater than total')
             }
         }
@@ -617,9 +553,16 @@
 
             }
         });
+        $('#paid_amount').keyup(function() {
+            let due = (grand_total - parseFloat($(this).val()));
+            $('#due_amount').val(due.toFixed(2));
+
+        });
 
         function foramtValue(val) {
             return 'Rs. ' + val;
         }
     </script>
+    @component('admin.orders.components._add_customer_js')
+    @endcomponent
 @endsection

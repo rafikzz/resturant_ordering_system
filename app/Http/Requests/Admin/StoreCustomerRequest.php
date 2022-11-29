@@ -25,7 +25,8 @@ class StoreCustomerRequest extends FormRequest
     {
         return [
             'name'=>'required',
-            'phone_no'=>['required_without:customer_id','unique:table_customers,phone_no'],
+            'phone_no'=>['required_without:customer_id'],
+
         ];
     }
 }

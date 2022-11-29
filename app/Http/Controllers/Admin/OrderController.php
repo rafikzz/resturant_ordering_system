@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateOrderRequest;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Customer;
+use App\Models\CustomerType;
 use App\Models\CustomerWalletTransaction;
 use App\Models\Item;
 use App\Models\Order;
@@ -49,13 +50,22 @@ class OrderController extends Controller
         $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=', Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
         $categories = Category::with('active_items')->whereHas('active_items')->orderBy('order')->get();
-        $customers = Customer::where('is_staff', null)->orderBy('name')->get();
+        $customer_types = CustomerType::get();
 
+        if (old('customer_type')) {
+            $default_customer_type_id = old('customer_type');
+        } else {
+            $default_customer_type = CustomerType::where('is_default', '1')->first();
+
+            $default_customer_type_id = $default_customer_type ? $default_customer_type->id : null;
+        }
+        $customers = Customer::where('customer_type_id', $default_customer_type_id)->where('status', 1)->orderBy('name')->get();
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
 
-        return view('admin.orders.create', compact('title', 'categories', 'coupons', 'couponsDictionary', 'customers', 'tax', 'service_charge', 'breadcrumbs'));
+        return view('admin.orders.create', compact('title', 'categories', 'delivery_charge', 'customer_types', 'coupons', 'couponsDictionary', 'default_customer_type_id', 'customers', 'tax', 'service_charge', 'breadcrumbs'));
     }
     public function test_create()
     {
@@ -70,8 +80,10 @@ class OrderController extends Controller
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
 
-        return view('admin.orders.test_create', compact('title', 'categories', 'coupons', 'couponsDictionary', 'customers', 'tax', 'service_charge', 'breadcrumbs'));
+
+        return view('admin.orders.test_create', compact('title', 'delivery_charge', 'categories', 'coupons', 'couponsDictionary', 'customers', 'tax', 'service_charge', 'breadcrumbs'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -79,21 +91,31 @@ class OrderController extends Controller
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
 
+        if (!Cart::getContent()->count() && $request->checkout) {
+            return redirect()->back()->with('error', 'No Item In Cart For Checkout')->withInput();;
+        }
         DB::beginTransaction();
         try {
-
             if ($request->customer_id) {
                 $customerId = $request->customer_id;
             } else {
                 $customer =  Customer::create([
                     'name' => $request->customer_name,
                     'phone_no' => $request->customer_phone_no,
-                    'is_staff' => $request->customer_type,
+                    'customer_type_id' => $request->customer_type,
                 ]);
                 $customerId = $customer->id;
+                if($request->patient_register_no)
+                {
+                    $customer->patient()->create([
+                        'register_no'=>$request->patient_register_no
+                    ]);
+                }
             }
             $billNo = time();
+
             $total = Cart::getTotal();
 
             $coupon_amount = 0;
@@ -114,36 +136,42 @@ class OrderController extends Controller
                 $service_charge_amount =    round(($service_charge  / 100) * ($net_total), 2);
                 $tax_amount =    round(($tax / 100) * ($net_total + $service_charge_amount), 2);
             }
-            $grand_total = $net_total + $service_charge_amount + $tax_amount;
-
 
             $completedStatus = Status::where('title', 'Completed')->first()->id;
-
+            $delivery_charge_amount = 0;
+            if ($request->is_delivery) {
+                $delivery_charge_amount = $delivery_charge;
+            }
+            $grand_total = $net_total + $service_charge_amount + $tax_amount + $delivery_charge_amount;
             $order = Order::create([
 
                 'bill_no' => $billNo,
                 'destination_no' => $request->destination_no,
-                'destination' => ucfirst($request->destination),
-                'customer_id' => $customerId,
+                'destination' => $request->destination,
+                'customer_id' =>  $customerId,
                 'total' =>  $total,
-                'service_charge' =>  $service_charge_amount,
-                'tax' =>  $tax_amount,
-                'net_total' =>  $grand_total,
-                'discount' => $total_discount,
+                'service_charge' => $request->checkout ? $service_charge_amount : null,
+                'tax' =>  $request->checkout ? $tax_amount : null,
+                'net_total' =>  $request->checkout ? $grand_total : null,
+                'discount' => $request->checkout ? $total_discount : null,
                 'status_id' => $request->checkout ? $completedStatus : 1,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
                 'order_datetime' => Carbon::now(),
+                'coupon_id' =>  $request->checkout ? $request->coupon_id : null,
+                'is_delivery' =>  $request->is_delivery,
+                'delivery_charge' => $request->checkout ? $delivery_charge_amount : null
+
+
             ]);
 
-            if (isset($request->customer_type) && $request->payment_type == 1 && $request->checkout == 1) {
+            if ($request->customer_type != 1 && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
                     $this->store_customer_wallet_transacion($order, $dueAmount, $request->paid_amount);
                 }
             }
-
             $cartItems = Cart::getContent();
             $this->storeOrderItem($order, $cartItems);
         } catch (\Throwable $th) {
@@ -166,18 +194,30 @@ class OrderController extends Controller
 
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'AddItem' => '#'];
         $processingStatus = Status::where('title', 'processing')->first()->id;
-        $order = Order::where('status_id', $processingStatus)->findOrFail($id);
+        $order = Order::where('status_id', $processingStatus)->with('customer')->findOrFail($id);
 
         $customer = Customer::where('id', $order->customer_id)->first();
 
         $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=', Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
         $categories = Category::with('active_items')->whereHas('active_items')->orderBy('order')->get();
-        $customers = Customer::where('is_staff', $customer->is_staff)->where('status', 1)->orderBy('name')->get();
+
+        $customer_types = CustomerType::get();
+
+        if (old('customer_type')) {
+            $default_customer_type_id = old('customer_type');
+        } else {
+            $default_customer_type = CustomerType::where('id', $order->customer->customer_type_id)->first();
+            $default_customer_type_id = $default_customer_type ? $default_customer_type->id : null;
+        }
+        $customers = Customer::where('customer_type_id', $default_customer_type_id)->where('status', 1)->orderBy('name')->get();
+
 
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
+
         $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get()->groupBy('order_no');
 
 
@@ -187,8 +227,10 @@ class OrderController extends Controller
             'setting',
             'tax',
             'service_charge',
+            'delivery_charge',
             'order',
             'customer',
+            'customer_types',
             'coupons',
             'couponsDictionary',
             'categories',
@@ -206,6 +248,12 @@ class OrderController extends Controller
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
+
+        if (!(Cart::getContent()->count() || $order->order_items()->count()) && $request->checkout) {
+            return redirect()->back()->with('error', 'No Item In Cart For Checkout')->withInput();;
+        }
+
         DB::beginTransaction();
         try {
             if ($request->customer_id) {
@@ -214,10 +262,15 @@ class OrderController extends Controller
                 $customer =  Customer::create([
                     'name' => $request->customer_name,
                     'phone_no' => $request->customer_phone_no,
-                    'is_staff' => $request->customer_type,
-
+                    'customer_type_id' => $request->customer_type,
                 ]);
                 $customerId = $customer->id;
+                if($request->patient_register_no)
+                {
+                    $customer->patient()->create([
+                        'register_no'=>$request->patient_register_no
+                    ]);
+                }
             }
 
             $cartItems = Cart::getContent();
@@ -240,26 +293,33 @@ class OrderController extends Controller
                 $service_charge_amount =    round(($service_charge  / 100) * ($net_total), 2);
                 $tax_amount =    round(($tax / 100) * ($net_total + $service_charge_amount), 2);
             }
-            $grand_total = $net_total + $service_charge_amount + $tax_amount;
 
 
             $completedStatus = Status::where('title', 'Completed')->first()->id;
-
+            $delivery_charge_amount = 0;
+            if ($request->is_delivery) {
+                $delivery_charge_amount = $delivery_charge;
+            }
+            $grand_total = $net_total + $service_charge_amount + $tax_amount + $delivery_charge_amount;
 
             $order->update([
                 'customer_id' =>  $customerId,
                 'destination_no' => $request->destination_no,
                 'destination' => ucfirst($request->destination),
                 'total' =>  $total,
-                'service_charge' =>  $service_charge_amount,
-                'tax' =>  $tax_amount,
-                'net_total' =>  $grand_total,
-                'discount' => $total_discount,
+                'service_charge' => $request->checkout ? $service_charge_amount : null,
+                'tax' =>  $request->checkout ? $tax_amount : null,
+                'net_total' =>  $request->checkout ? $grand_total : null,
+                'discount' => $request->checkout ? $total_discount : null,
                 'status_id' => $request->checkout ? $completedStatus : 1,
                 'updated_by' => auth()->id(),
+                'coupon_id' =>  $request->checkout ? $request->coupon_id : null,
+                'is_delivery' =>  $request->is_delivery,
+                'delivery_charge' => $request->checkout ? $delivery_charge_amount : null
+
             ]);
 
-            if (isset($request->customer_type) && $request->payment_type == 1 && $request->checkout == 1) {
+            if ($request->customer_type != 1 && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -289,14 +349,18 @@ class OrderController extends Controller
         $processingStatus = Status::where('title', 'processing')->first()->id;
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
 
+        $customer_types = CustomerType::get();
+
+
         $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=', Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
         $categories = Category::with('active_items')->whereHas('active_items')->orderBy('order')->get();
-        $customers = Customer::where('is_staff', null)->where('status', 1)->orderBy('name')->get();
 
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
+
         Cart::clear();
         $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get()->groupBy('order_no');
 
@@ -309,10 +373,11 @@ class OrderController extends Controller
             'coupons',
             'couponsDictionary',
             'service_charge',
+            'customer_types',
             'tax',
+            'delivery_charge',
             'order',
             'categories',
-            'customers',
             'breadcrumbs',
             'orderItems'
         ));
@@ -322,26 +387,21 @@ class OrderController extends Controller
     {
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
+        $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
         $processingStatus = Status::where('title', 'processing')->first()->id;
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
         $customer = Customer::where('id', $order->customer_id)->first();
+        if (!(Cart::getContent()->count() || $order->order_items()->count()) && $request->checkout) {
+            return redirect()->back()->with('error', 'No Item In Cart For Checkout')->withInput();;
+        }
         DB::beginTransaction();
         try {
 
             $cartItems = Cart::getContent();
             $this->storeOrderItem($order, $cartItems);
 
-            $orderItems = OrderItem::where('order_id', $order->id)->where('total', '>', 0)->get();
-            foreach ($orderItems as $item) {
-                Cart::add(array(
-                    'id' => $item->item_id, // uinique row ID
-                    'name' => $item->item->name,
-                    'price' => $item->price,
-                    'quantity' => $item->total
-                ));
-            }
-            $total = Cart::getTotal();
+            $total = $order->getTotal();
             $coupon_amount = 0;
             if ($request->coupon_id) {
                 $coupon = Coupon::where('id', $request->coupon_id)->where('expiry_date', '>=', Carbon::today())->first();
@@ -358,21 +418,30 @@ class OrderController extends Controller
                 $service_charge_amount =    round(($service_charge  / 100) * ($net_total), 2);
                 $tax_amount =    round(($tax / 100) * ($net_total + $service_charge_amount), 2);
             }
-            $grand_total = $net_total + $service_charge_amount + $tax_amount;
-
+            $delivery_charge_amount = 0;
+            if ($request->is_delivery) {
+                $delivery_charge_amount = $delivery_charge;
+            }
+            $grand_total = $net_total + $service_charge_amount + $tax_amount + $delivery_charge_amount;
 
 
             $completedStatus = Status::where('title', 'Completed')->first()->id;
             $order->update([
                 'total' =>  $total,
-                'service_charge' =>  $service_charge_amount,
-                'tax' =>  $tax_amount,
-                'net_total' =>  $grand_total,
-                'discount' => $total_discount,
+                'service_charge' => $request->checkout ? $service_charge_amount : null,
+                'tax' =>  $request->checkout ? $tax_amount : null,
+                'net_total' =>  $request->checkout ? $grand_total : null,
+                'discount' => $request->checkout ? $total_discount : null,
                 'status_id' => $request->checkout ? $completedStatus : 1,
                 'updated_by' => auth()->id(),
+                'coupon_id' =>  $request->checkout ? $request->coupon_id : null,
+                'is_delivery' =>  $request->is_delivery,
+                'delivery_charge' => $request->checkout ? $delivery_charge_amount : null,
+                'is_delivery' =>  $request->is_delivery,
+
+
             ]);
-            if (isset($customer->is_staff) && $request->payment_type == 1 && $request->checkout == 1) {
+            if ($customer->customer_type_id != 1  && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -430,7 +499,7 @@ class OrderController extends Controller
             return DataTables::of($data)
                 ->editColumn('destination', function ($order) {
                     return [
-                        'display' => $order->destination.' '.$order->destination_no,
+                        'display' => $order->destination . ' ' . $order->destination_no,
                         'order' => $order->destination
                     ];
                 })
@@ -483,7 +552,7 @@ class OrderController extends Controller
     public function getOrderDetail(Request $request)
     {
         if (request()->ajax()) {
-            $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer:id,name,phone_no')->where('id', $request->order_id)->first();
+            $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->where('id', $request->order_id)->first();
             $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
             $billRoute = route('orders.getBill', $order->id);
 

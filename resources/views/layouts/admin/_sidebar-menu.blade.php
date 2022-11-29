@@ -80,7 +80,7 @@
         </a>
     </li>
 @endcan
-@canany('customer_list')
+@canany('patient_list','staff_list')
     <li class="nav-item has-treeview {{ Request::is('admin/staffs*') ? 'menu-open' : '' }} {{ Request::is('admin/patients*') ? 'menu-open' : '' }}   ">
         <a href="#" class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}  {{ Request::is('admin/patients*') ? 'active' : '' }} ">
             <i class="nav-icon fas fa-users"></i>
@@ -90,7 +90,7 @@
             </p>
         </a>
         <ul class="nav nav-treeview ">
-            @can('customer_list')
+            @can('patient_list')
                 <li class="nav-item ">
                     <a href="{{ url('/admin/patients') }}"
                         class="nav-link {{ Request::is('admin/patients*') ? 'active' : '' }}">
@@ -146,7 +146,7 @@
         </ul>
     </li>
 @endcan
-@can('order_update')
+@can('order_edit')
     <li class="nav-item ">
         <a href="{{ url('/admin/kot') }}" class="nav-link {{ Request::is('admin/kot*') ? 'active' : '' }}">
             <i class="nav-icon fa-fw nav-icon fa fa-list-alt"></i>

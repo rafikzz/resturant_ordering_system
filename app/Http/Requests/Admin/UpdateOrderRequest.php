@@ -23,13 +23,21 @@ class UpdateOrderRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules=[
             'customer_id' => 'required_without:customer_name',
             'customer_name' => 'required_without:customer_id',
             'customer_phone_no' => ['required_without:customer_id'],
+            // 'patient_register_no' => ['required_without:customer_id','required_if:custoemr_type,3'],
+
             'discount' => 'nullable',
             'destination' => 'nullable',
             'destination_no' => 'nullable',
         ];
+        if(request('customer_type') ==3)
+        {
+           $rules['patient_register_no']='required_without:customer_id|unique:table_patients,register_no';
+
+        }
+        return $rules;
     }
 }
