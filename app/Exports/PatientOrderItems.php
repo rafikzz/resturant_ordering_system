@@ -2,20 +2,23 @@
 
 namespace App\Exports;
 
+use App\Models\Customer;
 use App\Models\OrderItem;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PatientOrderItems implements FromCollection, WithMapping, WithHeadings,WithStyles
+class PatientOrderItems implements FromCollection, WithMapping, WithHeadings,WithStyles,WithTitle
 {
 
     private $count;
     public function __construct($id)
     {
         $this->customer_id = $id;
+        $this->customer= Customer::find($id);
     }
     /**
     * @return \Illuminate\Support\Collection
@@ -66,5 +69,13 @@ class PatientOrderItems implements FromCollection, WithMapping, WithHeadings,Wit
         $sheet->setCellValue("E{$totalRow}", "=SUM(E2:E{$numOfRows})");
 
 
+    }
+
+       /**
+     * @return string
+     */
+    public function title(): string
+    {
+        return  $this->customer->name.'_'.$this->patient->register_no;
     }
 }

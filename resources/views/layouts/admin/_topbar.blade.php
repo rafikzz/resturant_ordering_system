@@ -12,7 +12,7 @@
  <!-- Right navbar links -->
  <ul class="navbar-nav ml-auto">
      <!-- Navbar Search -->
-     <li class="nav-item">
+     {{-- <li class="nav-item">
          <a class="nav-link" data-widget="navbar-search" href="#" role="button">
              <i class="fas fa-search"></i>
          </a>
@@ -32,17 +32,16 @@
                  </div>
              </form>
          </div>
-     </li>
+     </li> --}}
 
 
 
      <li class="nav-item dropdown ml-3">
          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
              aria-haspopup="true" aria-expanded="false">
-             User
+             {{ ucwords(auth()->user()->name) }}
          </a>
          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-             <a class="dropdown-item disabled">{{ auth()->user()->name }}</a>
              <div class="dropdown-divider"></div>
              <a class="dropdown-item" href="{{ route('logout') }}"
                  onclick="event.preventDefault();

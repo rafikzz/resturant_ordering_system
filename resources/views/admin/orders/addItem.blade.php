@@ -378,12 +378,21 @@
                     btn.attr('disabled', false);
 
                     if (data.status === 'success') {
-                        $('#order-list').html('');
                         for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item].id, data.items[
+                            if($('#item-'+item).length){
+                                $('#item-'+item).replaceWith(tableRowTemplate(data.items[item]
+                                .id, data.items[
                                     item].name, data.items[item].price, data
                                 .items[item]
                                 .quantity));
+                            }else{
+                                $('#order-list').append(tableRowTemplate(data.items[item]
+                                .id, data.items[
+                                    item].name, data.items[item].price, data
+                                .items[item]
+                                .quantity));
+                            }
+
 
                         }
 

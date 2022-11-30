@@ -26,6 +26,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     {{-- Datatables --}}
     <link href="{{ asset('css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('css/jquery.dataTable-bootstrap.min.css') }}" rel="stylesheet"> --}}
+
     {{-- ColorPicker --}}
     <link rel="stylesheet"
         href="{{ asset('admin-lte/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css') }}">
@@ -38,6 +40,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         [class*="sidebar-dark-"] {
             background-color: #000;
         }
+
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
             background-color: #3e4e4e;
@@ -175,6 +178,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{ asset('admin-lte/plugins/select2/js/select2.min.js') }}"></script>
     {{-- datatalbes --}}
     <script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
+    {{-- <script src="{{ asset('js/jQuery.dataTable-bootstrap-4.js') }}"></script> --}}
+
+
     {{-- Jquery validation --}}
     <script src="{{ asset('js/jquery-validation-1.19.5/dist/jquery.validate.min.js') }}"></script>
     {{-- Moment Js --}}
@@ -201,12 +207,30 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     {{-- Print This Js v1.15 --}}
     <script src="{{ asset('js/printThis.js') }}"></script>
-
+    {{-- <script>
+        @if ($message = Session::get('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '{{ $message }}',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        @endif
+        @if ($message = Session::get('error'))
+            Swal.fire([
+                icon: 'error',
+                title:' {{ $message }}',
+                showConfirmButton: false,
+                timer: 1500
+            ])
+        @endif
+    </script> --}}
     <script>
         $(document).ready(function() {
             $('.select2').select2();
         });
     </script>
+
 
     @yield('js')
 

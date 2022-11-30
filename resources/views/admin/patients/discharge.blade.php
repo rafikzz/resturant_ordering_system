@@ -8,7 +8,7 @@
                     <div class="card-header">
                         <h5 class="card-title">Patient Discharge</h5>
                         <div class="card-tools">
-                            <a class="btn btn-primary" href="{{ route('admin.items.index') }}"> Back</a></i></a>
+                            <a class="btn btn-primary" href="{{ route('admin.patients.index') }}"> Back</a></i></a>
                         </div>
                     </div>
                     <div class="card-body">

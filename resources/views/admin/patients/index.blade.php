@@ -5,7 +5,7 @@
         <div class="col">
             <div class="card card-outline card-dark">
                 <div class="card-header">
-                    <h2 class="card-title">Patient List</h2>
+                    <a href="{{ route('admin.patients.exportOrderItems') }}" id="export" class="btn btn-success">Patient Orders Export</a>
                     <div class="card-tools form-inline">
                         @can('patient_list')
                             <select id="mode" class="form-control">
@@ -13,6 +13,8 @@
                                 <option value="0">Discharged</option>
                             </select>
                         @endcan
+
+
                         @can('patient_create')
                             <a class="btn btn-success ml-3" href="{{ route('admin.patients.create') }}"> <i
                                     class="fa fa-plus"></i></a>
@@ -108,6 +110,7 @@
             });
             $(document).on('change', '#mode', function() {
                 table.draw();
+                $('#export').toggle();
             });
 
             //for delete btn

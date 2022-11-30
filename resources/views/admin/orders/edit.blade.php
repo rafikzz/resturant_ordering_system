@@ -66,7 +66,7 @@
                                     <select name="customer_type" id="customer_type" class="form-control">
                                         @foreach ($customer_types as $customer_type)
                                             <option value="{{ $customer_type->id }}"
-                                                {{ old('customer_type',$order->customer->customer_type_id) == $customer_type->id ? 'selected' : '' }}>
+                                                {{ old('customer_type', $order->customer->customer_type_id) == $customer_type->id ? 'selected' : '' }}>
                                                 {{ $customer_type->name }}</option>
                                         @endforeach
 
@@ -78,8 +78,12 @@
                                     @enderror
                                 </div>
                             </div>
-                            @component('admin.orders.components._add_customers',['customers'=>$customers,'customer_type_id'=>$order->customer->customer_type_id,'customer_id'=>$order->customer_id])
-
+                            @component('admin.orders.components._add_customers',
+                                [
+                                    'customers' => $customers,
+                                    'customer_type_id' => $order->customer->customer_type_id,
+                                    'customer_id' => $order->customer_id,
+                                ])
                             @endcomponent
 
 
@@ -249,6 +253,11 @@
                                                 </option>
                                             </select>
                                         </td>
+                                        @error('payment_type')
+                                            <span class=" text-danger" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </tr>
                                     <tr>
                                         <td colspan="3">Paid Amount:</td>
@@ -439,14 +448,20 @@
                     btn.attr('disabled', false);
 
                     if (data.status === 'success') {
-                        $('#order-list').html('');
                         for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item]
-                                .id, data.items[
-                                    item].name, data.items[item].price, data
-                                .items[item]
-                                .quantity));
-
+                            if ($('#item-' + item).length) {
+                                $('#item-' + item).replaceWith(tableRowTemplate(data.items[item]
+                                    .id, data.items[
+                                        item].name, data.items[item].price, data
+                                    .items[item]
+                                    .quantity));
+                            } else {
+                                $('#order-list').append(tableRowTemplate(data.items[item]
+                                    .id, data.items[
+                                        item].name, data.items[item].price, data
+                                    .items[item]
+                                    .quantity));
+                            }
                         }
 
                         // sweetAlert('Success',data.message,'success');
@@ -773,6 +788,5 @@
         }
     </script>
     @component('admin.orders.components._add_customer_js')
-
     @endcomponent
 @endsection

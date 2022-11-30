@@ -108,6 +108,8 @@ class CheckoutController extends Controller
                 'coupon_id'=>$request->coupon_id,
                 'delivery_charge' => $delivery_charge_amount,
                 'is_delivery'=>  $request->is_delivery,
+                'is_credit' => $request->payment_type
+
 
             ]);
 

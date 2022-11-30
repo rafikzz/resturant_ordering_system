@@ -80,9 +80,11 @@
         </a>
     </li>
 @endcan
-@canany('patient_list','staff_list')
-    <li class="nav-item has-treeview {{ Request::is('admin/staffs*') ? 'menu-open' : '' }} {{ Request::is('admin/patients*') ? 'menu-open' : '' }}   ">
-        <a href="#" class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}  {{ Request::is('admin/patients*') ? 'active' : '' }} ">
+@canany('patient_list', 'staff_list')
+    <li
+        class="nav-item has-treeview {{ Request::is('admin/staffs*') ? 'menu-open' : '' }} {{ Request::is('admin/patients*') ? 'menu-open' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'menu-open' : '' }}   ">
+        <a href="#"
+            class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}  {{ Request::is('admin/patients*') ? 'active' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'active' : '' }} ">
             <i class="nav-icon fas fa-users"></i>
             <p>
                 Patient and Staff
@@ -99,10 +101,18 @@
                     </a>
                 </li>
             @endcan
+            @can('patient_discharge')
+                <li class="nav-item ">
+                    <a href="{{ url('/admin/patient-discharge-payments') }}"
+                        class="nav-link {{ Request::is('admin/patient-discharge-payments*') ? 'active' : '' }}">
+                        <i class="nav-icon fa-fw nav-icon fas fa-sign-out-alt"></i>
+                        <p>Patients Discharge Payment</p>
+                    </a>
+                </li>
+            @endcan
             @can('staff_list')
                 <li class="nav-item ">
-                    <a href="{{ url('/admin/staffs') }}"
-                        class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/staffs') }}" class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}">
                         <i class="nav-icon fa-fw nav-icon fa fa-user-md"></i>
                         <p>Staffs</p>
                     </a>

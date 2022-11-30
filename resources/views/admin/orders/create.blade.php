@@ -45,7 +45,7 @@
         <div class="col-lg-6">
             <form action="{{ route('admin.orders.store') }}" id="order-form" method="POST">
                 @csrf
-                <div class="card">
+                <div class="card ">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
@@ -203,6 +203,11 @@
                                                     {{ $default_customer_type_id == 1 ? 'disabled' : '' }}>
                                                     Account</option>
                                             </select>
+                                            @error('payment_type')
+                                                <span class=" text-danger" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
                                         </td>
                                     </tr>
                                     <tr>
@@ -345,13 +350,21 @@
                     btn.attr('disabled', false);
 
                     if (data.status === 'success') {
-                        $('#order-list').html('');
                         for (var item in data.items) {
-                            $('#order-list').append(tableRowTemplate(data.items[item]
-                                .id, data.items[
-                                    item].name, data.items[item].price, data
-                                .items[item]
-                                .quantity));
+                            if ($('#item-' + item).length) {
+                                $('#item-' + item).replaceWith(tableRowTemplate(data.items[item]
+                                    .id, data.items[
+                                        item].name, data.items[item].price, data
+                                    .items[item]
+                                    .quantity));
+                            } else {
+                                $('#order-list').append(tableRowTemplate(data.items[item]
+                                    .id, data.items[
+                                        item].name, data.items[item].price, data
+                                    .items[item]
+                                    .quantity));
+                            }
+
 
                         }
 

@@ -28,7 +28,7 @@ class UpdateOrderRequest extends FormRequest
             'customer_name' => 'required_without:customer_id',
             'customer_phone_no' => ['required_without:customer_id'],
             // 'patient_register_no' => ['required_without:customer_id','required_if:custoemr_type,3'],
-
+            'payment_type'=>'required',
             'discount' => 'nullable',
             'destination' => 'nullable',
             'destination_no' => 'nullable',

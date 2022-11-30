@@ -17,7 +17,7 @@
 </div>
 <div id="old" class="col-12 form-group  py-3"
     style="display:  {{ old('new_or_old') !== 'new' ? 'block' : 'none' }}">
-    <select name="customer_id" class="form-control select2" style="width: 50%" id="oldCustomer" required
+    <select name="customer_id" class="form-control select2" style="width: 75%" id="oldCustomer" required
         {{ old('new_or_old') == 'new' ? 'disabled' : '' }} required>
         <option value="">--Please Select Customer--</option>
         @foreach ($customers as $customer)

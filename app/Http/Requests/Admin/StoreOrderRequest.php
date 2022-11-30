@@ -32,6 +32,8 @@ class StoreOrderRequest extends FormRequest
             'customer_phone_no'=>['required_without:customer_id'],
             'patient_register_no' => '',
             'discount'=>'nullable',
+            'payment_type'=>'required',
+
 
          ];
          if(request('customer_type') ==3)

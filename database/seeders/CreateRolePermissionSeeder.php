@@ -53,6 +53,10 @@ class CreateRolePermissionSeeder extends Seeder
             'order_add',
             'report_list',
             'setting_create',
+            'coupon_list',
+            'coupon_create',
+            'coupon_edit',
+            'coupon_delete',
          ];
 
          foreach ($permissions as $permission) {
@@ -84,6 +88,10 @@ class CreateRolePermissionSeeder extends Seeder
             'order_add',
             'report_list',
             'setting_create',
+            'coupon_list',
+            'coupon_create',
+            'coupon_edit',
+            'coupon_delete',
          ];
          $staffPermission= [
             'item_list',
@@ -105,6 +113,10 @@ class CreateRolePermissionSeeder extends Seeder
             'order_edit',
             'order_delete',
             'order_add',
+            'coupon_list',
+            'coupon_create',
+            'coupon_edit',
+            'coupon_delete',
 
 
          ];

@@ -26,6 +26,7 @@ class CreateTableOrdersTable extends Migration
             $table->decimal('total',10,2);
             $table->timestamp('order_datetime')->nullable();
             $table->foreignId('payment_type_id')->nullable()->constrained('table_payment_types');
+            $table->boolean('is_credit')->nullable();
             $table->decimal('tax',10,2)->nullable();
             $table->decimal('service_charge',10,2)->nullable();
             $table->decimal('delivery_charge',10,2)->nullable();

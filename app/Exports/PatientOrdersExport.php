@@ -2,28 +2,33 @@
 
 namespace App\Exports;
 
+use App\Models\Customer;
 use App\Models\Order;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithPreCalculateFormulas;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PatientOrdersExport implements FromCollection, WithMapping, WithHeadings,WithStyles,WithPreCalculateFormulas,WithColumnWidths
+class PatientOrdersExport implements FromCollection, WithMapping, WithHeadings,WithStyles,WithPreCalculateFormulas,WithColumnWidths,WithTitle,ShouldAutoSize
 {
     private $count;
     public function __construct($id)
     {
         $this->customer_id = $id;
+        $this->customer= Customer::find($id);
+
     }
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection()
     {
-        $this->count= Order::where('status_id',3)->count();
+        $this->count= Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->where('customer_id', $this->customer_id)->where('status_id',3)->count();
         return Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->where('customer_id', $this->customer_id)->where('status_id',3)->get();
     }
     public function map($order): array
@@ -92,18 +97,25 @@ class PatientOrdersExport implements FromCollection, WithMapping, WithHeadings,W
     public function columnWidths(): array
     {
         return [
-            'B' => 15,
-            'C' => 15,
+            // 'B' => 15,
+            // 'C' => 15,
             'D' => 15,
-            'E' => 15,
-            'F' => 15,
-            'G' => 15,
-            'H' => 15,
-            'I' => 15,
-            'J' => 15,
-            'K' => 15,
-            'L' => 15,
+            // 'E' => 15,
+            // 'F' => 15,
+            // 'G' => 15,
+            // 'H' => 15,
+            // 'I' => 15,
+            // 'J' => 15,
+            // 'K' => 15,
+            // 'L' => 15,
 
         ];
+    }
+      /**
+     * @return string
+     */
+    public function title(): string
+    {
+        return  $this->customer->name.'_'.$this->customer->patient->register_no;
     }
 }

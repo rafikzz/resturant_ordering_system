@@ -101,16 +101,22 @@ class OrderController extends Controller
             if ($request->customer_id) {
                 $customerId = $request->customer_id;
             } else {
+                if ($request->customer_type  == 2 || $request->customer_type == 3) {
+                    $is_staff = ($request->customer_type == 3) ? 0 : 1;
+                } else {
+                    $is_staff = null;
+                }
                 $customer =  Customer::create([
                     'name' => $request->customer_name,
                     'phone_no' => $request->customer_phone_no,
                     'customer_type_id' => $request->customer_type,
+                    'is_staff' => $is_staff
+
                 ]);
                 $customerId = $customer->id;
-                if($request->patient_register_no)
-                {
+                if ($request->patient_register_no) {
                     $customer->patient()->create([
-                        'register_no'=>$request->patient_register_no
+                        'register_no' => $request->patient_register_no
                     ]);
                 }
             }
@@ -154,6 +160,7 @@ class OrderController extends Controller
                 'tax' =>  $request->checkout ? $tax_amount : null,
                 'net_total' =>  $request->checkout ? $grand_total : null,
                 'discount' => $request->checkout ? $total_discount : null,
+                'is_credit' => $request->checkout ? $request->payment_type : null,
                 'status_id' => $request->checkout ? $completedStatus : 1,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
@@ -189,7 +196,7 @@ class OrderController extends Controller
         $title = $this->title;
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'Edit' => '#'];
         $processingStatus = Status::where('title', 'processing')->first()->id;
-
+        Cart::clear();
 
 
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'AddItem' => '#'];
@@ -259,16 +266,22 @@ class OrderController extends Controller
             if ($request->customer_id) {
                 $customerId = $request->customer_id;
             } else {
+                if ($request->customer_type  == 2 || $request->customer_type == 3) {
+                    $is_staff = ($request->customer_type == 3) ? 0 : 1;
+                } else {
+                    $is_staff = null;
+                }
                 $customer =  Customer::create([
                     'name' => $request->customer_name,
                     'phone_no' => $request->customer_phone_no,
                     'customer_type_id' => $request->customer_type,
+                    'is_staff' => $is_staff
+
                 ]);
                 $customerId = $customer->id;
-                if($request->patient_register_no)
-                {
+                if ($request->patient_register_no) {
                     $customer->patient()->create([
-                        'register_no'=>$request->patient_register_no
+                        'register_no' => $request->patient_register_no
                     ]);
                 }
             }
@@ -315,7 +328,9 @@ class OrderController extends Controller
                 'updated_by' => auth()->id(),
                 'coupon_id' =>  $request->checkout ? $request->coupon_id : null,
                 'is_delivery' =>  $request->is_delivery,
-                'delivery_charge' => $request->checkout ? $delivery_charge_amount : null
+                'delivery_charge' => $request->checkout ? $delivery_charge_amount : null,
+                'is_credit' => $request->checkout ? $request->payment_type : null
+
 
             ]);
 
@@ -438,6 +453,8 @@ class OrderController extends Controller
                 'is_delivery' =>  $request->is_delivery,
                 'delivery_charge' => $request->checkout ? $delivery_charge_amount : null,
                 'is_delivery' =>  $request->is_delivery,
+                'is_credit' => $request->checkout ? $request->payment_type : null
+
 
 
             ]);
@@ -593,7 +610,7 @@ class OrderController extends Controller
     {
         $wallet_balance = isset($order->customer_id) ? $order->customer->wallet_balance() : 0;
         $current_balance = $wallet_balance - $dueAmount;
-        $customer = Customer::where('id', $order->customer_id)->whereNotNull('is_staff')->first();
+        $customer = Customer::where('id', $order->customer_id)->where('customer_type_id', '!=', 1)->first();
         if ($customer) {
             $customer->update([
                 'balance' => $current_balance

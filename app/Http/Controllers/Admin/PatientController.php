@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\OrdersByCustomerExport;
 use App\Exports\PatientOrderItems;
 use App\Exports\PatientOrdersExport;
 use App\Http\Controllers\Controller;
@@ -253,11 +254,23 @@ class PatientController extends Controller
 
     public function export($id)
     {
+
+        // $customers =Customer::with('orders')->with('patient')->whereHas('patient')->get();
+        // return view('admin.excel_export.customer_order_items',compact('customers'));
         $customer_type = CustomerType::where('name', 'Patient')->first();
         $customer_type_id = $customer_type ? $customer_type->id : null;
         $customer = Customer::where('customer_type_id', $customer_type_id)->findOrFail($id);
+        // dd( Customer::where('customer_type_id',3)->whereHas('orders')->where('status',1)->get());
+
         $excelname= $customer->name.'_'.$customer->patient->register_no.'.xlsx';
         return Excel::download(new PatientOrdersExport($id), $excelname);
+    }
+
+    public function exportOrderItems()
+    {
+        $excelname= 'Patient_'.Carbon::now().'.xlsx';
+        return Excel::download(new OrdersByCustomerExport(), $excelname);
+
     }
 
 }

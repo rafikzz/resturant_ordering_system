@@ -130,6 +130,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::post('patients/{id}/discharge', [PatientController::class,'discharge'])->name('patients.discharge');
     Route::get('patients/{id}/discharge', [PatientController::class,'discharge_show'])->name('patients.discharge');
     Route::get('patients/{id}/export', [PatientController::class,'export'])->name('patients.export');
+    Route::get('patients/export/export-order-items', [PatientController::class,'exportOrderItems'])->name('patients.exportOrderItems');
 
 
     Route::get('get-patient-order-item-data', [PatientController::class, 'getOrderItemData'])->name('patient.getOrderItemData');

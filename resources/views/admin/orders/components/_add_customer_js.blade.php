@@ -24,8 +24,13 @@
                 if (data.status === 'success') {
                     $('#oldCustomer').find('option').not(':first').remove();
                     data.customers.forEach(function(customer) {
+                        let register_no ='';
+                        if(customer.patient)
+                        {
+                            register_no= " Register No:"+customer.patient.register_no;
+                        }
                         let text = customer.name + '(' + customer.phone_no +
-                            ')';
+                            ')'+register_no;
                         let newOption = new Option(text, customer.id, true,
                             true);
                         $('#oldCustomer').append(newOption);
