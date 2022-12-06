@@ -70,7 +70,7 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
             'Discount',
             'Tax',
             'Service Charge',
-            'Delivery Charge',
+            'Packaging Charge',
             'Net Total',
             'Created At',
             'Created By',

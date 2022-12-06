@@ -101,7 +101,7 @@
 
                                         </tr>
                                         <tr id="delivery-charge" style="display:none">
-                                            <td colspan="3">Delivery Charge Amount:</td>
+                                            <td colspan="3">Packaging Charge Amount:</td>
                                             <td>Rs. {{ $delivery_charge }}</td>
                                         </tr>
                                     @endif
@@ -355,7 +355,7 @@
                         }
                         if (data.order.delivery_charge && data.order.delivery_charge != 0) {
                             $('#table-items').append(
-                                "<tr><td colspan='3'>Delivery Charge</td><td>" +
+                                "<tr><td colspan='3'>Packaging Charge</td><td>" +
                                 foramtValue(data.order.delivery_charge) + "</td></tr>");
                         }
                         if (data.order.net_total) {

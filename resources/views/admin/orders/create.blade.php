@@ -178,7 +178,7 @@
                                     @endif
                                     @if ($delivery_charge)
                                         <tr>
-                                            <td colspan="3">Take Delivery Charge</td>
+                                            <td colspan="3">Take Packaging Charge</td>
                                             <td><select name="is_delivery" id="is_delivery"
                                                     class="form-control form-control-sm  float-right">
                                                     <option value="0">No</option>
@@ -193,7 +193,7 @@
 
                                         </tr>
                                         <tr id="delivery-charge" style="display:none">
-                                            <td colspan="3">Delivery Charge Amount:</td>
+                                            <td colspan="3">Packaging Charge Amount:</td>
                                             <td>Rs. {{ $delivery_charge }}</td>
                                         </tr>
                                     @endif

@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered table-sm" width="100%" id="table">
+                    <table class="table table-bordered table-sm" width="100%"    id="table">
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
@@ -191,7 +191,7 @@
                             }
                             if (data.order.delivery_charge && data.order.delivery_charge != 0) {
                                 $('#table-items').append(
-                                    "<tr><td colspan='3'>Delivery Charge</td><td>" +
+                                    "<tr><td colspan='3'>Packaging Charge</td><td>" +
                                     foramtValue(data.order.delivery_charge) + "</td></tr>");
                             }
                             if (data.order.net_total) {

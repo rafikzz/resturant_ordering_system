@@ -224,7 +224,7 @@
                                     @endif
                                     @if ($delivery_charge)
                                         <tr>
-                                            <td colspan="3">Take Delivery Charge</td>
+                                            <td colspan="3">Take Packaging Charge</td>
                                             <td><select name="is_delivery" id="is_delivery"
                                                     class="form-control form-control-sm  float-right">
                                                     <option value="0">No</option>
@@ -239,7 +239,7 @@
 
                                         </tr>
                                         <tr id="delivery-charge" style="display:none">
-                                            <td colspan="3">Delivery Charge Amount:</td>
+                                            <td colspan="3">Packaging Charge Amount:</td>
                                             <td>Rs. {{ $delivery_charge }}</td>
                                         </tr>
                                     @endif
@@ -385,51 +385,6 @@
                     $('.menu-items').show();
                 }
             });
-        });
-        //Getting Customer Type
-        $('#customer_type').on('change', function() {
-            let customer_type = parseInt($(this).val());
-            $("#payment_type option[value='1']").attr("disabled", false);
-
-            if (customer_type === 3 || customer_type === 2) {
-                if (customer_type === 3) {
-                    $("#payment_type").val('1').trigger('change');
-                }
-
-            } else {
-                $("#payment_type").val(0).trigger('change');
-                $("#payment_type option[value='1']").attr("disabled", "disabled");
-            }
-            $.ajax({
-                type: 'GET',
-                url: '{{ route('admin.customer.getType') }}',
-                data: {
-                    'customer_type': customer_type,
-                },
-                success: function(data) {
-
-                    if (data.status === 'success') {
-                        $('#oldCustomer').find('option').not(':first').remove();
-                        data.customers.forEach(function(customer) {
-                            let text = customer.name + '(' + customer.phone_no +
-                                ')';
-                            let newOption = new Option(text, customer.id, true,
-                                true);
-                            $('#oldCustomer').append(newOption);
-                        });
-                        $('#oldCustomer').val(null);
-
-                    } else {
-                        console.log(data.message);
-
-                    }
-                },
-                error: function(xhr) {
-                    console.log('Internal Sever Error');
-
-                }
-            });
-
         });
 
         //For Adding Order Item to List
@@ -789,8 +744,7 @@
 
         });
         $('#paid_amount').focusout(function() {
-            if ($(this).val()) {
-                } else {
+            if ($(this).val()) {} else {
                 $(this).val(0);
             }
         });

@@ -32,7 +32,7 @@
             @endif
             @if ($orders_summary->orders_delivery_charge != 0)
                 <tr>
-                    <th>Delivery Charge</th>
+                    <th>Packaging Charge</th>
                     <th>{{ $orders_summary->orders_delivery_charge }}</th>
                 </tr>
             @endif

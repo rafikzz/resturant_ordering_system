@@ -4,8 +4,8 @@
         let customer_type = parseInt($(this).val());
         $("#payment_type option[value='1']").attr("disabled", false);
 
-        if( customer_type === 2) {
-                $("#payment_type").val('0').trigger('change');
+        if (customer_type === 2) {
+            $("#payment_type").val('0').trigger('change');
         } else {
             $("#payment_type").val(0).trigger('change');
             $("#payment_type option[value='1']").attr("disabled", "disabled");
@@ -21,18 +21,22 @@
                 if (data.status === 'success') {
                     $('#oldCustomer').find('option').not(':first').remove();
                     data.customers.forEach(function(customer) {
-                        let register_no ='';
-                        if(customer.patient)
-                        {
-                            register_no= " Register No:"+customer.patient.register_no;
+                        let register_no = '';
+                        if (customer.patient) {
+                            register_no = " Register No:" + customer.patient.register_no;
                         }
                         let text = customer.name + '(' + customer.phone_no +
-                            ')'+register_no;
+                            ')' + register_no;
                         let newOption = new Option(text, customer.id, true,
                             true);
                         $('#oldCustomer').append(newOption);
                     });
-                    $('#oldCustomer').val(null);
+                    if (customer_type == 1) {
+                        $('#oldCustomer').val(1);
+
+                    } else {
+                        $('#oldCustomer').val(null);
+                    }
                     $("input[name=new_or_old]:checked").trigger('click');
 
 

@@ -66,7 +66,7 @@ class PatientOrdersExport implements FromCollection, WithMapping, WithHeadings,W
             'Discount',
             'Tax',
             'Service Charge',
-            'Delivery Charge',
+            'Packaging Charge',
             'Net Total',
             'Created At',
             'Created By',

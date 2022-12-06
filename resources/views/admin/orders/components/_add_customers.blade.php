@@ -21,7 +21,7 @@
         {{ old('new_or_old') == 'new' ? 'disabled' : '' }} required>
         <option value="">--Please Select Customer--</option>
         @foreach ($customers as $customer)
-            <option value="{{ $customer->id }}" {{ old('customer_id', $customer_id) == $customer->id ? 'selected' : '' }}>
+            <option value="{{ $customer->id }}" {{ old('customer_id', $customer_id) == $customer->id ? 'selected' : '' }}  {{ $customer->id == 1 ? 'selected' : '' }}>
                 {{ $customer->name }}({{ $customer->phone_no }})
             </option>
         @endforeach

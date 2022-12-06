@@ -38,7 +38,7 @@ return [
     'shipping'        => 'Shipping',
     'time'            =>  'Published On',
     'cashier'         =>  'Cashier',
-    'delivery_charge' =>  'Delivery Charge',
+    'delivery_charge' =>  'Packaging Charge',
     'thanks_for_visiting'=>'Thanks For Visiting !!'
 
 ];
