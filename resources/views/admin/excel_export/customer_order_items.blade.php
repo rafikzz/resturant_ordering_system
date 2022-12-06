@@ -9,59 +9,50 @@
         <tr>
             <th colspan="6">Patient Register No:{{ $customer->patient->register_no }}</th>
         </tr>
-        <tr>
-            <th>Bill No</th>
-            <th>Item</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Sub Total</th>
-            <th>Created At</th>
-        </tr>
-        <tbody>
-            @php
-                $orders_total = 0;
-                $orders_discount = 0;
-                $orders_delivery_charge = 0;
-                $orders_net_total = 0;
-            @endphp
-            @foreach ($customer->orders as $order)
-                @php
-                    $orders_total += $order->total;
-                    $orders_discount += $order->discount;
-                    $orders_delivery_charge += $order->delivery_charge;
-
-                    $orders_net_total += $order->net_total;
-
-                @endphp
-                @foreach ($order->order_items as $order_item)
-                    <tr>
-                        <th>{{ $order->bill_no }}</th>
-                        <th>{{ $order_item->item->name }}</th>
-                        <th>{{ $order_item->price }}</th>
-                        <th>{{ $order_item->total }}</th>
-                        <th>{{ $order_item->total * $order_item->price }}</th>
-                        <th>{{ $order_item->created_at }}</th>
-
-                    </tr>
-                @endforeach
-            @endforeach
-        </tbody>
-
-        <tr>
-            <th colspan="4">Total</th>
-            <th>{{ $orders_total }}</th>
-        </tr>
-        <tr>
-            <th colspan="4">Discount</th>
-            <th>{{ $orders_discount }}</th>
-        </tr>
-        <tr>
-            <th colspan="4">Delivery Charge</th>
-            <th>{{ $orders_delivery_charge }}</th>
-        </tr>
-        <tr>
-            <th colspan="4">Net Total</th>
-            <th>{{ $orders_net_total }}</th>
-        </tr>
+        @forelse ($customer->orders_summary as $orders_summary)
+            <tr>
+                <th>Total</th>
+                <th>{{ $orders_summary->orders_total }}</th>
+            </tr>
+            <tr>
+                <th>Discount</th>
+                <th>{{ $orders_summary->orders_discount }}</th>
+            </tr>
+            @if ($orders_summary->orders_tax != 0)
+                <tr>
+                    <th>Tax</th>
+                    <th>{{ $orders_summary->orders_tax }}</th>
+                </tr>
+            @endif
+            @if ($orders_summary->orders_service_charge != 0)
+                <tr>
+                    <th>Service Charge</th>
+                    <th>{{ $orders_summary->orders_service_charge }}</th>
+                </tr>
+            @endif
+            @if ($orders_summary->orders_delivery_charge != 0)
+                <tr>
+                    <th>Delivery Charge</th>
+                    <th>{{ $orders_summary->orders_delivery_charge }}</th>
+                </tr>
+            @endif
+            <tr>
+                <th>Net Total</th>
+                <th>{{ $orders_summary->orders_net_total }}</th>
+            </tr>
+        @empty
+            <tr>
+                <th>Total</th>
+                <th>0</th>
+            </tr>
+            <tr>
+                <th>Discount</th>
+                <th>0</th>
+            </tr>
+            <tr>
+                <th>Net Total</th>
+                <th>0</th>
+            </tr>
+        @endforelse
     </table>
 @endforeach

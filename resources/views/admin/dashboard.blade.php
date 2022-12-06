@@ -2,21 +2,19 @@
 
 @section('content')
     <div class="row">
+        @hasrole('Superadmin')
+            <div class="clearfix hidden-md-up"></div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box mb-3">
+                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-dollar-sign"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Sales</span>
+                        <span class="info-box-number">{{ $totalSales }}</span>
+                    </div>
 
-
-        <div class="clearfix hidden-md-up"></div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-                <span class="info-box-icon bg-info elevation-1"><i class="fas fa-dollar-sign"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Total Sales</span>
-                    <span class="info-box-number">{{ $totalSales }}</span>
                 </div>
-
             </div>
-
-        </div>
-
+        @endhasrole
 
         <div class="clearfix hidden-md-up"></div>
         <div class="col-12 col-sm-6 col-md-3">
@@ -39,7 +37,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">Top Sellling Item</span>
                     <span class="info-box-number">
-                            {{ $topSoldItem }}
+                        {{ $topSoldItem }}
                     </span>
                 </div>
             </div>

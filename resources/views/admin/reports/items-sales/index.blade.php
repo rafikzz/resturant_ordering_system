@@ -4,26 +4,31 @@
     <div class="row">
         <div class="col">
             <div class="card card-outline card-dark">
-                <div class="card-header">
-                    {{-- <h2 class="badge bg-orange">Total Sales: Rs.{{ $totalSales }}</h2>
+                <form action="{{ route('admin.reports.exportItemSales') }}" method="POST">
+                    @csrf
+                    <div class="card-header">
+                        {{-- <h2 class="badge bg-orange">Total Sales: Rs.{{ $totalSales }}</h2>
                     <h2 class="badge bg-orange">Todays Sales: Rs.{{ $todaysSales }}</h2> --}}
-                    <a href="{{ route('admin.reports.exportItemSales') }}" id="export" class="btn btn-success">Export Excel</a>
-                    <div class="card-tools form-inline">
-                        <div class="form-group">
-                            <label>Date range:</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="far fa-calendar-alt"></i>
-                                    </span>
+                        <button id="export" class="btn btn-success">Export
+                            Excel</button>
+                        <div class="card-tools form-inline">
+                            <div class="form-group">
+                                <label>Date range:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control float-right"  name="date_range" id="custom-date-range">
                                 </div>
-                                <input type="text" class="form-control float-right" id="custom-date-range">
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
+
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered" id="table">
+                    <table class="table table-bordered" width="100%" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Item Name</th>
@@ -65,7 +70,14 @@
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
-                        'month').endOf('month')]
+                        'month').endOf('month')],
+                    'Last 3 Month': [moment().subtract(3, 'month').startOf('month'), moment().subtract(1,
+                        'month').endOf('month')],
+                    'Last 6 Month': [moment().subtract(6, 'month').startOf('month'), moment().subtract(1,
+                        'month').endOf('month')],
+                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+                    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1,
+                        'year').endOf('year')],
                 }
             }, cb);
 
@@ -74,7 +86,7 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                "aaSorting":[],
+                "aaSorting": [],
                 ajax: {
                     url: "{{ route('admin.reports.itemSalesData') }}",
                     data: function(d) {
@@ -95,12 +107,12 @@
                     {
                         data: 'total_quantity',
                         name: 'total_quantity',
-                        searchable:false,
+                        searchable: false,
                     },
                     {
                         data: 'total_price',
                         name: 'total_price',
-                        searchable:false,
+                        searchable: false,
 
                     },
 

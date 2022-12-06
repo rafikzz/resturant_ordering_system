@@ -28,10 +28,13 @@
                 </div>
 
                 <div class="card-body " id="menu-items">
+
                     @foreach ($categories as $category)
                         <div class="row menu-category" data-category="{{ $category->id }}">
                             <div class="col-12">
-                                <h6>{{ $category->title }}</h6>
+                                <b>
+                                    <h4>{{ $category->title }}</h4>
+                                </b>
                             </div>
                             @foreach ($category->active_items as $item)
                                 @component('admin.orders.components._menu-items', ['item' => $item])
@@ -46,7 +49,11 @@
             <form action="{{ route('admin.orders.store') }}" id="order-form" method="POST">
                 @csrf
                 <div class="card ">
+                    <div class="overlay" id="overlay" style="display: none">
+                        <i class="fas fa-2x fa-sync fa-spin"></i>
+                    </div>
                     <div class="card-body">
+
                         <div class="row">
                             <div class="col-12">
                                 <h3>Customer Info</h3>
@@ -109,6 +116,7 @@
                         </div>
 
                         <div class="row">
+
                             <h3>Order List</h3>
                             <table class="table table-sm table-hover " style="  min-height: 10vh; ">
                                 <thead>
@@ -200,7 +208,7 @@
                                                 id="payment_type" required="">
                                                 <option value="0" selected>Cash</option>
                                                 <option value="1"
-                                                    {{ $default_customer_type_id == 1 ? 'disabled' : '' }}>
+                                                    {{ $default_customer_type_id != 2 ? 'disabled' : '' }}>
                                                     Account</option>
                                             </select>
                                             @error('payment_type')
@@ -568,8 +576,19 @@
         });
         $('#paid_amount').keyup(function() {
             let due = (grand_total - parseFloat($(this).val()));
-            $('#due_amount').val(due.toFixed(2));
+            if (due) {
+                $('#due_amount').val(due.toFixed(2));
+            } else {
+                $('#due_amount').val(grand_total);
 
+            }
+
+        });
+        $('#paid_amount').focusout(function() {
+            if ($(this).val()) {
+                } else {
+                $(this).val(0);
+            }
         });
 
         function foramtValue(val) {

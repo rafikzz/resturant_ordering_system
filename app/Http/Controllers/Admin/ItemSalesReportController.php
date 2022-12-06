@@ -24,15 +24,15 @@ class ItemSalesReportController extends Controller
 
     public function index(Request $request)
     {
-        $breadcrumbs =[ 'Item Report'=>route('admin.reports.item_sales.index')];
+        $breadcrumbs = ['Item Report' => route('admin.reports.item_sales.index')];
 
 
         $title = $this->title;
         $totalSales = DB::table('table_orders')->sum(DB::raw('total - discount'));
-        $todaysSales = DB::table('table_orders')->whereDate('order_datetime','=',Carbon::today())->sum(DB::raw('total - discount'));
+        $todaysSales = DB::table('table_orders')->whereDate('order_datetime', '=', Carbon::today())->sum(DB::raw('total - discount'));
 
 
-        return view('admin.reports.items-sales.index', compact('title','totalSales','todaysSales','breadcrumbs'));
+        return view('admin.reports.items-sales.index', compact('title', 'totalSales', 'todaysSales', 'breadcrumbs'));
     }
 
 
@@ -42,16 +42,16 @@ class ItemSalesReportController extends Controller
         if ($request->ajax()) {
             $startDate = Carbon::parse($request->startDate)->startOfDay();
             $endDate = Carbon::parse($request->endDate)->endOfDay();
-            if(!$request->order){
+            if (!$request->order) {
                 $data = OrderItem::with('item')->selectRaw('table_order_items.item_id,sum(table_order_items.total * table_order_items.price) as total_price, sum(table_order_items.total) as total_quantity')
-            ->groupBy('item_id')->whereHas('order',function($q) use($startDate,$endDate){
-                $q->whereBetween('order_datetime', [$startDate, $endDate])->where('status_id',3);
-            })->orderByRaw('total_quantity','desc');
-            }else{
+                    ->groupBy('item_id')->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('order_datetime', [$startDate, $endDate])->where('status_id', 3);
+                    })->orderByRaw('total_quantity', 'desc');
+            } else {
                 $data = OrderItem::with('item')->selectRaw('table_order_items.item_id,sum(table_order_items.total * table_order_items.price) as total_price, sum(table_order_items.total) as total_quantity')
-                ->groupBy('item_id')->whereHas('order',function($q) use($startDate,$endDate){
-                    $q->whereBetween('order_datetime', [$startDate, $endDate])->where('status_id',3);
-                });
+                    ->groupBy('item_id')->whereHas('order', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('order_datetime', [$startDate, $endDate])->where('status_id', 3);
+                    });
             }
 
 
@@ -60,11 +60,17 @@ class ItemSalesReportController extends Controller
             })
                 ->make(true);
         }
-
-
     }
 
-    public function exportSales(Request $request){
-            return Excel::download(new ItemSalesReport,'item_sales.xlsx');
+    public function exportSales(Request $request)
+    {
+        $startDate = null;
+        $endDate = null;
+        if ($request->date_range) {
+            $date = explode('-', $request->date_range);
+            $startDate = Carbon::parse(trim($date[0]))->startOfDay();
+            $endDate = Carbon::parse(trim($date[1]))->endOfDay();
+        }
+        return Excel::download(new ItemSalesReport($startDate, $endDate), 'item_sales.xlsx');
     }
 }

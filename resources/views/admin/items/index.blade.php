@@ -91,6 +91,7 @@
                         searchable: false,
                         orderable: false,
                     },
+
                     {
                         data: 'created_at',
                         name: 'created_at',

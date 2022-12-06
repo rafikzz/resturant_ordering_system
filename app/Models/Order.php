@@ -107,6 +107,17 @@ class Order extends Model
         }
         return ($this->total - $discount);
     }
+    public function scopeDateBetween($query,$date)
+    {
+
+        if($date['start'] && $date['end'])
+        {
+          return  $query->whereBetween('order_datetime',[$date['start'],$date['end']]);
+        }
+
+        return $query;
+
+    }
 
     public function totalWithTax($discount = 0)
     {

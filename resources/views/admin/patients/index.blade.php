@@ -22,13 +22,13 @@
                     </div>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered" id="table">
+                    <table class="table table-bordered" width="100%" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Name</th>
                             <th>Phone No.</th>
                             <th>Register No</th>
-                            <th>Due</th>
+                            <th>Orders Total</th>
                             <th>Created At</th>
                             <th>Action</th>
                         </thead>
@@ -79,15 +79,19 @@
 
                     },
                     {
-                        data: 'balance',
-                        name: 'balance',
-                        render: function(balance) {
-                            if (balance < 0) {
-                                return -balance;
-                            } else {
-                                return balance;
+                        data: 'orders_total',
+                        name: 'orders_total',
+                        render: function(orders_total) {
+                            if (orders_total) {
+                                return parseFloat(orders_total);
                             }
-                        }
+                            else
+                            {
+                                return 0;
+                            }
+                        },
+                        searchable: false
+
                     },
                     {
                         data: 'created_at',

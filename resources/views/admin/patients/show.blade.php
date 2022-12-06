@@ -228,7 +228,7 @@
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .total, item.price));
+                                    .total_quantity, parseFloat(item.average_price)));
                             });
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Total</td><td>" +

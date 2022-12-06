@@ -148,6 +148,32 @@ class StaffController extends Controller
 
     }
 
+    public function changeStatus(Request $request)
+    {
+        $customer_id = $request->customer_id;
+        $customer_type =CustomerType::where('name','Staff')->first();
+        $customer_type_id= $customer_type? $customer_type->id:null;
+        $status =  $request->status;
+        $customer= Customer::where('customer_type_id',$customer_type_id)->find($customer_id);
+        if($customer)
+        {
+            $customer->update(['status' => $status]);
+            return response()->json([
+                'success' => true,
+                'status' => $status == 1 ? 'Active' : 'Inactive',
+                'checked' => $status == 1 ? true : false,
+                'message' => 'Status Successfully Changed!',
+            ]);
+        }else{
+            return response()->json([
+                'success' => false,
+                'status'=>'fail',
+                'message' => 'Staff Not Found',
+            ]);
+        }
+
+    }
+
     public function getData(Request $request)
     {
         if ($request->ajax()) {
@@ -167,9 +193,20 @@ class StaffController extends Controller
                         'timestamp' => $status->created_at
                     ];
                 })
+                ->editColumn('status', function ($customer) {
 
+                    return ($customer->status) ?
+                        '<div class="custom-control custom-switch  ">
+                    <input type="checkbox" class="custom-control-input changeStatus" checked data-id="' . $customer->id . '" id="' . $customer->id . '" >
+                    <label class="custom-control-label"  for="' . $customer->id . '">Active</label>' :
+
+                        '<div class="form-group ">
+                    <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input  changeStatus"  data-id="' . $customer->id . '" id="' . $customer->id . '" >
+                    <label class="custom-control-label" for="' . $customer->id . '">Inactive</label>
+                   ';
+                })
                 ->addColumn(
-
                     'action',
                     function ($row)use ($canEdit,$canShow,$canWalllettransaction) {
                         $walletTransactionBtn = $canWalllettransaction? '<a href="'.route('admin.staffs.wallet_transaction', $row->id).'"
@@ -183,8 +220,11 @@ class StaffController extends Controller
                         return $showBtn.' '.$editBtn  .' '. $walletTransactionBtn ;
                     }
                 )
+                ->rawColumns(['action', 'status'])
                 ->make(true);
         }
     }
+
+
 
 }

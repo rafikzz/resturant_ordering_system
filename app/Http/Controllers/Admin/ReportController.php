@@ -23,22 +23,27 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $title = $this->title;
-        $breadcrumbs =[ 'Sales Report'=>route('admin.reports.sales.index')];
+        $breadcrumbs = ['Sales Report' => route('admin.reports.sales.index')];
 
-        $totalSales = DB::table('table_orders')->sum(DB::raw('net_total'));
-        $todaysSales = DB::table('table_orders')->whereDate('order_datetime','=',Carbon::today())->sum(DB::raw('net_total'));
+        // $totalSales = DB::table('table_orders')->where('status_id',3)->sum(DB::raw('net_total'));
+        $todaysSales = DB::table('table_orders')->whereDate('order_datetime', '=', Carbon::today())->where('status_id',3)->sum(DB::raw('net_total'));
 
 
-        return view('admin.reports.sales.index', compact('title','totalSales','todaysSales','breadcrumbs'));
+        return view('admin.reports.sales.index', compact('title', 'todaysSales', 'breadcrumbs'));
     }
 
 
     public function getSalesData(Request $request)
     {
         if ($request->ajax()) {
-            $startDate = Carbon::parse($request->startDate)->startOfDay();
-            $endDate = Carbon::parse($request->endDate)->endOfDay();
-            $data = Order::select('*')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate]);
+            if ($request->startDate && $request->endDate) {
+                $startDate = Carbon::parse($request->startDate)->startOfDay();
+                $endDate = Carbon::parse($request->endDate)->endOfDay();
+                $data = Order::select('*')->with('status:id,title,color')->whereBetween('order_datetime', [$startDate, $endDate])->where('status_id',3);
+            } else {
+
+                $data = Order::select('*')->with('status:id,title,color')->whereBetween('order_datetime')->where('status_id',3);
+            }
 
             return DataTables::of($data)
                 ->editColumn('created_at', function ($order) {
@@ -53,7 +58,16 @@ class ReportController extends Controller
 
 
 
-    public function exportSales(Request $request){
-            return Excel::download(new OrdersExport,'sales.xlsx');
+    public function exportSales(Request $request)
+    {
+
+        $startDate = null;
+        $endDate = null;
+        if ($request->date_range) {
+            $date = explode('-', $request->date_range);
+            $startDate = Carbon::parse(trim($date[0]))->startOfDay();
+            $endDate = Carbon::parse(trim($date[1]))->endOfDay();
+        }
+        return Excel::download(new OrdersExport($startDate, $endDate), 'sales.xlsx');
     }
 }

@@ -32,7 +32,9 @@
                     @foreach ($categories as $category)
                         <div class="row menu-category" data-category="{{ $category->id }}">
                             <div class="col-12">
-                                <h6>{{ $category->title }}</h6>
+                                <b>
+                                    <h4>{{ $category->title }}</h4>
+                                </b>
                             </div>
                             @foreach ($category->active_items as $item)
                                 @component('admin.orders.components._menu-items', ['item' => $item])
@@ -48,6 +50,9 @@
                 @csrf
                 @method('PUT')
                 <div class="card">
+                    <div class="overlay" id="overlay" style="display: none">
+                        <i class="fas fa-2x fa-sync fa-spin"></i>
+                    </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -222,7 +227,7 @@
 
                                         <td> <select name="payment_type" class="form-control form-control-sm  float-right"
                                                 id="payment_type" required="">
-                                                @if ($order->customer->customer_type_id != 1)
+                                                @if ($order->customer->customer_type_id == 2)
                                                     <option value="0">Cash</option>
                                                     <option value="1"
                                                         {{ $order->customer->customer_type_id == 3 ? 'selected' : '' }}>
@@ -237,9 +242,8 @@
                                     <tr>
                                         <td colspan="3">Paid Amount:</td>
                                         <td> <input
-                                                type="number"value="{{ $order->customer->customer_type_id == 3 ? 0 : $order->totalWithTax() }}"
-                                                {{ $order->customer->customer_type_id == 3 ? '' : 'readonly' }}
-                                                step="0.01" min="0" class="form-control form-control-sm"
+                                                type="number"value="{{ $order->totalWithTax() }}"
+                                                readonly step="0.01" min="0" class="form-control form-control-sm"
                                                 name="paid_amount" id="paid_amount" required></td>
                                     </tr>
                                     <tr>
@@ -577,8 +581,19 @@
         }
         $('#paid_amount').keyup(function() {
             let due = (grand_total - parseFloat($(this).val()));
-            $('#due_amount').val(due.toFixed(2));
+            if (due) {
+                $('#due_amount').val(due.toFixed(2));
+            } else {
+                $('#due_amount').val(grand_total);
 
+            }
+
+        });
+        $('#paid_amount').focusout(function() {
+            if ($(this).val()) {
+                } else {
+                $(this).val(0);
+            }
         });
 
         $('#payment_type').change(function() {

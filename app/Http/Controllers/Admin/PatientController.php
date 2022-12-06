@@ -130,14 +130,21 @@ class PatientController extends Controller
 
     public function getData(Request $request)
     {
-
         $customer_type = CustomerType::where('name', 'Patient')->first();
         $customer_type_id = $customer_type ? $customer_type->id : null;
+        $data = Customer::select('table_customers.*')->withCount(['orders as orders_total'=>function($query) {
+            $query->select(DB::raw('sum(net_total)'));
+        }])->with('patient')->where('customer_type_id', $customer_type_id)->where('status', 1)->get();
+
         if ($request->ajax()) {
             if ($request->mode) {
-                $data = Customer::select('table_customers.*')->with('patient')->where('customer_type_id', $customer_type_id)->where('status', 1);
+                $data = Customer::select('table_customers.*')->withCount(['orders as orders_total'=>function($query) {
+                    $query->select(DB::raw('sum(net_total)'));
+                }])->with('patient')->where('customer_type_id', $customer_type_id)->where('status', 1);
             } else {
-                $data = Customer::select('table_customers.*')->with('patient')->where('customer_type_id', $customer_type_id)->where('status', 0);
+                $data = Customer::select('table_customers.*')->withCount(['orders as orders_total'=>function($query) {
+                    $query->select(DB::raw('sum(net_total)'));
+                }])->with('patient')->where('customer_type_id', $customer_type_id)->where('status', 0);
             }
             $canEdit = auth()->user()->can('patient_edit');
             $canDischarge = auth()->user()->can('patient_discharge');
@@ -207,33 +214,21 @@ class PatientController extends Controller
 
     public function discharge(Request $request, $id)
     {
-        $customer_type = CustomerType::where('name', 'Patient')->first();
-        $customer_type_id = $customer_type ? $customer_type->id : null;
-        $customer = Customer::where('customer_type_id', $customer_type_id)->where('status', 1)->findOrFail($id);
-        PatientDischargePaymentRecord::create([
-            'total_amount' => $request->order_total,
-            'customer_id' => $id,
-            'paid_amount' => $request->paid_amount,
-            'discount' => $request->discount_amount,
 
-        ]);
         DB::beginTransaction();
         try {
-            if ($customer instanceof Customer) {
-                $previous_amount = $customer->balance;
-                $transaction_type = TransactionType::find(4);
-                $previous_amount = $customer->wallet_balance();
-                $current_balance = 0;
+            $customer_type = CustomerType::where('name', 'Patient')->first();
+            $customer_type_id = $customer_type ? $customer_type->id : null;
+            $customer = Customer::where('customer_type_id', $customer_type_id)->where('status', 1)->findOrFail($id);
+            PatientDischargePaymentRecord::create([
+                'total_amount' => $request->order_total,
+                'customer_id' => $id,
+                'paid_amount' => $request->paid_amount,
+                'discount' => $request->discount_amount,
 
-                $transaction = CustomerWalletTransaction::create([
-                    'previous_amount' => $previous_amount,
-                    'amount' => -$previous_amount,
-                    'total_amount' => -$previous_amount,
-                    'current_amount' => $current_balance,
-                    'transaction_type_id' => 4,
-                    'customer_id' => $customer->id,
-                    'author_id' => auth()->id(),
-                ]);
+            ]);
+            if ($customer instanceof Customer) {
+
 
                 $customer->update([
                     'balance' => 0,
@@ -263,7 +258,7 @@ class PatientController extends Controller
         // dd( Customer::where('customer_type_id',3)->whereHas('orders')->where('status',1)->get());
 
         $excelname= $customer->name.'_'.$customer->patient->register_no.'.xlsx';
-        return Excel::download(new PatientOrdersExport($id), $excelname);
+        return Excel::download(new PatientOrderItems($id), $excelname);
     }
 
     public function exportOrderItems()

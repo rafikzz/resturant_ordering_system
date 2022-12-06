@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered table-sm" id="table">
+                    <table class="table table-bordered table-sm" width="100%" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
@@ -218,7 +218,7 @@
                 +'</h5> </div> <div class="col-6"> <a href="javascript:void(0);" rel="'+key+'" class="btn btn-primary btn-xs print-this float-right ">Print This</a> </div> <div class="col-12"> <table class="table table-sm" id="order-list-'+
                     key+'"> <thead> <th>Item Name</th> <th>Quantity</th> </thead> <tbody> ';
             items.forEach(function(value) {
-                template +='<tr><td>'+value.item.name+'</td><td>'+value.total+'</td></tr>';
+                template +='<tr><td><b>'+value.item.name+'</b></td><td><b>'+value.total+'</b></td></tr>';
             });
             template+='</tbody></table></div>';
             return template;

@@ -113,7 +113,7 @@ class CheckoutController extends Controller
 
             ]);
 
-            if ($request->payment_type == 1 && $order->customer->customer_type_id !=1) {
+            if ($request->payment_type == 1 && $order->customer->customer_type_id ==2) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {

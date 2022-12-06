@@ -23,6 +23,17 @@ class Customer extends Model
     }
 
     /**
+     * Get all of the orders_summary for the Customer
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function orders_summary()
+    {
+        return $this->hasMany(Order::class, 'customer_id')->selectRaw('customer_id,sum(total) as orders_total,sum(discount) as orders_discount,
+        sum(delivery_charge) as orders_delivery_charge ,sum(tax) as orders_tax ,sum(service_charge) as orders_service_charge,sum(net_total) as orders_net_total')->groupBy('customer_id');
+    }
+
+    /**
      * Get all of the cusomter_wallet_transaction for the Customer
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -95,6 +106,16 @@ class Customer extends Model
     public function orders()
     {
         return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    /**
+     * Get all of the orders for the Customer
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function order_items()
+    {
+        return $this->hasManyThrough(OrderItem::class, Order::class,'table_orders.customer_id','order_id','id');
     }
 
      /**

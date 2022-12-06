@@ -182,6 +182,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
         $(document).ready(function() {
             $('.select2').select2();
         });
+        jQuery.ajaxSetup({
+            beforeSend: function() {
+                $('#overlay').show()
+            },
+            complete: function() {
+                $('#overlay').hide()
+            },
+            success: function() {
+                $('#overlay').hide()
+            }
+        });
     </script>
 
     @yield('js')

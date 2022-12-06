@@ -60,7 +60,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::delete('categories/force-delete/{user}', [CategoryController::class, 'forceDelete'])->name('categories.forceDelete');
     Route::get('categories/restore/{user}', [CategoryController::class, 'restore'])->name('categories.restore');
     Route::post('categories/updateOrder', [CategoryController::class, 'updateOrder'])->name('category.updateOrder');
-    Route::get('categories/changeStatus', [CategoryController::class, 'changeStatus'])->name('category.changeStatus');
+    Route::get('categories/change/status', [CategoryController::class, 'changeStatus'])->name('category.changeStatus');
     Route::resource('categories', CategoryController::class);
 
     //Coupon route
@@ -72,7 +72,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::delete('items/force-delete/{user}', [ItemController::class, 'forceDelete'])->name('items.forceDelete');
     Route::get('items/restore/{user}', [ItemController::class, 'restore'])->name('items.restore');
     Route::post('items/updateOrder', [ItemController::class, 'updateOrder'])->name('item.updateOrder');
-    Route::get('items/changeStatus', [ItemController::class, 'changeStatus'])->name('item.changeStatus');
+    Route::get('items/change/status', [ItemController::class, 'changeStatus'])->name('item.changeStatus');
     Route::get('items/get-category-items-data', [ItemController::class, 'getCategoryItemsData'])->name('item.getCategoryItemsData');
     Route::resource('items', ItemController::class);
 
@@ -121,6 +121,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Staff Controller
     Route::resource('staffs', StaffController::class);
     Route::get('get-staff-data', [StaffController::class, 'getData'])->name('staff.getData');
+    Route::get('staffs/change/status', [StaffController::class, 'changeStatus'])->name('staff.changeStatus');
+
 
     Route::get('staffs/{id}/walllet-transaction', [StaffController::class, 'wallet_transaction'])->name('staffs.wallet_transaction');
     Route::post('staffs/{id}/wallet-transaction', [StaffController::class, 'store_wallet_transaction'])->name('staffs.wallet_transactions.store');
@@ -155,12 +157,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Report Controller
     Route::get('reports/sales', [ReportController::class, 'index'])->name('reports.sales.index');
     Route::get('get-sales-report-data', [ReportController::class, 'getSalesData'])->name('reports.salesData');
-    Route::get('export-sales-report-data', [ReportController::class, 'exportSales'])->name('reports.exportSales');
+    Route::post('export-sales-report-data', [ReportController::class, 'exportSales'])->name('reports.exportSales');
 
     //ItemSalesReport Controller
     Route::get('reports/item-sales', [ItemSalesReportController::class, 'index'])->name('reports.item_sales.index');
     Route::get('get-item-sales-report-data', [ItemSalesReportController::class, 'getItemSalesData'])->name('reports.itemSalesData');
-    Route::get('export-item-sales-report-data', [ItemSalesReportController::class, 'exportSales'])->name('reports.exportItemSales');
+    Route::post('export-item-sales-report-data', [ItemSalesReportController::class, 'exportSales'])->name('reports.exportItemSales');
 
     //Customer Statement Controller
     Route::get('reports/customer-statement', [CustomerStatementController::class, 'index'])->name('reports.customer_statement');

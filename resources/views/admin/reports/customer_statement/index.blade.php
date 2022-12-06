@@ -22,7 +22,7 @@
                             <i class="far fa-calendar-alt"></i>
                         </span>
                     </div>
-                    <input type="text" class="form-control float-right" id="custom-date-range" autocomplete="off">
+                    <input type="text" class="form-control float-right"  id="custom-date-range" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -32,8 +32,8 @@
     </div>
     <div class="row ">
         <div class="col">
-            <div class="card">
-                <table class="table table-bordered">
+            <div class="card table-responsive">
+                <table class="table table-bordered" width="100%">
                     <tr>
                         <td>Total Orders</td>
                         <td>0</td>

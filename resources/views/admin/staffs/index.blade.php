@@ -14,12 +14,13 @@
                     </div>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered" id="table">
+                    <table class="table table-bordered" width="100%" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Name</th>
                             <th>Phone No.</th>
                             <th>Wallet Balance</th>
+                            <th>Status</th>
                             <th>Created At</th>
                             <th>Action</th>
                         </thead>
@@ -77,6 +78,11 @@
                         }
                     },
                     {
+                        data: 'status',
+                        name: 'status',
+                        searchable: false,
+                    },
+                    {
                         data: 'created_at',
                         name: 'created_at',
                         render: {
@@ -114,6 +120,47 @@
                             .closest("form").submit();
                     }
                 });
+            });
+              //for changing status
+              $(document).on('click', '.changeStatus', function(e) {
+                e.preventDefault();
+                let btn = $(this).closest('[type=checkbox]');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to change staff status?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let customer_id = btn.data('id');
+                        let status = ($(this).is(":checked")) ? 0 : 1;
+                        let clickedBtn = btn;
+                        $.ajax({
+                            type: "GET",
+                            url: '{{ route('admin.staff.changeStatus') }}',
+                            data: {
+                                'status': status,
+                                'customer_id': customer_id
+                            },
+                            success: function(res) {
+                                if (res.success) {
+                                    btn.parent().find('label').text(res.status).trigger(
+                                        'change');
+                                    btn.prop('checked', res.checked);
+                                } else {
+                                    Swal.fire('Something went wrong!');
+                                }
+                            },
+                            error: function() {
+                                alert('Internal Server Error !');
+                            }
+                        });
+                    }
+                });
+
             });
 
         });

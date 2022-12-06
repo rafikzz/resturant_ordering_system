@@ -4,26 +4,34 @@
     <div class="row">
         <div class="col">
             <div class="card card-outline card-dark">
-                <div class="card-header">
-                    <h2 class="badge bg-orange">Total Sales: Rs.{{ $totalSales }}</h2>
-                    <h2 class="badge bg-orange">Todays Sales: Rs.{{ $todaysSales }}</h2>
-                    <a href="{{ route('admin.reports.exportSales') }}" id="export" class="btn btn-success">Export Excel</a>
-                    <div class="card-tools form-inline">
-                        <div class="form-group">
-                            <label>Date range:</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="far fa-calendar-alt"></i>
-                                    </span>
+                <form action="{{ route('admin.reports.exportSales') }}" method="POST">
+                    <div class="card-header">
+                        @csrf
+                        @isset($totalSales)
+                            <h2 class="badge bg-orange">Total Sales: Rs.{{ $totalSales }}</h2>
+                        @endisset
+                        <h2 class="badge bg-orange">Todays Sales: Rs.{{ $todaysSales }}</h2>
+                        <button id="export" class="btn btn-success">Export
+                            Excel</button>
+                        <div class="card-tools form-inline">
+                            <div class="form-group">
+                                <label>Date range:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" name="date_range" class="form-control float-right"
+                                        id="custom-date-range">
                                 </div>
-                                <input type="text" class="form-control float-right" id="custom-date-range">
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
+
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered" id="table">
+                    <table class="table table-bordered" width="100%" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
@@ -50,6 +58,9 @@
             var end = moment();
 
             function cb(start, end) {
+                if (!start.isValid() || !end.isValid()) {
+                    $(this).val('')
+                }
                 $('#custom-date-range span').html(start.format('MMMM D, YYYY') + ' - ' + end.format(
                     'MMMM D, YYYY'));
             }
@@ -64,10 +75,16 @@
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
-                        'month').endOf('month')]
+                    'Last 3 Month': [moment().subtract(3, 'month').startOf('month'), moment().subtract(1,
+                        'month').endOf('month')],
+                    'Last 6 Month': [moment().subtract(6, 'month').startOf('month'), moment().subtract(1,
+                        'month').endOf('month')],
+                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+                    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1,
+                        'year').endOf('year')],
                 }
             }, cb);
+
 
             cb(start, end);
             var table = $('#table').DataTable({

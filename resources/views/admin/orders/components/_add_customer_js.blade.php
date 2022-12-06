@@ -4,11 +4,8 @@
         let customer_type = parseInt($(this).val());
         $("#payment_type option[value='1']").attr("disabled", false);
 
-        if (customer_type === 3 || customer_type === 2) {
-            if (customer_type === 3) {
-                $("#payment_type").val('1').trigger('change');
-            }
-
+        if( customer_type === 2) {
+                $("#payment_type").val('0').trigger('change');
         } else {
             $("#payment_type").val(0).trigger('change');
             $("#payment_type option[value='1']").attr("disabled", "disabled");

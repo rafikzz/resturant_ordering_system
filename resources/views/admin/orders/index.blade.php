@@ -20,15 +20,13 @@
                     </div>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered table-sm" id="table">
+                    <table class="table table-bordered table-sm" width="100%" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
                             <th>Customer Name</th>
                             <th>Destination</th>
                             <th>Order Total</th>
-                            <th>Discount</th>
-                            <th>Net Total</th>
                             <th>Created At</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -93,14 +91,6 @@
                     {
                         data: 'total',
                         name: 'total'
-                    },
-                    {
-                        data: 'discount',
-                        name: 'discount'
-                    },
-                    {
-                        data: 'net_total',
-                        name: 'net_total'
                     },
                     {
                         data: 'created_at',
@@ -178,7 +168,7 @@
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .total, item.price));
+                                    .total_quantity, parseFloat(item.average_price)));
                             });
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Total</td><td>" +

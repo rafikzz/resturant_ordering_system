@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LaravelDaily\Invoices\Classes\Buyer;
 use LaravelDaily\Invoices\Classes\InvoiceItem;
 use LaravelDaily\Invoices\Classes\Party;
@@ -17,10 +18,13 @@ class InvoiceController extends Controller
 {
     public function index(Order $order)
     {
-        $orderItems = OrderItem::where('order_id',$order->id)->where('total','>',0)->get();
+        $orderItems = OrderItem::with('item')->where('order_id',$order->id)->where('total','>',0)->get();
+
+        $orderItems = OrderItem::select('item_id', DB::raw('sum(total * price) as total_price'),DB::raw('sum(total * price)/sum(total) as average_price'),DB::raw('sum(total) as total_quantity'))
+        ->with('item')->where('order_id',$order->id)->where('total','>',0)->groupBy('item_id')->get();
         $items =[];
         foreach($orderItems as $item){
-            $items[$item->id] =  (new InvoiceItem())->title($item->item->name)->pricePerUnit($item->price)->quantity($item->total)->subTotalPrice($item->price*$item->total);
+            $items[$item->item_id] =  (new InvoiceItem())->title($item->item->name)->pricePerUnit($item->average_price)->quantity($item->total_quantity)->subTotalPrice($item->total_price);
         }
         $setting =Setting::first();
         $cashier = new Party([

@@ -18,19 +18,22 @@ use Maatwebsite\Excel\Concerns\WithPreCalculateFormulas;
 class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyles,WithPreCalculateFormulas,WithColumnWidths
 {
     // use Exportable;
-
-    // public function __construct($startDate,$endDate)
-    // {
-    //     $this->startDate = $startDate;
-    //     $this->endDate = $endDate;
-
-    // }
     private $count;
+
+    public function __construct($startDate,$endDate)
+    {
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+
+    }
 
     public function collection()
     {
-        $this->count= Order::where('status_id',3)->count();
-        return Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->where('status_id',3)->get();
+        $date=['start'=>$this->startDate,'end'=>$this->endDate];
+
+        $orders=Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->dateBetween($date)->where('status_id',3)->get();
+        $this->count= $orders->count();
+        return $orders;
     }
     public function map($order): array
     {

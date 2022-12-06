@@ -7,7 +7,7 @@
                     <h2 class="card-title">Payment Type</h2>
                 </div>
                 <div class="card-body table-responsive">
-                    <table class="table table-bordered table-sm" id="table">
+                    <table class="table table-bordered table-sm" width="100%" id="table">
                         <thead>
                             <th>Id</th>
                             <th>Name</th>

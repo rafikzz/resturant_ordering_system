@@ -172,7 +172,7 @@ class OrderController extends Controller
 
             ]);
 
-            if ($request->customer_type != 1 && $request->payment_type == 1 && $request->checkout == 1) {
+            if ($request->customer_type == 2 && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -353,8 +353,13 @@ class OrderController extends Controller
     }
     public function destroy(Order $order)
     {
-        $order->forceDelete();
-        return redirect()->route('admin.orders.index')->with('success', 'Order Deleted Successfully');
+        $cancelledStatus = Status::where('title', 'cancelled')->first()->id;
+
+
+        $order->update([
+            'status_id'=>$cancelledStatus
+        ]);
+        return redirect()->route('admin.orders.index')->with('success', 'Order Cancelled Successfully');
     }
 
     public function addMoreItem($id)
@@ -570,7 +575,8 @@ class OrderController extends Controller
     {
         if (request()->ajax()) {
             $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->where('id', $request->order_id)->first();
-            $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
+            $orderItems = OrderItem::select('item_id', DB::raw('sum(total * price) as total_price'),DB::raw('sum(total * price)/sum(total) as average_price'),DB::raw('sum(total) as total_quantity'))
+            ->with('item')->where('order_id',$order->id)->where('total','>',0)->groupBy('item_id')->get();
             $billRoute = route('orders.getBill', $order->id);
 
             if ($order) {

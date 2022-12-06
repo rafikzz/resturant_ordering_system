@@ -20,7 +20,7 @@
                                     <p>Customer Name:{{ $order->customer->name }}</p>
                                     <p>Customer Type:{{ $order->customer->customer_type->name }}</p>
                                 @endisset
-                                @if ($order->customer->customer_type_id !== 1)
+                                @if ($order->customer->customer_type_id == 2)
                                     <p>Wallet Balance: {{ $order->customer->balance }}</p>
                                 @endif
 
@@ -114,10 +114,9 @@
 
                                         <td> <select name="payment_type" class="form-control form-control-sm  float-right"
                                                 id="payment_type" required="">
-                                                @if ($order->customer->customer_type_id != 1)
+                                                @if ($order->customer->customer_type_id == 2)
                                                     <option value="0">Cash</option>
-                                                    <option value="1"
-                                                        {{ $order->customer->customer_type_id == 3 ? 'selected' : '' }}>
+                                                    <option value="1">
                                                         Account
                                                     </option>
                                                 @else
@@ -128,18 +127,14 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3">Paid Amount:</td>
-                                        <td> <input type="number"
-                                                type="number"value="{{ $order->customer->customer_type_id == 3 ? 0 : $order->totalWithTax() }}"
-                                                {{ $order->customer->customer_type_id == 3 ? '' : 'readonly' }}
-                                                step="0.01" min="0" class="form-control form-control-sm"
+                                        <td> <input type="number" type="number"value="{{ $order->totalWithTax() }}"
+                                                readonly step="0.01" min="0" class="form-control form-control-sm"
                                                 name="paid_amount" id="paid_amount" required></td>
                                     </tr>
                                     <tr>
                                         <td colspan="3">Due Amount:</td>
-                                        <td> <input type="number"
-                                                value="{{ $order->customer->customer_type_id == 3 ? $order->totalWithTax() : 0 }}"
-                                                class="form-control form-control-sm" min="0" readonly
-                                                name="due_amount" id="due_amount" required></td>
+                                        <td> <input type="number" value="0" class="form-control form-control-sm"
+                                                min="0" readonly name="due_amount" id="due_amount" required></td>
                                     </tr>
 
                                 </table>
@@ -298,8 +293,22 @@
         });
         $('#paid_amount').keyup(function() {
             let due = (grand_total - parseFloat($(this).val()));
-            $('#due_amount').val(due.toFixed(2));
+            if (due) {
+                $('#due_amount').val(due.toFixed(2));
+            }else
+            {
+                $('#due_amount').val(grand_total);
 
+            }
+
+        });
+        $('#paid_amount').focusout(function(){
+            if($(this).val())
+            {
+
+            }else{
+                $(this).val(0);
+            }
         });
         $('#print-bill').on('click', function(e) {
             e.preventDefault();
