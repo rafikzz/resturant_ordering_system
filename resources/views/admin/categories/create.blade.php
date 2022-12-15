@@ -26,6 +26,17 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
+                                <label class="label" for="coupon_discount_percentage">Coupon Discount Percentage</label>
+                                <input type="number" name="coupon_discount_percentage" value="{{ old('coupon_discount_percentage') }}"
+                                    class="form-control  @error('coupon_discount_percentage') is-invalid @enderror" step="0.01" min="0" max="100"
+                                    placeholder="Enter Percentage" required autocomplete="off">
+                                @error('coupon_discount_percentage')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
                                 <label class="label" for="title">Status</label>
                                 <div class="custom-control custom-switch  ">
                                     <input type="checkbox" value="1" class="custom-control-input" name="status"

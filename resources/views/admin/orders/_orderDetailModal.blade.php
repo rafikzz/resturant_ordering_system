@@ -28,7 +28,7 @@
                     <div class="col-12">
                         <b>Status</b>: <b id="order-status"></b>
                     </div>
-                    <div class="col-12" id="paymentType" style="display: hidden">
+                    <div class="col-12" id="paymentType" >
                         <b>Payment Type</b>: <b id="payment-type"></b>
                     </div>
                 </div>

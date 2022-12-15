@@ -35,7 +35,9 @@
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
+                            <th>Order Total</th>
                             <th>Discount</th>
+                            <th>Delivery Charge</th>
                             <th>Total</th>
                             <th>Order Datetime</th>
                         </thead>
@@ -106,14 +108,21 @@
                         data: 'bill_no',
                         name: 'bill_no'
                     },
-
+                    {
+                        data: 'total',
+                        name: 'total'
+                    },
                     {
                         data: 'discount',
                         name: 'discount'
                     },
                     {
-                        data: 'total',
-                        name: 'total'
+                        data: 'delivery_charge',
+                        name: 'delivery_charge'
+                    },
+                    {
+                        data: 'net_total',
+                        name: 'net_total'
                     },
                     {
                         data: 'order_datetime',

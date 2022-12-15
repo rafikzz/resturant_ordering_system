@@ -15,11 +15,16 @@ class CategorySeeder extends Seeder
     public function run()
     {
         $categories = [
-            'Lunch',
-            'Drinks',
-            'Snacks',
-            'Soup',
-
+            'BreakFast',
+            'Tiffin/Snacks',
+            'Roti',
+            'Curry',
+            'Momo:',
+            'Chowmein',
+            'Instant Wai Wai Noddles',
+            'Fried Rice',
+            'Beverages',
+            'Khana',
          ];
 
          foreach ($categories as $category) {
@@ -28,3 +33,5 @@ class CategorySeeder extends Seeder
          }
     }
 }
+
+

@@ -19,7 +19,7 @@
                                 <label class="label" for="name">Role Name</label>
                                 <input type="text" name="name" value="{{ old('name') ?: $role->name }}"
                                     class="form-control  @error('name') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter Name" required>
+                                    placeholder="Enter Name" required readonly>
                                 @error('name')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>

@@ -25,9 +25,9 @@ class UpdateItemRequest extends FormRequest
     {
         return [
             'name'=>'required|min:3',
-            'order'=>'required',
             'image'=>'nullable|mimes:jpg,jpeg,png,bmp,tiff|image|max:4096',
             'price'=>'required|min:0',
+            'guest_price'=>'required|min:0',
             'category_id'=>'required|exists:table_categories,id',
         ];
     }

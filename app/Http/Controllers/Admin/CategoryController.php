@@ -90,6 +90,7 @@ class CategoryController extends Controller
     {
         $category->title =$request->title;
         $category->order =$request->order;
+        $category->coupon_discount_percentage =$request->coupon_discount_percentage;
         if ($image = $request->file('image')) {
             $path = 'categories/';
             $this->deleteImage($category->image);
@@ -166,9 +167,9 @@ class CategoryController extends Controller
                         'timestamp' => $category->created_at
                     ];
                 })
-                ->editColumn('image', function ($category) {
-                    return $category->image();
-                })
+                // ->editColumn('image', function ($category) {
+                //     return $category->image();
+                // })
                 ->addColumn(
                     'action',
                     function ($row, Request $request) use(  $canEdit,$canDelete) {

@@ -17,6 +17,7 @@ class CreateTableCategoriesTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('image')->nullable();
+            $table->decimal('coupon_discount_percentage',10,2)->default(100);
             $table->integer('order')->nullable()->default(0);
             $table->boolean('status')->nullable()->default(0);
             $table->softDeletes();

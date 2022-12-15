@@ -71,7 +71,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-item-data', [ItemController::class, 'getData'])->name('items.getData');
     Route::delete('items/force-delete/{user}', [ItemController::class, 'forceDelete'])->name('items.forceDelete');
     Route::get('items/restore/{user}', [ItemController::class, 'restore'])->name('items.restore');
-    Route::post('items/updateOrder', [ItemController::class, 'updateOrder'])->name('item.updateOrder');
     Route::get('items/change/status', [ItemController::class, 'changeStatus'])->name('item.changeStatus');
     Route::get('items/get-category-items-data', [ItemController::class, 'getCategoryItemsData'])->name('item.getCategoryItemsData');
     Route::resource('items', ItemController::class);
@@ -85,7 +84,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Order route
     Route::resource('orders', OrderController::class);
     Route::get('orders/add/{order}', [OrderController::class, 'addMoreItem'])->name('orders.addItem');
-    Route::get('orders/create/test', [OrderController::class, 'test_create']);
+    Route::get('orders/{order}/edit-checkout', [OrderController::class, 'edit_checkout'])->name('orders.editCheckout');
+    Route::patch('orders/{order}/update-checkout', [OrderController::class, 'update_checkout'])->name('orders.updateCheckout');
+
+
     Route::put('orders/add/{order}', [OrderController::class, 'updateMoreItem'])->name('orders.addItem.update');
     Route::get('get-order-data', [OrderController::class, 'getData'])->name('orders.getData');
     Route::get('get-order-detail', [OrderController::class, 'getOrderDetail'])->name('orders.getOrderDetail');
@@ -110,6 +112,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-cart-items', [CartController::class, 'getCartItems'])->name('cart.getCartItems');
     Route::get('add-cart-item', [CartController::class, 'addCartItem'])->name('cart.addCartItem');
     Route::get('remove-cart-item', [CartController::class, 'removeCartItem'])->name('cart.removeCartItem');
+    Route::get('clear-cart-item', [CartController::class, 'clearCart'])->name('cart.clearCartItem');
     Route::get('edit-cart-item-quantity', [CartController::class, 'editCartItemQuantity'])->name('cart.editCartItemQuantity');
 
     //Customer Controller

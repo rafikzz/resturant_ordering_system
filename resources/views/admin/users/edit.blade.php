@@ -18,8 +18,8 @@
                             <div class="form-group col-md-6">
                                 <label class="label" for="name">User Name</label>
                                 <input type="text" name="name" value="{{ old('name') ?: $user->name }}"
-                                    class="form-control  @error('name') is-invalid @enderror" minlength="3" autocomplete="off"
-                                    placeholder="Enter Name" required>
+                                    class="form-control  @error('name') is-invalid @enderror" minlength="3"
+                                    autocomplete="off" placeholder="Enter Name" required>
                                 @error('name')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -29,8 +29,8 @@
                             <div class="form-group col-md-6">
                                 <label class="label" for="email">User Email</label>
                                 <input type="email" name="email" value="{{ old('email') ?: $user->email }}"
-                                    class="form-control  @error('email') is-invalid @enderror" placeholder="Enter Email" autocomplete="off"
-                                    required>
+                                    class="form-control  @error('email') is-invalid @enderror" placeholder="Enter Email"
+                                    autocomplete="off" required>
                                 @error('email')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -38,6 +38,32 @@
                                 @enderror
                             </div>
                         </div>
+                        @hasrole('Superadmin')
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label class="label" for="password">Password</label>
+                                    <input type="password" name="password"
+                                        class="form-control  @error('password') is-invalid @enderror" minlength="8"
+                                        placeholder="Enter Password">
+                                    @error('password')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="label" for="confirm-password">Confirm Password</label>
+                                    <input type="password" name="confirm-password"
+                                        class="form-control  @error('confirm-password') is-invalid @enderror" minlength="8"
+                                        placeholder="Confirm Password">
+                                    @error('confirm-password')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        @endhasrole
 
                         <div class="form-group col-md-6 ml-n2">
                             <label class="roles" for="confirm-password">Roles</label>

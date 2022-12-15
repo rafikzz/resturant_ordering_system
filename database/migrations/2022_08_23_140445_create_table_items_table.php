@@ -18,12 +18,12 @@ class CreateTableItemsTable extends Migration
             $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->string('image')->nullable();
-            $table->decimal('price',10,2);
-            $table->string('order')->nullable()->default(0);
+            $table->decimal('price',10,2);//price for staff
+            $table->decimal('guest_price',10,2)->nullable();
             $table->boolean('status')->nullable()->default(0);
             $table->softDeletes();
             $table->timestamps();
-            $table->foreign('category_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('table_categories')->onDelete('cascade');
         });
     }
 

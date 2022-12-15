@@ -40,7 +40,7 @@ class OrderBreakDownController extends Controller
 
         $order = Order::where('status_id', $processingStatus)->findOrFail($id);
         $orderItems = OrderItem::select('item_id', DB::raw('sum(total) as quantity'))->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->orderBy('quantity')->get();
-        $customers = Customer::select('id', 'name', 'phone_no')->where('id', '!=', $order->customer_id)->where('id', '!=', $order->customer_id)->where('customer_type_id',2)->get();
+        $customers = Customer::select('id', 'name', 'phone_no')->where('id', '!=', $order->customer_id)->where('id', '!=', $order->customer_id)->get();
         $itemQuantityDictionary = [];
         $itemDictionary = [];
 
@@ -80,7 +80,12 @@ class OrderBreakDownController extends Controller
 
             foreach ($orderItems as  $item) {
                 if ($item->total_quantity > 0) {
-                    $this->storeOrderItem($order->id, $item->item_id, $item->total_quantity, $item->item->price);
+                    if ($order->guest_menu == 1) {
+                        $price = $item->item->guest_price;
+                    } else {
+                        $price = $item->item->price;
+                    }
+                    $this->storeOrderItem($order->id, $item->item_id, $item->total_quantity, $price);
                 }
             }
             $orderTotal = $order->setTotal();
@@ -109,6 +114,8 @@ class OrderBreakDownController extends Controller
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                     'order_datetime' => $order->order_datetime,
+                    'guest_menu' => $order->guest_menu,
+                    'is_delivery' =>  $order->is_delivery,
 
                 ]);
                 $orderNo = 1;
@@ -118,6 +125,11 @@ class OrderBreakDownController extends Controller
             foreach ($request->qunatity as $item_id => $quantity) {
                 if ($quantity > 0) {
                     $item = Item::findOrFail($item_id);
+                    if ($order->guest_menu == 1) {
+                        $price = $item->guest_price;
+                    } else {
+                        $price = $item->price;
+                    }
                     $this->storeOrderItem($newOrder->id, $item_id, $quantity, $item->price, $orderNo);
                 }
             }
@@ -168,6 +180,8 @@ class OrderBreakDownController extends Controller
                         'created_by' => auth()->id(),
                         'updated_by' => auth()->id(),
                         'order_datetime' => $order->order_datetime,
+                        'guest_menu' => $order->guest_menu,
+                        'is_delivery' =>  $order->is_delivery,
 
                     ]);
                     $orderNo = $newOrder->getOrderNo();
@@ -182,6 +196,8 @@ class OrderBreakDownController extends Controller
                         'created_by' => auth()->id(),
                         'updated_by' => auth()->id(),
                         'order_datetime' => $order->order_datetime,
+                        'guest_menu' => $order->guest_menu,
+                        'is_delivery' =>  $order->is_delivery,
 
                     ]);
                     $orderNo = 1;
@@ -202,7 +218,12 @@ class OrderBreakDownController extends Controller
                                     ]
                                 );
                             } else {
-                                $this->storeOrderItem($newOrder->id, $customerItem['item_id'], $customerItem['quantity'], $item->price, $orderNo);
+                                if ($order->guest_menu == 1) {
+                                    $price = $item->guest_price;
+                                } else {
+                                    $price = $item->price;
+                                }
+                                $this->storeOrderItem($newOrder->id, $customerItem['item_id'], $customerItem['quantity'], $price, $orderNo);
                             }
                         }
                     }
@@ -216,11 +237,16 @@ class OrderBreakDownController extends Controller
 
             foreach ($orderItems as  $item) {
                 if ($item->total_quantity > 0) {
-                    $this->storeOrderItem($order->id, $item->item_id, $item->total_quantity, $item->item->price);
+                    if ($order->guest_menu == 1) {
+                        $price =  $item->item->guest_price;
+                    } else {
+                        $price =  $item->item->price;
+                    }
+                    $this->storeOrderItem($order->id, $item->item_id, $item->total_quantity,$price);
                 }
             }
            $orderAmount = $order->setTotal();
-           if($orderAmount == 0)
+           if($order->order_items->count() == 0)
            {
             $order->delete();
            }

@@ -12,7 +12,7 @@ class Category extends Model
     use HasFactory,SoftDeletes;
 
     protected $table ='table_categories';
-    protected $fillable = ['title','order','status','image'];
+    protected $fillable = ['title','order','status','image','coupon_discount_percentage'];
 
     public function image()
     {

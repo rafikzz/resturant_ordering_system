@@ -38,17 +38,21 @@ class CheckoutController extends Controller
         $title = $this->title;
         $processingStatus = Status::where('title', 'Processing')->first()->id;
         $order = Order::where('status_id', '=', $processingStatus)->with('customer')->findOrFail($id);
-        $order_items = OrderItem::where('order_id', $order->id)->with('item:id,name')->where('total', '>', 0)->get()->groupBy('order_no');
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
         $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
 
-        $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=',Carbon::today())->get();
+        $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=', Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
 
+        $order_items = OrderItem::where('order_id', $order->id)->with('item.category')->where('total', '>', 0)->get();
+        $order_couponable_discount_amount = $this->getCouponableDiscountAmount($order_items);
+        $order_non_couponable_discount_amount = $order->total - $order_couponable_discount_amount;
+        $order_items =  $order_items->groupBy('order_no');
 
-        return view('admin.checkout.index', compact('order', 'coupons','delivery_charge','couponsDictionary', 'order_items', 'title', 'breadcrumbs', 'tax', 'service_charge'));
+
+        return view('admin.checkout.index', compact('order', 'order_couponable_discount_amount', 'order_non_couponable_discount_amount', 'coupons', 'delivery_charge', 'couponsDictionary', 'order_items', 'title', 'breadcrumbs', 'tax', 'service_charge'));
     }
 
     public function store(OrderCheckoutRequest $request, $id)
@@ -64,7 +68,7 @@ class CheckoutController extends Controller
             $order = Order::where('status_id', '=', $processingStatus)->with('status:id,title')->with('customer')->findOrFail($id);
 
             if ($request->discount > $order->total) {
-                if($request->ajax){
+                if ($request->ajax) {
                     return response()->json([
                         'status' => 'fail',
                         'message' => 'Discount is greater than total',
@@ -74,11 +78,16 @@ class CheckoutController extends Controller
             }
             $completedStatus = Status::where('title', 'Completed')->first()->id;
             $coupon_amount = 0;
+            $order_items = OrderItem::where('order_id', $order->id)->with('item.category')->where('total', '>', 0)->get();
+            $coupon_discoutable_amount = $this->getCouponableDiscountAmount($order_items);
             if ($request->coupon_id) {
                 $coupon = Coupon::where('id', $request->coupon_id)->where('expiry_date', '>=', Carbon::today())->first();
                 $coupon_amount = ($coupon) ? $coupon->discount : 0;
+                if ($coupon_amount >= $coupon_discoutable_amount) {
+                    $coupon_amount = $coupon_discoutable_amount;
+                }
             }
-            $total=$order->total;
+            $total = $order->total;
             $total_discount = $coupon_amount + $request->discount ?: 0;
             if ($total_discount >= $total) {
                 $total_discount = $total;
@@ -90,12 +99,11 @@ class CheckoutController extends Controller
                 $service_charge_amount =    round(($service_charge  / 100) * ($net_total), 2);
                 $tax_amount =    round(($tax / 100) * ($net_total + $service_charge_amount), 2);
             }
-            $delivery_charge_amount =0;
-            if($request->is_delivery)
-            {
-                $delivery_charge_amount =$delivery_charge;
+            $delivery_charge_amount = 0;
+            if ($request->is_delivery) {
+                $delivery_charge_amount = $request->delivery_charge;
             }
-            $grand_total = $net_total + $service_charge_amount + $tax_amount+$delivery_charge_amount;
+            $grand_total = $net_total + $service_charge_amount + $tax_amount + $delivery_charge_amount;
 
             $order->update([
                 'discount' => $total_discount ?: 0,
@@ -105,15 +113,15 @@ class CheckoutController extends Controller
                 'payment_type_id' => $request->payment_type_id,
                 'net_total' => $grand_total,
                 'updated_by' => auth()->id(),
-                'coupon_id'=>$request->coupon_id,
+                'coupon_id' => $request->coupon_id,
                 'delivery_charge' => $delivery_charge_amount,
-                'is_delivery'=>  $request->is_delivery,
+                'is_delivery' =>  $request->is_delivery,
                 'is_credit' => $request->payment_type
 
 
             ]);
 
-            if ($request->payment_type == 1 && $order->customer->customer_type_id ==2) {
+            if ($request->payment_type == 1 && $order->customer->customer_type_id == 2) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
 
                 if ($dueAmount != 0) {
@@ -158,16 +166,15 @@ class CheckoutController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Order Checked Out Successfully');
     }
 
-    public function store_customer_wallet_transacion($order, $dueAmount,$paidAmount)
+    public function store_customer_wallet_transacion($order, $dueAmount, $paidAmount)
     {
         $wallet_balance = isset($order->customer_id) ? $order->customer->wallet_balance() : 0;
         $current_balance = $wallet_balance - $dueAmount;
 
-        $customer = Customer::where('id',$order->customer_id)->whereNotNull('is_staff')->first();
-        if($customer)
-        {
+        $customer = Customer::where('id', $order->customer_id)->whereNotNull('is_staff')->first();
+        if ($customer) {
             $customer->update([
-                'balance'=>$current_balance
+                'balance' => $current_balance
             ]);
         }
 
@@ -176,10 +183,22 @@ class CheckoutController extends Controller
             'order_id' => $order->id,
             'previous_amount' => $wallet_balance,
             'amount' => $dueAmount,
-            'total_amount'=>$paidAmount,
+            'total_amount' => $paidAmount,
             'current_amount' => $current_balance,
             'transaction_type_id' => 3,
             'author_id' => auth()->id(),
         ]);
+    }
+
+    public function getCouponableDiscountAmount($orderItems)
+    {
+        $order_couponable_discount_amount = 0;
+        if (isset($orderItems)) {
+            foreach ($orderItems as $order_item) {
+                $coupon_discount_percentage = $order_item->item->category->coupon_discount_percentage;
+                $order_couponable_discount_amount += $order_item->price * ($order_item->total * $coupon_discount_percentage) / 100;
+            }
+        }
+        return  $order_couponable_discount_amount;
     }
 }

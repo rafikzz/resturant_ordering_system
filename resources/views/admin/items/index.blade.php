@@ -24,10 +24,10 @@
                         <thead>
                             <th>Id</th>
                             <th>Name</th>
-                            <th>Price</th>
+                            <th>Staff Price</th>
+                            <th>Guest Price</th>
                             <th>Status</th>
                             <th>Category</th>
-                            <th>Image</th>
                             <th>Created At</th>
                             <th>Action</th>
                         </thead>
@@ -41,7 +41,6 @@
     </div>
 @endsection
 @section('js')
-    <script src="{{ asset('js/jQuery-ui.js') }}"></script>
     <script>
         $(document).ready(function() {
             // $('#table').DataTable({
@@ -51,7 +50,10 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                "aaSorting": [],
+                "pageLength": 25,
+                order: [
+                    [0, 'desc']
+                ],
                 ajax: {
                     url: "{{ route('admin.items.getData') }}",
                     data: function(d) {
@@ -71,6 +73,10 @@
                         name: 'price'
                     },
                     {
+                        data: 'guest_price',
+                        name: 'guest_price'
+                    },
+                    {
                         data: 'status',
                         name: 'status',
                         searchable: false,
@@ -82,15 +88,15 @@
                             return '<i class="badge badge-info">' + data + '</i>';
                         },
                     },
-                    {
-                        data: 'image',
-                        name: 'image',
-                        render: function(data) {
-                            return '<img width="120px" height="100px" src="' + data + '"></img>';
-                        },
-                        searchable: false,
-                        orderable: false,
-                    },
+                    // {
+                    //     data: 'image',
+                    //     name: 'image',
+                    //     render: function(data) {
+                    //         return '<img width="120px" height="100px" src="' + data + '"></img>';
+                    //     },
+                    //     searchable: false,
+                    //     orderable: false,
+                    // },
 
                     {
                         data: 'created_at',
@@ -111,44 +117,6 @@
                 ]
 
             });
-
-            //for sortable table
-            $("#tablecontents").sortable({
-                items: "tr",
-                cursor: 'move',
-                opacity: 0.6,
-                update: function() {
-                    sendOrderToServer();
-                }
-            });
-
-
-            //To change order while changing table
-            function sendOrderToServer() {
-                var order = [];
-                $('tr.row1').each(function(index, element) {
-                    order.push({
-                        id: $(this).attr('data-id'),
-                        position: index + 1
-                    });
-                });
-                $.ajax({
-                    type: "POST",
-                    dataType: "json",
-                    url: "{{ route('admin.item.updateOrder') }}",
-                    data: {
-                        order: order,
-                        "_token": "{{ csrf_token() }}",
-                    },
-                    success: function(response) {
-                        if (response.status == "success") {
-                            console.log(response);
-                        } else {
-                            console.log(response);
-                        }
-                    }
-                });
-            }
             $(document).on('change', '#mode', function() {
                 table.draw();
             });

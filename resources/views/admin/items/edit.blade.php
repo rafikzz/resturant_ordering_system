@@ -27,20 +27,27 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="price">Item Price</label>
+                                <label class="label" for="price">Staff Item Price</label>
                                 <input type="number" name="price" value="{{ old('price') ?: $item->price }}"
                                     class="form-control  @error('price') is-invalid @enderror" min="0" step="0.01"
-                                    placeholder="Enter Name" required autocomplete="off">
+                                    placeholder="Enter Staff Item Price" required autocomplete="off">
                                 @error('price')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                             </div>
-
-
-                        </div>
-                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label class="label" for="guest_price">Guest Item Price</label>
+                                <input type="number" name="guest_price" value="{{ old('guest_price', $item->guest_price) }}"
+                                    class="form-control  @error('guest_price') is-invalid @enderror" min="0"
+                                    step="0.01" placeholder="Enter Guest Item Price" required autocomplete="off">
+                                @error('guest_price')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                             <div class="form-group col-md-6">
                                 <label for="category_id"> Category</label>
                                 <select class="form-control" name="category_id" required>
@@ -57,20 +64,7 @@
                                     </span>
                                 @enderror
                             </div>
-                            <div class="form-group col-md-6">
-                                <label class="label" for="order">Item Order</label>
-                                <input type="number" min="0" step="1" name="order"
-                                    value="{{ old('order') ?: $item->order }}"
-                                    class="form-control  @error('order') is-invalid @enderror" placeholder="Enter order"
-                                    required autocomplete="off">
-                                @error('order')
-                                    <span class=" text-danger" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
                         </div>
-
                         <div class="form-group ml-n2">
                             <div class="col-md-6">
                                 <label for="exampleInputFile">Upload Image</label>
@@ -90,8 +84,6 @@
                                 <img id="preview-image-before-upload" src="{{ $item->image() }}" width="150">
                             </div>
                         </div>
-
-
                         <div class="col-md-12 text-center">
                             <button type="submit" class="btn btn-primary  mt-3">Edit</button>
                         </div>

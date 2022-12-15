@@ -13,6 +13,7 @@
                                 <button type="button" class="btn input-group-text"><i class="fas fa-search"></i></button>
                             </div> --}}
                         </div>
+
                     </div>
                     <div class="card-tools">
 
@@ -37,7 +38,7 @@
                                 </b>
                             </div>
                             @foreach ($category->active_items as $item)
-                                @component('admin.orders.components._menu-items', ['item' => $item])
+                                @component('admin.orders.components._menu-items', ['item' => $item, 'guest_menu' => $guest_menu])
                                 @endcomponent
                             @endforeach
                         </div>
@@ -53,9 +54,21 @@
                         <i class="fas fa-2x fa-sync fa-spin"></i>
                     </div>
                     <div class="card-body">
-
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-12 ml-n2">
+                                <h3>Menu Type</h3>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="guest_menu" id="guest_menu1"
+                                    value="1" checked>
+                                <label class="form-check-label" for="guest_menu1">Guest Menu</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="guest_menu" id="guest_menu2"
+                                    value="0">
+                                <label class="form-check-label" for="guest_menu2">Staff Menu</label>
+                            </div>
+                            <div class="col-12 ml-n2">
                                 <h3>Customer Info</h3>
                             </div>
                             <div class="col-md-6">
@@ -99,7 +112,6 @@
                                 </div>
                             </div>
 
-
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
                                     <label for="destination_no">Destination No</label>
@@ -107,6 +119,21 @@
                                         id="destination_no" autocomplete="off" name="destination_no" re
                                         value="{{ old('destination_no') }}">
                                     @error('destination_no')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group  ml-n2">
+                                    <label for="is_delivery">Packaging</label>
+                                    <select name="is_delivery" id="is_delivery"
+                                        class="form-control form-control-sm  float-right">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                    @error('is_delivery')
                                         <span class=" text-danger" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -176,27 +203,17 @@
                                             <td id="tax-amount">Rs. 0</td>
                                         </tr>
                                     @endif
-                                    @if ($delivery_charge)
-                                        <tr>
-                                            <td colspan="3">Take Packaging Charge</td>
-                                            <td><select name="is_delivery" id="is_delivery"
-                                                    class="form-control form-control-sm  float-right">
-                                                    <option value="0">No</option>
-                                                    <option value="1">Yes</option>
-                                                </select>
-                                                @error('is_delivery')
-                                                    <span class=" text-danger" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </td>
-
-                                        </tr>
-                                        <tr id="delivery-charge" style="display:none">
-                                            <td colspan="3">Packaging Charge Amount:</td>
-                                            <td>Rs. {{ $delivery_charge }}</td>
-                                        </tr>
-                                    @endif
+                                    <tr id="delivery-charge" style="display:none">
+                                        <td colspan="3">Packaging Charge Amount:</td>
+                                        <td class="btn-group"><input id="delivery" min="0" step=".01"
+                                                class="form-control form-control-sm " value="{{ $delivery_charge }}"
+                                                type="number">
+                                            <input type="hidden" id="delivery_charge" value="{!! $delivery_charge !!}"
+                                                name="delivery_charge">
+                                            <button id="apply-charge" type="button"
+                                                class="btn btn-primary btn-sm ml-2">Apply</button>
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td colspan="3">Grand Total:</td>
                                         <td id="grand-total">Rs. 0</td>
@@ -237,9 +254,9 @@
                         <div class="row text-center">
                             <div class="col-12 ">
                                 <button id="order-checkout" name="checkout" value="1"
-                                    class="btn btn-primary ">Checkout</button>
+                                    class="btn btn-primary submit-btn">Checkout</button>
 
-                                <button id="order-submit" class="btn btn-primary ">Save</button>
+                                <button id="order-submit submit-btn" class="btn btn-primary ">Save</button>
                             </div>
                         </div>
                     </div>
@@ -259,7 +276,31 @@
         let couponDictionary = {!! $couponsDictionary !!};
         let coupon_discount = 0;
         let discount = 0;
+        let discountable_amount = 0;
+        let non_discountable_amount = 0;
         let delivery_charge = {!! $delivery_charge !!};
+
+        $('input[type=radio][name=guest_menu]').change(function() {
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('admin.cart.clearCartItem') }}',
+                success: function(data) {
+                    if (data.status == "success") {
+                        $('#order-list').html('');
+                        setTotal(data.total, data.discountable_amount, data.non_discountable_amount);
+
+                    }
+                }
+            });
+            if (this.value == 1) {
+                $('.staff-price').css('display', 'none');
+                $('.guest-price').css('display', 'block');
+
+            } else if (this.value == 0) {
+                $('.staff-price').css('display', 'block');
+                $('.guest-price').css('display', 'none');
+            }
+        });
 
         $('#toggle-checkout').click(function() {
             if ($(this).is(':checked')) {
@@ -273,35 +314,23 @@
             }
         });
         $(function() {
-            //Getting Items on changing category
-            $('#category').on('change', function() {
-                let category_id = $(this).val();
 
-                if (category_id) {
-                    $('.menu-category').hide();
-                    $('.menu-category[data-category="' + category_id + '"]').show();
-
-                } else {
-                    $('.menu-category').show();
-
-                }
-
-            });
             //For Coupon Discount
             $('#coupon_id').on('change', function() {
                 coupon_discount = 0;
                 if ($(this).val()) {
                     coupon_discount = couponDictionary[$(this).val()];
-                    if (coupon_discount >= total) {
-                        coupon_discount = 0;
-                        $('#coupon_id').val("");
-                        sweetAlert('Error', 'Coupon Amount Should Not Be Greater Than Total Amount',
-                            'error');
-
-                        $('#discount').attr('max', 0);
+                    if (coupon_discount >= discountable_amount) {
+                        coupon_discount = discountable_amount;
+                        $('#discount').attr('max', non_discountable_amount);
                     } else {
-                        $('#discount').attr('max', total - coupon_discount);
+                        coupon_discount = coupon_discount;
+                        $('#discount').attr('max', non_discountable_amount + discountable_amount -
+                            coupon_discount);
                     }
+                } else {
+                    $('#discount').attr('max', total);
+
                 }
                 resetAppliedDiscount();
                 calculateSetServiceChargeAndTax();
@@ -310,21 +339,29 @@
             //For Delivery
             $('#is_delivery').on('change', function() {
                 let destination = $(this).val();
-                if (delivery_charge) {
-                    if (destination == 1) {
-                        is_delivery = 1;
-                        $('#delivery-charge').show();
-                    } else {
-                        $('#delivery-charge').hide();
-                        is_delivery = 0;
-                    }
-                    calculateSetServiceChargeAndTax(discount);
+                if (destination == 1) {
+                    is_delivery = 1;
+                    $('#delivery-charge').show();
+                } else {
+                    $('#delivery-charge').hide();
+                    is_delivery = 0;
                 }
+                calculateSetServiceChargeAndTax(discount);
 
 
             });
 
+            //Getting Items on changing category
+            $('#category').on('change', function() {
+                let category_id = $(this).val();
+                if (category_id) {
+                    $('.menu-category').hide();
+                    $('.menu-category[data-category="' + category_id + '"]').show();
 
+                } else {
+                    $('.menu-category').show();
+                }
+            });
             //Getting Items on changing category
             $('#search-items').on('keyup', function() {
                 let search = $(this).val();
@@ -347,16 +384,16 @@
             let itemId = $(this).data('id');
             let itemName = $(this).data('name');
             let itemPrice = $(this).data('price');
-
+            let guest_menu = $("#guest_menu1").is(":checked") ? 1 : 0;;
             $.ajax({
                 type: 'GET',
                 url: '{{ route('admin.cart.addCartItem') }}',
                 data: {
                     'item_id': itemId,
+                    'guest_menu': guest_menu,
                 },
                 success: function(data) {
                     btn.attr('disabled', false);
-
                     if (data.status === 'success') {
                         for (var item in data.items) {
                             if ($('#item-' + item).length) {
@@ -372,14 +409,9 @@
                                     .items[item]
                                     .quantity));
                             }
-
-
                         }
-
                         // sweetAlert('Success',data.message,'success');
-
-                        setTotal(data.total);
-
+                        setTotal(data.total, data.discountable_amount, data.non_discountable_amount);
                     }
                 },
                 error: function(xhr) {
@@ -404,6 +436,7 @@
                 sweetAlert('Number is not Valid', "Please Enter Valid Quantity", 'warning');
             }
         });
+
         //For Deleting Cart Item
         $(document).on('click', '.tr-remove', function() {
             Swal.fire({
@@ -427,7 +460,8 @@
                         success: function(data) {
                             if (data.status === 'success') {
                                 removeItem(btn, item_id);
-                                setTotal(data.total);
+                                setTotal(data.total, data.discountable_amount, data
+                                    .non_discountable_amount);
                             } else {
                                 alert(data.message);
                             }
@@ -447,18 +481,35 @@
             $('#category-items').html('');
         }
         //For setting the total
-        function setTotal(totalAmount) {
+        function setTotal(totalAmount, discountableAmount = 0, nonDiscountableAmount = 0) {
+
+            discountable_amount = discountableAmount;
+            non_discountable_amount = nonDiscountableAmount;
             total = totalAmount;
-            net_total = totalAmount;
+            resetAppliedDiscount();
+            if ($('#coupon_id').val()) {
+                coupon_discount = couponDictionary[$('#coupon_id').val()];
+                if (coupon_discount >= discountable_amount) {
+                    coupon_discount = discountable_amount;
+                    $('#discount').attr('max', non_discountable_amount);
+                } else {
+                    coupon_discount = coupon_discount;
+                    $('#discount').attr('max', non_discountable_amount + discountable_amount - coupon_discount);
+                }
+            } else {
+                $('#discount').attr('max', total);
+
+            }
+
             $('#totalAmount').html('Rs. ' + totalAmount);
-            calculateSetServiceChargeAndTax(discount);
+            calculateSetServiceChargeAndTax();
 
         }
 
         //Template of table row
         function tableRowTemplate(id, name, price, quantity = '1') {
-            return '<tr id="item-' + id + '" data-id="' + id + '"><td>' + name +
-                '</td><td class="form-inline col-xs-2"><input type="number" id="item-quantity-' + id +
+            return '<tr id="item-' + id + '" data-id="' + id + '"><td width="200px">' + name +
+                '</td><td class="form-inline col-xs-2" width="250px"><input type="number" id="item-quantity-' + id +
                 '" class="form-control form-control-sm"  step="1" min="1" value="' +
                 quantity +
                 '"><button type="button" class="btn btn-outline-light update-quantity ml-2 btn-sm" rel="' + id +
@@ -479,7 +530,7 @@
                 success: function(data) {
                     if (data.status === 'success') {
 
-                        setTotal(data.total);
+                        setTotal(data.total, data.discountable_amount, data.non_discountable_amount);
                     } else {
                         console.log(data.message);
                     }
@@ -504,6 +555,25 @@
             } else {
 
                 $("#discount")[0].reportValidity();
+            }
+
+        });
+
+        //for applying packaging charge
+        $('#apply-charge').on('click', function(e) {
+            let delivery = parseFloat($('#delivery').val());
+            if (isNaN(delivery)) {
+                delivery = 0;
+            }
+            if ($('#delivery')[0].checkValidity()) {
+
+                $('#delivery_charge').val(delivery);
+
+                calculateSetServiceChargeAndTax(discount);
+
+            } else {
+
+                $("#delivery")[0].reportValidity();
             }
 
         });
@@ -540,9 +610,11 @@
         }
 
         function calculateSetServiceChargeAndTax(discount = 0) {
-            let deliveryCharge = (is_delivery) ? parseFloat(delivery_charge) : 0;
-            let temp_total = total - coupon_discount - discount;
-            if (temp_total + deliveryCharge >= 0) {
+            let deliveryCharge = (is_delivery) ? parseFloat($('#delivery_charge').val()) : 0;
+            discount=$('#discount-amount').val() ;
+            console.log(discount);
+            let temp_total = non_discountable_amount + discountable_amount - coupon_discount -discount;
+            if (temp_total >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
                 let tax_amount = parseFloat(((parseFloat(temp_total) + parseFloat(service_charge_amount)) * (tax / 100))
                     .toFixed(2));
@@ -556,7 +628,6 @@
 
 
             } else {
-                $('#coupon_id').val("");
                 alert('Discount cannot be greater than total')
             }
         }
@@ -585,11 +656,11 @@
 
         });
         $('#paid_amount').focusout(function() {
-            if ($(this).val()) {
-                } else {
+            if ($(this).val()) {} else {
                 $(this).val(0);
             }
         });
+
 
         function foramtValue(val) {
             return 'Rs. ' + val;

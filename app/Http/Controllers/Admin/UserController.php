@@ -87,7 +87,11 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user)
     {
-        $data = $request->except(['_token', '_method', 'roles']);
+        $data = $request->except(['_token', '_method', 'roles',]);
+        if($request->password)
+        {
+        $data['password'] = Hash::make($data['password']);
+        }
         $user->update($data);
         $user->syncRoles($request->roles);
         return redirect()->route('admin.users.index')->with("success", "User updated successfully");

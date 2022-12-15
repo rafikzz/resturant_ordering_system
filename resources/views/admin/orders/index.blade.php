@@ -27,6 +27,8 @@
                             <th>Customer Name</th>
                             <th>Destination</th>
                             <th>Order Total</th>
+                            <th>Discount</th>
+                            <th>Net Total</th>
                             <th>Created At</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -91,6 +93,14 @@
                     {
                         data: 'total',
                         name: 'total'
+                    },
+                    {
+                        data: 'discount',
+                        name: 'discount'
+                    },
+                    {
+                        data: 'net_total',
+                        name: 'net_total'
                     },
                     {
                         data: 'created_at',
@@ -235,8 +245,6 @@
             $('#order-status').html('');
             $('#table-items').html('');
             $('#get-bill').attr('href', 'javascript:void(0)');
-            $('#paymentType').css('display', 'none');
-
 
         }
 
@@ -246,11 +254,14 @@
             $('#customer-contact').html(order.customer.phone_no);
             $('#order-date').html(order.order_datetime);
             $('#order-status').html(order.status.title);
-            if (order.payment_type_id) {
-                $('#paymentType').css('display', 'block');
-                $('#payment-type').html(order.payment_type.name);
-            }
 
+
+            if (order.is_credit) {
+                $('#payment-type').html('Account');
+
+            }else{
+                $('#payment-type').html('Cash');
+            }
         }
 
         function foramtValue(val) {

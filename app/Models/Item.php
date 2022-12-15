@@ -12,7 +12,7 @@ class Item extends Model
     use HasFactory,SoftDeletes;
 
     protected $table ='table_items';
-    protected $fillable = ['name','order','status','price','category_id','image'];
+    protected $fillable = ['name','status','price','category_id','image','for_staff'];
 
     public function image()
     {
@@ -30,11 +30,11 @@ class Item extends Model
         return $this->belongsTo(Category::class, 'category_id')->withTrashed();
     }
 
-    public function setNameAttribute($value)
-    {
+    // public function setNameAttribute($value)
+    // {
 
-        $this->attributes['name'] = strtolower($value);
-    }
+    //     $this->attributes['name'] = strtolower($value);
+    // }
 
     public function getNameAttribute($value)
     {

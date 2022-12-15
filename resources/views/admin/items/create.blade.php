@@ -26,18 +26,27 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="title">Item Price</label>
+                                <label class="label" for="price">Staff Item Price</label>
                                 <input type="number" name="price" value="{{ old('price') }}"
                                     class="form-control  @error('price') is-invalid @enderror" min="0" step="0.01"
-                                    placeholder="Enter Name" required autocomplete="off">
+                                    placeholder="Enter Staff Item Price" required autocomplete="off">
                                 @error('price')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                             </div>
-                        </div>
-                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label class="label" for="guest_price">Guest Item Price</label>
+                                <input type="number" name="guest_price" value="{{ old('guest_price') }}"
+                                    class="form-control  @error('guest_price') is-invalid @enderror" min="0" step="0.01"
+                                    placeholder="Enter Guest Item Price" required autocomplete="off">
+                                @error('guest_price')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                             <div class="form-group col-md-6 ">
                                 <label for="category_id"> Category</label>
                                 <select class="form-control" name="category_id" required>

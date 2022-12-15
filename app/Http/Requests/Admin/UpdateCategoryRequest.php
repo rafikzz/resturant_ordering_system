@@ -26,6 +26,7 @@ class UpdateCategoryRequest extends FormRequest
         return [
             'title'=>'required|min:3|unique:table_categories,title,'.$this->category->id,
             'image'=>'nullable|mimes:jpg,jpeg,png,bmp,tiff|image|max:4096',
+            'coupon_discount_percentage'=>'required|numeric|min:0|max:100',
             'order'=>'required'
         ];
     }

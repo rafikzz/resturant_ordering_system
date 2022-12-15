@@ -51,6 +51,7 @@ class CreateRolePermissionSeeder extends Seeder
             'order_edit',
             'order_delete',
             'order_add',
+            'checkout_edit',
             'report_list',
             'setting_create',
             'coupon_list',

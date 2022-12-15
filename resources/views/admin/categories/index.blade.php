@@ -24,8 +24,8 @@
                         <thead>
                             <th>Id</th>
                             <th>Name</th>
+                            <th>Coupon Discount Percentage</th>
                             <th>Status</th>
-                            <th>Image</th>
                             <th>Display Order</th>
                             <th>Created At</th>
                             <th>Action</th>
@@ -50,6 +50,7 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
+                "pageLength": 25,
                 "aaSorting": [],
                 ajax: {
                     url: "{{ route('admin.categories.getData') }}",
@@ -66,18 +67,12 @@
                         name: 'title'
                     },
                     {
-                        data: 'status',
-                        name: 'status',
-
+                        data: 'coupon_discount_percentage',
+                        name: 'coupon_discount_percentage'
                     },
                     {
-                        data: 'image',
-                        name: 'image',
-                        render: function(data) {
-                            return '<img width="120px" height="100px" src="' + data + '"></img>';
-                        },
-                        searchable: false,
-                        orderable: false,
+                        data: 'status',
+                        name: 'status',
 
                     },
                     {

@@ -20,30 +20,28 @@ class ItemController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:item_list|item_create|item_edit|item_delete', ['only' => ['index','show','getData']]);
-        $this->middleware('permission:item_create', ['only' => ['create','store']]);
-        $this->middleware('permission:item_edit', ['only' => ['edit','update',]]);
-        $this->middleware('permission:item_delete', ['only' => ['destroy','restore','forceDelete']]);
+        $this->middleware('permission:item_list|item_create|item_edit|item_delete', ['only' => ['index', 'show', 'getData']]);
+        $this->middleware('permission:item_create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:item_edit', ['only' => ['edit', 'update',]]);
+        $this->middleware('permission:item_delete', ['only' => ['destroy', 'restore', 'forceDelete']]);
         $this->title = 'Item Management';
     }
     public function index(Request $request)
     {
-
-
         $title = $this->title;
-        $breadcrumbs =[ 'Item'=>route('admin.items.index')];
+        $breadcrumbs = ['Item' => route('admin.items.index')];
 
-        return view('admin.items.index', compact('title','breadcrumbs'));
+        return view('admin.items.index', compact('title', 'breadcrumbs'));
     }
 
 
     public function create()
     {
         $title = $this->title;
-        $categories = Category::where('status',1)->get();
-        $breadcrumbs =[ 'Item'=>route('admin.items.index'),'Create'=>'#'];
+        $categories = Category::where('status', 1)->get();
+        $breadcrumbs = ['Item' => route('admin.items.index'), 'Create' => '#'];
 
-        return view('admin.items.create', compact('title', 'categories','breadcrumbs'));
+        return view('admin.items.create', compact('title', 'categories', 'breadcrumbs'));
     }
 
 
@@ -53,45 +51,44 @@ class ItemController extends Controller
             $path = 'items/';
             $imagePath = $this->uploads($image, $path);
         }
+
         Item::create([
             'name' => $request->name,
             'price' => $request->price,
-            'status' => isset($request->status)?1:0,
+            'status' => isset($request->status) ? 1 : 0,
+            'for_staff' => isset($request->for_staff) ? 1 : 0,
             'category_id' => $request->category_id,
             'image' => isset($imagePath) ? $imagePath : ''
 
         ]);
-        if(isset($request->new))
-        {
+        if (isset($request->new)) {
             return redirect()->route('admin.items.create')->with("success", "Item saved successfully");
-
-        }else{
+        } else {
             return redirect()->route('admin.items.index')->with("success", "Item saved successfully");
-
         }
     }
 
 
     public function show($id)
     {
-        $breadcrumbs =[ 'Item'=>route('admin.items.index'),'Show'=>'#'];
+        $breadcrumbs = ['Item' => route('admin.items.index'), 'Show' => '#'];
 
         $item = Item::findOrFail($id);
         $title = $this->title;
 
-        return view('admin.items.show', compact('item', 'title','breadcrumbs'));
+        return view('admin.items.show', compact('item', 'title', 'breadcrumbs'));
     }
 
 
     public function edit($id)
     {
-        $breadcrumbs =[ 'Item'=>route('admin.items.index'),'Edit'=>'#'];
+        $breadcrumbs = ['Item' => route('admin.items.index'), 'Edit' => '#'];
 
         $item = Item::findOrFail($id);
         $title = $this->title;
-        $categories = Category::where('status',1)->get();
+        $categories = Category::where('status', 1)->get();
 
-        return view('admin.items.edit', compact('item', 'categories', 'title','breadcrumbs'));
+        return view('admin.items.edit', compact('item', 'categories', 'title', 'breadcrumbs'));
     }
 
 
@@ -101,6 +98,8 @@ class ItemController extends Controller
         $item->price = $request->price;
         $item->order = $request->order;
         $item->category_id = $request->category_id;
+        $item->for_staff = ($request->for_staff) ? 1 : 0;
+
 
         if ($image = $request->file('image')) {
             $path = 'items/';
@@ -138,16 +137,12 @@ class ItemController extends Controller
     {
         if ($request->ajax()) {
             if ($request->mode == 0) {
-                    if(!$request->order){
-                    $data = Item::select('*')->with('category:id,title')->withCount('order_items')->orderBy('order');
-                    }else{
-                        $data = Item::select('*')->with('category:id,title')->withCount('order_items');
-                    }
+                $data = Item::select('*')->with('category:id,title')->withCount('order_items');
             } else {
                 $data = Item::select('*')->with('category:id,title')->onlyTrashed();
             }
-            $canEdit =auth()->user()->can('item_edit');
-            $canDelete =auth()->user()->can('item_delete');
+            $canEdit = auth()->user()->can('item_edit');
+            $canDelete = auth()->user()->can('item_delete');
 
             return DataTables::of($data)
                 ->setRowClass('row1')
@@ -156,9 +151,9 @@ class ItemController extends Controller
                         return $item->id;
                     },
                 ])
-                ->editColumn('image', function ($item) {
-                    return $item->image();
-                })
+                // ->editColumn('image', function ($item) {
+                //     return $item->image();
+                // })
                 ->editColumn('status', function ($item) {
 
                     return ($item->status) ?
@@ -180,17 +175,13 @@ class ItemController extends Controller
                 })
                 ->addColumn(
                     'action',
-                    function ($row, Request $request) use($canDelete,$canEdit) {
+                    function ($row, Request $request) use ($canDelete, $canEdit) {
                         if ($canEdit || $canDelete) {
                             if ($request->mode == 0) {
                                 $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.items.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
-                                if(!($row->order_items))
-                                {
+                                if (!($row->order_items_count)) {
                                     $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
-
-
-                                }
-                                else{
+                                } else {
                                     $deleteBtn = null;
                                 }
                                 $formStart = '<form action="' . route('admin.items.destroy', $row->id) . '" method="POST">
@@ -235,36 +226,24 @@ class ItemController extends Controller
         ]);
     }
 
-    public function updateOrder(Request $request)
+
+
+    public function getCategoryItemsData(Request $request)
     {
-        $items = Item::get();
-
-        foreach ($items as $item) {
-            foreach ($request->order as $order) {
-                if ($order['id'] == $item->id) {
-                    $item->update(['order' => $order['position']]);
-                }
-            }
-        }
-
-        return response('Update Successfully.', 200);
-    }
-
-    public function getCategoryItemsData(Request $request){
-        if($request->ajax()){
-            $category_id =$request->category_id;
-            $categoryItems =Item::where('category_id',$category_id)->where('status',1)->orderBy('category_id','desc')->get();
-            if($categoryItems->count()){
+        if ($request->ajax()) {
+            $category_id = $request->category_id;
+            $categoryItems = Item::where('category_id', $category_id)->where('status', 1)->orderBy('category_id', 'desc')->get();
+            if ($categoryItems->count()) {
                 return response()->json([
-                    'items'=>$categoryItems,
-                    'status'=>'success',
-                    'message'=>'success'
-                ],200);
-            }else{
+                    'items' => $categoryItems,
+                    'status' => 'success',
+                    'message' => 'success'
+                ], 200);
+            } else {
                 return response()->json([
-                    'message'=>'No items for this category available',
-                    'status'=>'fail',
-                ],200);
+                    'message' => 'No items for this category available',
+                    'status' => 'fail',
+                ], 200);
             }
         }
     }

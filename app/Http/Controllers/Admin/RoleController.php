@@ -84,7 +84,7 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request,Role $role)
     {
-        $role->update(['name'=>$request->name]  );
+        $role->update(['name'=>$request->name]);
         $role->syncPermissions($request->permissions);
         return redirect()->route('admin.roles.index')->with("success", "Role updated successfully");
     }
@@ -116,8 +116,9 @@ class RoleController extends Controller
                     'action',
                     function ($row) use( $canEdit, $canDelete) {
                         if ($canEdit ||  $canDelete) {
-                        $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.roles.edit', $row->id) . '">Edit</a>' : '';
-                        $deleteBtn =   $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
+                        $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.roles.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                        // $deleteBtn =   $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
+                        $deleteBtn='';
                         $formStart = '<form action="' . route('admin.roles.destroy', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                  <input type="hidden" name="_method" value="delete" />';

@@ -19,12 +19,12 @@ class DatabaseSeeder extends Seeder
             CreateUserSeeder::class,
             StatusSeeder::class,
             CategorySeeder::class,
-            ItemSeeder::class,
             SettingSeeder::class,
             PaymentTypeSeeder::class,
             TransactionTypeSeeder::class,
             CustomerTypeSeeder::class,
-            CustomerSeeder::class
+            CustomerSeeder::class,
+            ItemSeeder::class,
 
         ]);
     }

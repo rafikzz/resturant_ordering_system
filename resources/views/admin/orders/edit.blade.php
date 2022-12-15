@@ -36,7 +36,7 @@
                                 </b>
                             </div>
                             @foreach ($category->active_items as $item)
-                                @component('admin.orders.components._menu-items', ['item' => $item])
+                                @component('admin.orders.components._menu-items', ['item' => $item, 'guest_menu' => $order->guest_menu])
                                 @endcomponent
                             @endforeach
                         </div>
@@ -63,6 +63,21 @@
                     <div class="card-body">
 
                         <div class="row">
+                            <div class="col-12 ml-n2">
+                                <h3>Menu Type</h3>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="guest_menu" id="guest_menu1"
+                                        value="1" {{ $order->guest_menu == 1 ? 'checked' : 'disabled' }}>
+                                    <label class="form-check-label" for="guest_menu1">Guest Menu</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="guest_menu" id="guest_menu2"
+                                        value="0" {{ $order->guest_menu == 1 ? 'disabled' : 'checked' }}>
+                                    <label class="form-check-label" for="guest_menu2">Staff Menu</label>
+                                </div>
+                            </div>
                             <div class="col-12">
                                 <h3>Customer Info</h3>
                             </div>
@@ -91,8 +106,6 @@
                                     'customer_id' => $order->customer_id,
                                 ])
                             @endcomponent
-
-
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
                                     <label for="destination">Order Destination</label>
@@ -112,7 +125,6 @@
                                     @enderror
                                 </div>
                             </div>
-
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
                                     <label for="destination_no">Destination No</label>
@@ -126,8 +138,22 @@
                                     @enderror
                                 </div>
                             </div>
-
-
+                            <div class="col-md-6">
+                                <div class="form-group  ml-n2">
+                                    <label for="is_delivery">Packaging</label>
+                                    <select name="is_delivery" id="is_delivery"
+                                        class="form-control form-control-sm  float-right">
+                                        <option value="0" {{ $order->is_delivery == 0 ? 'selected' : '' }}>No</option>
+                                        <option value="1" {{ $order->is_delivery == 1 ? 'selected' : '' }}>Yes
+                                        </option>
+                                    </select>
+                                    @error('is_delivery')
+                                        <span class=" text-danger" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
 
@@ -144,7 +170,7 @@
                                     @foreach ($items as $item)
                                         <tr>
                                             <td width="200px">{{ $item->item->name }}</td>
-                                            <td width="200px" class="form-inline  col-xs-2">
+                                            <td width="250px" class="form-inline  col-xs-2">
                                                 @if ($item->total > 1)
                                                     <input type="number" id="order-item-quantity-{{ $item->id }}"
                                                         max="{{ $item->total }}" class="form-control form-control-sm"
@@ -222,27 +248,17 @@
                                             <td id="tax-amount">Rs. {{ $order->taxAmount() }}</td>
                                         </tr>
                                     @endif
-                                    @if ($delivery_charge)
-                                        <tr>
-                                            <td colspan="3">Take Packaging Charge</td>
-                                            <td><select name="is_delivery" id="is_delivery"
-                                                    class="form-control form-control-sm  float-right">
-                                                    <option value="0">No</option>
-                                                    <option value="1">Yes</option>
-                                                </select>
-                                                @error('is_delivery')
-                                                    <span class=" text-danger" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </td>
-
-                                        </tr>
-                                        <tr id="delivery-charge" style="display:none">
-                                            <td colspan="3">Packaging Charge Amount:</td>
-                                            <td>Rs. {{ $delivery_charge }}</td>
-                                        </tr>
-                                    @endif
+                                    <tr id="delivery-charge" style="{{ $order->is_delivery ? '' : 'display:none' }};">
+                                        <td colspan="3">Packaging Charge Amount:</td>
+                                        <td class="btn-group"><input id="delivery" min="0" step=".01"
+                                                class="form-control form-control-sm " value="{{ $delivery_charge }}"
+                                                type="number">
+                                            <input type="hidden" id="delivery_charge" value="{!! $delivery_charge !!}"
+                                                name="delivery_charge">
+                                            <button id="apply-charge" type="button"
+                                                class="btn btn-primary btn-sm ml-2">Apply</button>
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td colspan="3">Grand Total:</td>
                                         <td id="grand-total">Rs. {{ $order->totalWithTax() }}</td>
@@ -298,6 +314,8 @@
     <script>
         let orderTotal = {{ $order->total }};
         let cartTotal = 0;
+        let order_non_couponable_discount_amount = {!! $order_non_couponable_discount_amount !!};
+        let order_couponable_discount_amount = {!! $order_couponable_discount_amount !!};
         let tax = {!! $tax !!};
         let service_charge = {!! $service_charge !!};
         var total = {{ $order->total }};
@@ -306,9 +324,11 @@
         let couponDictionary = {!! $couponsDictionary !!};
         let coupon_discount = 0;
         let delivery_charge = {!! $delivery_charge !!};
-        let is_delivery = 0;
+        let is_delivery = {!! $order->is_delivery !!};
         let discount = 0;
-
+        let discountable_amount = 0;
+        let non_discountable_amount = 0;
+        calculateSetServiceChargeAndTax();
         $(function() {
             //Getting Items on changing category
             $('#category').on('change', function() {
@@ -340,37 +360,41 @@
                 coupon_discount = 0;
                 if ($(this).val()) {
                     coupon_discount = couponDictionary[$(this).val()];
-                    if (coupon_discount >= total) {
-                        coupon_discount = 0;
-                        $('#coupon_id').val("");
-                        sweetAlert('Error', 'Coupon Amount Should Not Be Greater Than Total Amount',
-                            'error');
 
-                        $('#discount').attr('max', 0);
+                    if (coupon_discount >= discountable_amount + order_couponable_discount_amount) {
+                        coupon_discount = discountable_amount + order_couponable_discount_amount;
+                        $('#discount').attr('max', order_non_couponable_discount_amount +
+                            non_discountable_amount);
                     } else {
-                        $('#discount').attr('max', total - coupon_discount);
+                        coupon_discount = coupon_discount;
+                        console.log(non_discountable_amount,
+                            order_non_couponable_discount_amount, order_couponable_discount_amount,
+                            discountable_amount, coupon_discount);
+                        $('#discount').attr('max', non_discountable_amount +
+                            order_non_couponable_discount_amount + order_couponable_discount_amount +
+                            discountable_amount - coupon_discount);
                     }
+                } else {
+                    $('#discount').attr('max', total);
+
                 }
                 resetAppliedDiscount();
                 calculateSetServiceChargeAndTax();
 
             });
 
+
             //For Delivery
             $('#is_delivery').on('change', function() {
                 let destination = $(this).val();
-                if (delivery_charge) {
-                    if (destination == 1) {
-                        is_delivery = 1;
-                        $('#delivery-charge').show();
-                    } else {
-                        $('#delivery-charge').hide();
-                        is_delivery = 0;
-                    }
-                    calculateSetServiceChargeAndTax(discount);
+                if (destination == 1) {
+                    is_delivery = 1;
+                    $('#delivery-charge').show();
+                } else {
+                    $('#delivery-charge').hide();
+                    is_delivery = 0;
                 }
-
-
+                calculateSetServiceChargeAndTax(discount);
             });
 
             //Getting Items on changing category
@@ -394,11 +418,13 @@
             let itemId = $(this).data('id');
             let itemName = $(this).data('name');
             let itemPrice = $(this).data('price');
+            let guest_menu = $("#guest_menu1").is(":checked") ? 1 : 0;;
             $.ajax({
                 type: 'GET',
                 url: '{{ route('admin.cart.addCartItem') }}',
                 data: {
                     'item_id': itemId,
+                    'guest_menu': guest_menu
                 },
                 success: function(data) {
                     btn.attr('disabled', false);
@@ -422,6 +448,8 @@
 
                         // sweetAlert('Success',data.message,'success');
                         cartTotal = parseFloat(data.total);
+                        discountable_amount = data.discountable_amount;
+                        non_discountable_amount = data.non_discountable_amount;
                         setTotal();
 
 
@@ -456,7 +484,8 @@
                         success: function(data) {
                             if (data.status === 'success') {
                                 orderTotal = parseFloat(data.total);
-
+                                order_couponable_discount_amount = data.discountable_amount;
+                                order_non_couponable_discount_amount = data.non_discountable_amount;
                                 sweetAlert('Success', data.message, 'success');
                                 if (quantity <= 1) {
                                     btn.closest('td').html(quantity);
@@ -513,6 +542,9 @@
                             success: function(data) {
                                 if (data.status === 'success') {
                                     orderTotal = parseFloat(data.total);
+                                    order_couponable_discount_amount = data.discountable_amount;
+                                    order_non_couponable_discount_amount = data
+                                        .non_discountable_amount;
                                     btn.closest('tr').html('');
                                     setTotal();
 
@@ -572,6 +604,8 @@
                             if (data.status === 'success') {
                                 removeItem(btn, item_id);
                                 cartTotal = parseFloat(data.total);
+                                discountable_amount = data.discountable_amount;
+                                non_discountable_amount = data.non_discountable_amount;
                                 setTotal();
 
 
@@ -595,7 +629,24 @@
         }
         //For setting the total
         function setTotal() {
+
             total = cartTotal + orderTotal;
+
+            resetAppliedDiscount();
+            if ($('#coupon_id').val()) {
+                coupon_discount = couponDictionary[$('#coupon_id').val()];
+                if (coupon_discount >= discountable_amount + order_couponable_discount_amount) {
+                    coupon_discount = discountable_amount + order_couponable_discount_amount;
+                    $('#discount').attr('max', order_non_couponable_discount_amount + non_discountable_amount);
+                } else {
+                    coupon_discount = coupon_discount;
+                    $('#discount').attr('max', non_discountable_amount + order_non_couponable_discount_amount +
+                        order_couponable_discount_amount + discountable_amount - coupon_discount);
+                }
+            } else {
+                $('#discount').attr('max', total);
+
+            }
             $('#totalAmount').html('Rs. ' + total);
             calculateSetServiceChargeAndTax(discount);
 
@@ -614,8 +665,8 @@
         }
         //Template of table row
         function tableRowTemplate(id, name, price, quantity = '1') {
-            return '<tr id="item-' + id + '" data-id="' + id + '"><td>' + name +
-                '</td><td class="btn-group col-xs-2"><input type="number" id="item-quantity-' + id +
+            return '<tr id="item-' + id + '" data-id="' + id + '"><td width="200px">' + name +
+                '</td><td class="form-inline col-xs-2" width="250px"><input type="number" id="item-quantity-' + id +
                 '" class="form-control form-control-sm"  step="1" min="1" value="' +
                 quantity +
                 '"><button type="button" class="btn btn-outline-light update-quantity ml-2 btn-sm" rel="' + id +
@@ -636,6 +687,8 @@
                 success: function(data) {
                     if (data.status === 'success') {
                         cartTotal = parseFloat(data.total);
+                        discountable_amount = data.discountable_amount;
+                        non_discountable_amount = data.non_discountable_amount;
                         setTotal();
                     } else {
                         console.log(data.message);
@@ -677,7 +730,7 @@
         }
         //for applying discount
         $('#apply-discount').on('click', function(e) {
-            let discount = parseFloat($('#discount').val());
+            discount = parseFloat($('#discount').val());
             if (isNaN(discount)) {
                 discount = 0;
             }
@@ -691,6 +744,24 @@
             }
 
         });
+        //for applying packaging charge
+        $('#apply-charge').on('click', function(e) {
+            let delivery = parseFloat($('#delivery').val());
+            if (isNaN(delivery)) {
+                delivery = 0;
+            }
+            if ($('#delivery')[0].checkValidity()) {
+
+                $('#delivery_charge').val(delivery);
+
+                calculateSetServiceChargeAndTax(discount);
+
+            } else {
+
+                $("#delivery")[0].reportValidity();
+            }
+
+        });
         //for resseting applied discount
         function resetAppliedDiscount() {
             $('#discount').val(0);
@@ -698,7 +769,8 @@
         }
 
         function calculateSetServiceChargeAndTax(discount = 0) {
-            let deliveryCharge = (is_delivery) ? parseFloat(delivery_charge) : 0;
+            let deliveryCharge = (is_delivery) ? parseFloat($('#delivery_charge').val()) : 0;
+            discount=$('#discount-amount').val() ;
             let temp_total = total - coupon_discount - discount;
             if (temp_total + deliveryCharge >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
@@ -716,7 +788,6 @@
 
             } else {
                 alert('Discount cannot be greater than total');
-                $('#coupon_id').val("");
             }
         }
         $('#payment_type').change(function() {

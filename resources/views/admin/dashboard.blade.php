@@ -109,7 +109,6 @@
                             <thead>
                                 <th>Item Image</th>
                                 <th>Item Name</th>
-                                <th>Item Price</th>
                             </thead>
                             <tbody>
                                 @foreach ($topSoldItems as $cartItem)
@@ -118,21 +117,12 @@
                                                 class="img-size-50">
                                         </td>
                                         <td>{{ $cartItem->item->name }}</td>
-                                        <td>{{ $cartItem->item->price }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
-                        <tr>
-
-                        </tr>
-
-
-
                     </ul>
                 </div>
-
-
                 <div class="card-footer text-center">
                     <a href="{{ route('admin.items.index') }}" class="uppercase">View All Items</a>
                 </div>

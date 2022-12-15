@@ -28,6 +28,17 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
+                                <label class="label" for="coupon_discount_percentage">Coupon Discount Percentage</label>
+                                <input type="number" name="coupon_discount_percentage" value="{{ old('coupon_discount_percentage') ?: $category->coupon_discount_percentage }}"
+                                    class="form-control  @error('coupon_discount_percentage') is-invalid @enderror" min="0" max="100" step="0.01"
+                                    placeholder="Enter Discount Percentage" required autocomplete="off">
+                                @error('coupon_discount_percentage')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
                                 <label class="label" for="order">Category Order</label>
                                 <input type="number" min="0" step="1" name="order"
                                     value="{{ old('order') ?: $category->order }}"

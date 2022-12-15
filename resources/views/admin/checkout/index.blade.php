@@ -84,27 +84,34 @@
                                             <td id="tax-amount">Rs. {{ $order->taxAmount() }}</td>
                                         </tr>
                                     @endif
-                                    @if ($delivery_charge)
-                                        <tr>
-                                            <td colspan="3">Take Delivery Charge</td>
-                                            <td><select name="is_delivery" id="is_delivery"
-                                                    class="form-control form-control-sm  float-right">
-                                                    <option value="0">No</option>
-                                                    <option value="1">Yes</option>
-                                                </select>
-                                                @error('is_delivery')
-                                                    <span class=" text-danger" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </td>
+                                    <tr>
+                                        <td colspan="3">Packaging</td>
+                                        <td><select name="is_delivery" id="is_delivery"
+                                                class="form-control form-control-sm  float-right">
+                                                <option value="0" {{ $order->is_delivery == 0 ? 'selected' : '' }}>No
+                                                </option>
+                                                <option value="1" {{ $order->is_delivery == 1 ? 'selected' : '' }}>Yes
+                                                </option>
+                                            </select>
+                                            @error('is_delivery')
+                                                <span class=" text-danger" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </td>
 
-                                        </tr>
-                                        <tr id="delivery-charge" style="display:none">
-                                            <td colspan="3">Packaging Charge Amount:</td>
-                                            <td>Rs. {{ $delivery_charge }}</td>
-                                        </tr>
-                                    @endif
+                                    </tr>
+                                    <tr id="delivery-charge" style="{{ $order->is_delivery ? '' : 'display:none' }};">
+                                        <td colspan="3">Packaging Charge Amount:</td>
+                                        <td class="btn-group"><input id="delivery" min="0" step=".01"
+                                                class="form-control form-control-sm " value="{{ $delivery_charge }}"
+                                                type="number">
+                                            <input type="hidden" id="delivery_charge" value="{!! $delivery_charge !!}"
+                                                name="delivery_charge">
+                                            <button id="apply-charge" type="button"
+                                                class="btn btn-primary btn-sm ml-2">Apply</button>
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td colspan="3">Grand Total:</td>
                                         <td id="grand-total">Rs. {{ $order->totalWithTax() }}</td>
@@ -161,8 +168,11 @@
         let couponDictionary = {!! $couponsDictionary !!};
         let coupon_discount = 0;
         let delivery_charge = {!! $delivery_charge !!};
-        let is_delivery = 0;
+        let is_delivery = {!! $order->is_delivery !!};
         let discount = 0;
+        let order_non_couponable_discount_amount = {!! $order_non_couponable_discount_amount !!};
+        let order_couponable_discount_amount = {!! $order_couponable_discount_amount !!};
+        calculateSetServiceChargeAndTax();
         //For enabling paid amount
         let payment_type_id = $('#payment_type_id').val();
         if (payment_type_id == 3) {
@@ -188,18 +198,14 @@
             //For Delivery
             $('#is_delivery').on('change', function() {
                 let destination = $(this).val();
-                if (delivery_charge) {
-                    if (destination == 1) {
-                        is_delivery = 1;
-                        $('#delivery-charge').show();
-                    } else {
-                        $('#delivery-charge').hide();
-                        is_delivery = 0;
-                    }
-                    calculateSetServiceChargeAndTax(discount);
+                if (destination == 1) {
+                    is_delivery = 1;
+                    $('#delivery-charge').show();
+                } else {
+                    $('#delivery-charge').hide();
+                    is_delivery = 0;
                 }
-
-
+                calculateSetServiceChargeAndTax(discount);
             });
         });
 
@@ -210,15 +216,17 @@
             coupon_discount = 0;
             if ($(this).val()) {
                 coupon_discount = couponDictionary[$(this).val()];
-                if (coupon_discount >= total) {
-                    coupon_discount = 0;
-                    $('#coupon_id').val("");
-                    sweetAlert('Error', 'Coupon Amount Should Not Be Greater Than Total Amount', 'error');
-
-                    $('#discount').attr('max', 0);
+                if (coupon_discount >=  order_couponable_discount_amount) {
+                    coupon_discount =  order_couponable_discount_amount;
+                    $('#discount').attr('max', order_non_couponable_discount_amount);
                 } else {
-                    $('#discount').attr('max', total - coupon_discount);
+                    coupon_discount = coupon_discount;
+                    $('#discount').attr('max',
+                        order_non_couponable_discount_amount + order_couponable_discount_amount  - coupon_discount);
                 }
+            } else {
+                $('#discount').attr('max', total);
+
             }
             resetAppliedDiscount();
             calculateSetServiceChargeAndTax();
@@ -240,14 +248,34 @@
             calculateSetServiceChargeAndTax()
 
         }
+         //for applying packaging charge
+         $('#apply-charge').on('click', function(e) {
+            let delivery = parseFloat($('#delivery').val());
+            if (isNaN(delivery)) {
+                delivery = 0;
+            }
+            if ($('#delivery')[0].checkValidity()) {
+
+                $('#delivery_charge').val(delivery);
+
+                calculateSetServiceChargeAndTax(discount);
+
+            } else {
+
+                $("#delivery")[0].reportValidity();
+            }
+
+        });
         //for resseting applied discount
         function resetAppliedDiscount() {
             $('#discount').val(0);
             $('#discount-amount').val(0);
         }
+
         //Calculate
         function calculateSetServiceChargeAndTax(discount = 0) {
-            let deliveryCharge = (is_delivery) ? parseFloat(delivery_charge) : 0;
+            let deliveryCharge = (is_delivery) ? parseFloat($('#delivery_charge').val()) : 0;
+            discount=$('#discount-amount').val() ;
             let temp_total = total - coupon_discount - discount;
             if (temp_total + deliveryCharge >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
@@ -266,7 +294,6 @@
 
             } else {
                 alert('Discount cannot be greater than total');
-                $('#coupon_id').val("");
 
             }
         }
@@ -295,18 +322,16 @@
             let due = (grand_total - parseFloat($(this).val()));
             if (due) {
                 $('#due_amount').val(due.toFixed(2));
-            }else
-            {
+            } else {
                 $('#due_amount').val(grand_total);
 
             }
 
         });
-        $('#paid_amount').focusout(function(){
-            if($(this).val())
-            {
+        $('#paid_amount').focusout(function() {
+            if ($(this).val()) {
 
-            }else{
+            } else {
                 $(this).val(0);
             }
         });

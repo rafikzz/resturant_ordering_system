@@ -232,31 +232,31 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col" class="border-0 pl-0">{{ __('invoices::invoice.particulars') }}</th>
+                    <th scope="col" class=" pl-0">{{ __('invoices::invoice.particulars') }}</th>
                     @if ($invoice->hasItemUnits)
-                        <th scope="col" class="text-center border-0">{{ __('invoices::invoice.units') }}</th>
+                        <th scope="col" class="text-center ">{{ __('invoices::invoice.units') }}</th>
                     @endif
-                    <th scope="col" class="text-center border-0">{{ __('invoices::invoice.quantity') }}</th>
-                    <th scope="col" class="text-right border-0">{{ __('invoices::invoice.rate') }}</th>
+                    <th scope="col" class="text-center ">{{ __('invoices::invoice.quantity') }}</th>
+                    <th scope="col" class="text-right ">{{ __('invoices::invoice.rate') }}</th>
                     @if ($invoice->hasItemDiscount)
-                        <th scope="col" class="text-right border-0">{{ __('invoices::invoice.discount') }}</th>
+                        <th scope="col" class="text-right ">{{ __('invoices::invoice.discount') }}</th>
                     @endif
                     @if ($invoice->hasItemTax)
-                        <th scope="col" class="text-right border-0">{{ __('invoices::invoice.tax') }}</th>
+                        <th scope="col" class="text-right ">{{ __('invoices::invoice.tax') }}</th>
                     @endif
-                    <th scope="col" class="text-right border-0 pr-0">{{ __('invoices::invoice.amount') }}</th>
+                    <th scope="col" class="text-right  pr-0">{{ __('invoices::invoice.amount') }}</th>
                 </tr>
             </thead>
             <tbody>
                 {{-- Items --}}
                 @foreach ($invoice->items as $item)
                     <tr>
-                        <td class="pl-0">{{ $item->title }}</td>
-                        <td class="text-center pr-0 quantity">{{ $item->quantity }}</td>
-                        <td class="text-right pr-0 rate">
+                        <td class="pl-0 border-0" >{{ $item->title }}</td>
+                        <td class="text-center pr-0 quantity border-0">{{ $item->quantity }}</td>
+                        <td class="text-right pr-0 rate border-0">
                             {{ floatval($item->price_per_unit) }}
                         </td>
-                        <td class="text-right pr-0 price">
+                        <td class="text-right pr-0 price border-0">
                             {{ floatval($item->sub_total_price) }}
                         </td>
                     </tr>

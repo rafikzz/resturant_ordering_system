@@ -15,7 +15,7 @@ class OrdersByCustomerExport implements FromView,ShouldAutoSize
 
     public function view(): View
     {
-        $customers =Customer::with('orders_summary')->with('patient')->whereHas('patient')->orderBy('name','asc')->get();
+        $customers =Customer::with('orders_summary')->with('patient')->whereHas('patient')->where('status',1)->orderBy('name','asc')->get();
 
         // dd($customers);
         return view('admin.excel_export.customer_order_items', [

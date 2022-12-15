@@ -133,7 +133,7 @@
                                         <input type="checkbox" value="1" class="custom-control-input" name="delivery_charge_status"
                                         {{ (old('delivery_charge_status') ?: isset($setting)) ? $setting->delivery_charge_status?'checked':'' : '' }}
                                             id="delivery_charge_status">
-                                        <label class="custom-control-label" for="delivery_charge_status">Enable Delivery Charge</label>
+                                        <label class="custom-control-label" for="delivery_charge_status">Set Defualt Delivery Charge</label>
                                     </div>
                                 </div>
                             </div>

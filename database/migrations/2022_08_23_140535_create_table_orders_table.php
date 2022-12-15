@@ -33,6 +33,7 @@ class CreateTableOrdersTable extends Migration
             $table->decimal('net_total',10,2)->nullable();
             $table->boolean('is_delivery')->nullable()->default(0);
             $table->softDeletes();
+            $table->boolean('guest_menu')->nullable();
             $table->timestamps();
 
         });
