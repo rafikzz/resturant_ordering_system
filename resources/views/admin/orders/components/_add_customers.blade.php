@@ -21,8 +21,20 @@
         {{ old('new_or_old') == 'new' ? 'disabled' : '' }} required>
         <option value="">--Please Select Customer--</option>
         @foreach ($customers as $customer)
-            <option value="{{ $customer->id }}" {{ old('customer_id', $customer_id) == $customer->id ? 'selected' : '' }}  {{ $customer->id == 1 ? 'selected' : '' }}>
-                {{ $customer->name }}({{ $customer->phone_no }})
+            <option value="{{ $customer->id }}"
+                {{ old('customer_id', $customer_id) == $customer->id ? 'selected' : '' }}
+                {{ $customer->id == 1 ? 'selected' : '' }}>
+                @if (isset($customer->staff))
+                    {{ $customer->staff->department->code }} {{ $customer->name }}({{ $customer->phone_no }})
+                    Department: {{ $customer->staff->department->name }}
+                @elseif (isset($customer->patient))
+                    {{ $customer->name }}({{ $customer->phone_no }}) Register No:
+                    {{ $customer->patient->register_no }}
+                @else
+                    {{ $customer->name }}({{ $customer->phone_no }})
+                @endif
+
+
             </option>
         @endforeach
     </select>
@@ -34,7 +46,7 @@
 </div>
 <div id="new" class="col-12  py-3 form-group"
     style="display: {{ old('new_or_old') === 'new' ? 'block' : 'none' }};">
-    <div class="d-flex">
+    <div class="row d-flex">
         <div class="col-6">
             <label for="customer_name">Customer Name</label>
             <input class="form-control" name="customer_name" value="{{ old('customer_name') }}" type="text"
@@ -59,11 +71,44 @@
         </div>
 
     </div>
-    <div class="col-6" {{ $customer_type_id == 3 ? '' : 'style=display:none' }} id="patient-reg">
+    <div class="row d-flex staff-block" {{ $customer_type_id == 2 ? '' : 'style=display:none' }}>
+        <div class="col-md-6 staff-block" {{ $customer_type_id == 2 ? '' : 'style=display:none' }}>
+            <label for="department_id">Department</label>
+            <select name="department_id" id="department_id" class="form-control" required
+                {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} {{ $customer_type_id == 2 ? '' : 'disabled' }}>
+                <option value="">Choose Department</option>
+                @foreach ($departments as $department)
+                    <option value="{{ $department->id }}">
+                        {{ $department->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('department_id')
+                <span class=" text-danger" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+        <div class="col-6 staff-block" {{ $customer_type_id == 2 ? '' : 'style=display:none' }}>
+            <label for="customer_phone_no">Code No</label>
+            <input class="form-control" name="code" type="text" value="{{ old('code', $code_no) }}"
+                placeholder="Enter code" autocomplete="off" required
+                {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} {{ $customer_type_id == 2 ? '' : 'disabled' }}
+                id="code">
+            @error('code')
+                <span class=" text-danger" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+    </div>
+
+    <div class="row col-6" {{ $customer_type_id == 3 ? '' : 'style=display:none' }} id="patient-reg">
         <label for="customer_phone_no">Patient Registred No</label>
         <input class="form-control" name="patient_register_no" type="text" value="{{ old('patient_register_no') }}"
             placeholder="Enter Customer Phone No" autocomplete="off" required
-            {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} {{ $customer_type_id == 3 ? '' : 'disabled' }} id="patient_register_no">
+            {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} {{ $customer_type_id == 3 ? '' : 'disabled' }}
+            id="patient_register_no">
         @error('patient_register_no')
             <span class=" text-danger" role="alert">
                 <strong>{{ $message }}</strong>

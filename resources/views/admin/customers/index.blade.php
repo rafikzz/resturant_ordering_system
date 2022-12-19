@@ -19,7 +19,7 @@
                             <th>Id</th>
                             <th>Name</th>
                             <th>Phone No.</th>
-                            <th>Wallet Balance</th>
+                            <th>Order Total</th>
                             <th>Created At</th>
                             <th>Action</th>
                         </thead>
@@ -66,17 +66,9 @@
 
                     },
                     {
-                        data: 'last_transaction.current_amount',
-                        name: 'last_transaction.current_amount',
-                        render: function(data) {
-                            if (data) {
-                                return data;
-                            } else {
-                                return 0;
-                            }
-                        },
-
-
+                        data: 'orders_total',
+                        name: 'orders_total',
+                        searchable: false
                     },
                     {
                         data: 'created_at',

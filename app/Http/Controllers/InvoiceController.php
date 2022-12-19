@@ -40,7 +40,8 @@ class InvoiceController extends Controller
             'name'          => $order->customer->name,
             'phone'          => $order->customer->phone_no
         ]);
-
+        $setting=Setting::first();
+        $prefix =isset($setting)?$setting->bill_no_prefix:'B';
         $serviceCharge =$order->service_charge?:0.00;
         $deliveryCharge =$order->delivery_charge?:0.00;
 
@@ -50,7 +51,7 @@ class InvoiceController extends Controller
         $invoice = Bill::make('receipt')
             ->filename('Order_' . $order->bill_no)
             ->sequence($order->bill_no)
-            ->series('B')
+            ->series( $prefix )
             ->seller($seller)
             ->buyer($customer)
             ->time($time)

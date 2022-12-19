@@ -12,9 +12,8 @@
                         <thead>
                             <th>Id</th>
                             <th>Bill No</th>
-                            <th>Table No</th>
                             <th>Discount</th>
-                            <th>Total</th>
+                            <th>Net Total</th>
                             <th>Created At</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -41,7 +40,7 @@
                 processing: true,
                 serverSide: true,
                 order: [
-                    [5, 'desc']
+                    [4, 'desc']
                 ],
                 ajax: {
                     url: "{{ route('admin.orders.getData') }}",
@@ -60,17 +59,15 @@
                         name: 'bill_no'
                     },
                     {
-                        data: 'table_no',
-                        name: 'table_no',
-                    },
-                    {
                         data: 'discount',
                         name: 'discount'
                     },
                     {
-                        data: 'total',
-                        name: 'total'
+                        data: 'net_total',
+                        name: 'net_total',
+
                     },
+
                     {
                         data: 'created_at',
                         name: 'created_at',
@@ -130,32 +127,36 @@
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .total, item.price));
+                                    .total_quantity, parseFloat(item.average_price)));
                             });
-                            if (data.order.discount && data.order.discount !=0 ) {
+                            $('#table-items').append(
+                                "<tr><td colspan='3'>Total</td><td>" +
+                                foramtValue(data.order.total) + "</td></tr>");
+                            if (data.order.discount && data.order.discount != 0 || data.order.status_id ==3) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Discount</td><td>" +
                                     foramtValue(data.order.discount) + "</td></tr>");
                             }
-                            if (data.order.service_charge) {
+
+                            if (data.order.service_charge && data.order.service_charge != 0 ) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Service Charge</td><td>" +
                                     foramtValue(data.order.service_charge) + "</td></tr>");
                             }
-                            if (data.order.tax) {
+                            if (data.order.tax && data.order.tax != 0) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Tax</td><td>" +
                                     foramtValue(data.order.tax) + "</td></tr>");
                             }
-
+                            if (data.order.delivery_charge && data.order.delivery_charge != 0) {
+                                $('#table-items').append(
+                                    "<tr><td colspan='3'>Packaging Charge</td><td>" +
+                                    foramtValue(data.order.delivery_charge) + "</td></tr>");
+                            }
                             if (data.order.net_total) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Net Total</td><td>" +
                                     foramtValue(data.order.net_total) + "</td></tr>");
-                            }else{
-                                $('#table-items').append(
-                                    "<tr><td colspan='3'>Total</td><td>" +
-                                    foramtValue(data.order.total) + "</td></tr>");
                             }
 
                         } else {

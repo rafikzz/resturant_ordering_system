@@ -18,6 +18,8 @@
                         <thead>
                             <th>Id</th>
                             <th>Name</th>
+                            <th>Code</th>
+                            <th>Department</th>
                             <th>Phone No.</th>
                             <th>Wallet Balance</th>
                             <th>Status</th>
@@ -62,6 +64,21 @@
                         name: 'name'
                     },
                     {
+                        data: 'staff.code',
+                        name: 'staff.code'
+                    },
+                    {
+                        data: 'staff.department.name',
+                        name: 'staff.department.name',
+                        render: function(data) {
+                            if (data) {
+                                return '<i class="badge badge-success" >' + data + '</i>';
+                            } else {
+                                return 'N/a';
+                            }
+                        }
+                    },
+                    {
                         data: 'phone_no',
                         name: 'phone_no',
 
@@ -69,10 +86,10 @@
                     {
                         data: 'balance',
                         name: 'balance',
-                        render:function(balance) {
-                            if( balance < 0) {
-                                return -balance +'(due)';
-                            }else  {
+                        render: function(balance) {
+                            if (balance < 0) {
+                                return -balance + '(due)';
+                            } else {
                                 return balance;
                             }
                         }
@@ -121,8 +138,8 @@
                     }
                 });
             });
-              //for changing status
-              $(document).on('click', '.changeStatus', function(e) {
+            //for changing status
+            $(document).on('click', '.changeStatus', function(e) {
                 e.preventDefault();
                 let btn = $(this).closest('[type=checkbox]');
                 Swal.fire({

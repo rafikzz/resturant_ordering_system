@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CustomerStatementController;
 use App\Http\Controllers\Admin\CustomerWalletTransactionController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\ItemSalesReportController;
 use App\Http\Controllers\Admin\KOTController;
@@ -116,8 +117,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('edit-cart-item-quantity', [CartController::class, 'editCartItemQuantity'])->name('cart.editCartItemQuantity');
 
     //Customer Controller
-    // Route::resource('customers', CustomerController::class);
-    // Route::get('get-customer-data', [CustomerController::class, 'getData'])->name('customer.getData');
+    Route::resource('customers', CustomerController::class);
+    Route::get('get-customer-data', [CustomerController::class, 'getData'])->name('customer.getData');
     Route::get('get-order-type-data', [CustomerController::class, 'getType'])->name('customer.getType');
 
 
@@ -141,6 +142,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::get('get-patient-order-item-data', [PatientController::class, 'getOrderItemData'])->name('patient.getOrderItemData');
 
     Route::get('get-patient-data', [PatientController::class, 'getData'])->name('patient.getData');
+
+    //Department Controller
+    Route::resource('departments',DepartmentController::class);
 
     //Customer Wallet Transacton
     // Route::get('customers/{customer}/wallet-transaction', [CustomerWalletTransactionController::class, 'index'])->name('customers.wallet_transactions.index');

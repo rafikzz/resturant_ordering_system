@@ -58,6 +58,10 @@ class CreateRolePermissionSeeder extends Seeder
             'coupon_create',
             'coupon_edit',
             'coupon_delete',
+            'department_list',
+            'department_create',
+            'department_edit',
+            'department_delete',
          ];
 
          foreach ($permissions as $permission) {

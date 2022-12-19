@@ -5,10 +5,10 @@
         <div class="col">
             <div class="card card-outline card-dark">
                 <div class="card-header">
-                    <h2 class="card-title">Coupon List</h2>
+                    <h2 class="card-title">Department List</h2>
                     <div class="card-tools form-inline">
                         @can('coupon_create')
-                            <a class="btn btn-success ml-3" href="{{ route('admin.coupons.create') }}"> <i
+                            <a class="btn btn-success ml-3" href="{{ route('admin.departments.create') }}"> <i
                                     class="fa fa-plus"></i></a>
                         @endcan
                     </div>
@@ -17,31 +17,29 @@
                     <table class="table table-bordered" width="100%" id="table">
                         <thead>
                             <th>Id</th>
-                            <th>Title</th>
-                            <th>Discount Amount</th>
-                            <th>Expiry Date</th>
+                            <th>Name</th>
                             <th>Created At</th>
                             <th>Action</th>
                         </thead>
                         <tbody id="tablecontents">
-                            @foreach ($coupons as $coupon)
+                            @foreach ($departments as $department)
                                 <tr>
-                                    <td>{{ $coupon->id }}</td>
-                                    <td>{{ $coupon->title }}</td>
-                                    <td>{{ $coupon->discount }}</td>
-                                    <td>{{ $coupon->expiry_date }}</td>
-                                    <td>{{ $coupon->created_at->diffForHumans() }}</td>
+                                    <td>{{ $department->id }}</td>
+                                    <td>{{ $department->name }}</td>
+                                    <td>{{ $department->created_at->diffForHumans() }}</td>
                                     <td class="form-inline">
-                                        <form action="{{ route('admin.coupons.destroy', $coupon->id) }}" method="post">
+                                        <form action="{{ route('admin.departments.destroy', $department->id) }}" method="post">
                                             @csrf
-                                            @method('delete')
-                                            @can('coupon_edit')
-                                                <a href="{{ route('admin.coupons.edit', $coupon->id) }}"
+                                            @method('DELETE')
+                                            @can('department_delete')
+                                                <a href="{{ route('admin.departments.edit', $department->id) }}"
                                                     class="btn btn-warning btn-xs">
                                                     <i class="fa fa-pencil-alt"></i>
                                                 </a>
                                             @endcan
-                                            {{-- <button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button> --}}
+                                            @can('department_delete')
+                                                <button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>
+                                            @endcan
                                         </form>
                                     </td>
                                 </tr>
@@ -66,7 +64,7 @@
             let form = $(this);
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Do you want to  delete coupons?",
+                text: "Do you want to  delete department?",
                 icon: 'danger',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',

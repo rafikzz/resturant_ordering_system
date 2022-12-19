@@ -22,11 +22,33 @@
                     $('#oldCustomer').find('option').not(':first').remove();
                     data.customers.forEach(function(customer) {
                         let register_no = '';
+                        let code = '';
+                        let department = '';
+                        let text = '';
+
+
                         if (customer.patient) {
                             register_no = " Register No:" + customer.patient.register_no;
+                            text = code + ' ' + customer.name + '(' + customer.phone_no +
+                                ')' + register_no;
                         }
-                        let text = customer.name + '(' + customer.phone_no +
-                            ')' + register_no;
+                        if (customer.staff) {
+                            code = customer.staff.code;
+                            if (customer.staff) {
+                                code = customer.staff.code;
+                                if (customer.staff.department) {
+                                    department = ' Department: ' + customer.staff.department
+                                        .name;
+
+                                }
+                                text = code + ' ' + customer.name + '(' + customer
+                                    .phone_no +
+                                    ') ' + department;
+                            }
+
+
+                        }
+
                         let newOption = new Option(text, customer.id, true,
                             true);
                         $('#oldCustomer').append(newOption);
@@ -76,9 +98,21 @@
             if ($('#customer_type').val() == 3) {
                 $('#patient-reg').css('display', 'block');
                 $('#patient_register_no').prop('disabled', false);
+                $('.staff-block').css('display', 'none');
+                $('#code').prop('disabled', true);
+                $('#department_id').prop('disabled', true);
+            } else if ($('#customer_type').val() == 2) {
+                $('#patient-reg').css('display', 'none');
+                $('#patient_register_no').prop('disabled', true);
+                $('.staff-block').css('display', 'block');
+                $('#code').prop('disabled', false);
+                $('#department_id').prop('disabled', false);
             } else {
                 $('#patient-reg').css('display', 'none');
                 $('#patient_register_no').prop('disabled', true);
+                $('.staff-block').css('display', 'none');
+                $('#code').prop('disabled', true);
+                $('#department_id').prop('disabled', true);
             }
         }
 

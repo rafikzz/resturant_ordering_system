@@ -47,6 +47,9 @@ class SettingController extends Controller
         if (isset($request->office_location)) {
             $setting->office_location = $request->office_location;
         }
+        if ($request->has('bill_no_prefix') ){
+            $setting->bill_no_prefix = $request->bill_no_prefix;
+        }
         if (isset($request->tax)) {
             $setting->tax = $request->tax;
         }

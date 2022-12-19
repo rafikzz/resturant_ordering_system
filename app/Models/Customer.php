@@ -127,4 +127,14 @@ class Customer extends Model
     {
         return $this->hasMany(Order::class, 'customer_id')->whereNotNull('coupon_id');
     }
+
+    /**
+     * Get the staff associated with the Customer
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function staff()
+    {
+        return $this->hasOne(Staff::class);
+    }
 }

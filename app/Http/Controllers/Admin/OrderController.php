@@ -10,10 +10,12 @@ use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\CustomerType;
 use App\Models\CustomerWalletTransaction;
+use App\Models\Department;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Setting;
+use App\Models\Staff;
 use App\Models\Status;
 use Carbon\Carbon;
 use Cart;
@@ -61,14 +63,16 @@ class OrderController extends Controller
 
             $default_customer_type_id = $default_customer_type ? $default_customer_type->id : null;
         }
-        $customers = Customer::where('customer_type_id', $default_customer_type_id)->where('status', 1)->orderBy('name')->get();
+        $customers = Customer::where('customer_type_id', $default_customer_type_id)->with('patient')->with('staff')->where('status', 1)->orderBy('name')->get();
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
         $delivery_charge = isset($setting) ? $setting->getDeliveryCharge() : 0;
         $guest_menu = 1;
+        $departments = Department::orderBy('name')->get();
+        $code_no = $this->getCodeNo();
 
-        return view('admin.orders.create', compact('title', 'categories', 'guest_menu', 'delivery_charge', 'customer_types', 'coupons', 'couponsDictionary', 'default_customer_type_id', 'customers', 'tax', 'service_charge', 'breadcrumbs'));
+        return view('admin.orders.create', compact('title', 'categories', 'guest_menu', 'code_no','delivery_charge', 'customer_types', 'coupons', 'couponsDictionary', 'default_customer_type_id', 'customers', 'tax', 'service_charge', 'breadcrumbs', 'departments'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -103,6 +107,13 @@ class OrderController extends Controller
                 if ($request->patient_register_no) {
                     $customer->patient()->create([
                         'register_no' => $request->patient_register_no
+                    ]);
+                }
+                if ($request->code) {
+                    Staff::create([
+                        'customer_id' => $customer->id,
+                        'department_id' => $request->department_id,
+                        'code' => $request->code,
                     ]);
                 }
             }
@@ -158,6 +169,7 @@ class OrderController extends Controller
                 'is_delivery' =>  $request->is_delivery,
                 'delivery_charge' => $request->checkout ? $delivery_charge_amount : null,
                 'guest_menu' => $request->guest_menu ?: 0,
+                'note'      => $request->note
 
             ]);
 
@@ -178,7 +190,7 @@ class OrderController extends Controller
         DB::commit();
         Cart::clear();
 
-        return redirect()->route('admin.orders.index')->with('success', 'Order Created Successfully');
+        return redirect()->route('admin.orders.create')->with('success', 'Order Created Successfully');
     }
 
     public function edit($id)
@@ -187,13 +199,15 @@ class OrderController extends Controller
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'Edit' => '#'];
         $processingStatus = Status::where('title', 'processing')->first()->id;
         Cart::clear();
+        $departments = Department::orderBy('name')->get();
+        $code_no = $this->getCodeNo();
 
 
         $breadcrumbs = ['Order' => route('admin.orders.index'), 'AddItem' => '#'];
         $processingStatus = Status::where('title', 'processing')->first()->id;
         $order = Order::where('status_id', $processingStatus)->with('customer')->findOrFail($id);
 
-        $customer = Customer::where('id', $order->customer_id)->first();
+        $customer = Customer::where('id', $order->customer_id)->with('patient')->with('staff')->first();
 
         $coupons = Coupon::select('id', 'title', 'discount')->where('expiry_date', '>=', Carbon::today())->get();
         $couponsDictionary = $coupons->pluck('discount', 'id');
@@ -207,7 +221,7 @@ class OrderController extends Controller
             $default_customer_type = CustomerType::where('id', $order->customer->customer_type_id)->first();
             $default_customer_type_id = $default_customer_type ? $default_customer_type->id : null;
         }
-        $customers = Customer::where('customer_type_id', $default_customer_type_id)->where('status', 1)->orderBy('name')->get();
+        $customers = Customer::where('customer_type_id', $default_customer_type_id)->with('patient')->with('staff')->where('status', 1)->orderBy('name')->get();
 
 
         $setting = Setting::first();
@@ -228,6 +242,7 @@ class OrderController extends Controller
             'orderItems',
             'setting',
             'tax',
+            'departments',
             'service_charge',
             'delivery_charge',
             'order',
@@ -235,6 +250,7 @@ class OrderController extends Controller
             'customer_types',
             'coupons',
             'couponsDictionary',
+            'code_no',
             'categories',
             'customers',
             'breadcrumbs'
@@ -267,19 +283,22 @@ class OrderController extends Controller
             $default_customer_type = CustomerType::where('id', $order->customer->customer_type_id)->first();
             $default_customer_type_id = $default_customer_type ? $default_customer_type->id : null;
         }
-        $customers = Customer::where('customer_type_id', $default_customer_type_id)->where('status', 1)->orderBy('name')->get();
+        $customers = Customer::where('customer_type_id', $default_customer_type_id)->with('patient')->with('staff')->where('status', 1)->orderBy('name')->get();
 
 
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
-        $delivery_charge =$order->delivery_charge;
+        $delivery_charge = $order->delivery_charge;
 
 
         $order_items = OrderItem::where('order_id', $order->id)->with('item.category')->where('total', '>', 0)->get();
         $order_couponable_discount_amount = $this->getCouponableDiscountAmount($order_items);
         $order_non_couponable_discount_amount = $order->total - $order_couponable_discount_amount;
         $orderItems = $order_items->groupBy('order_no');
+        $departments = Department::orderBy('name')->get();
+        $code_no = $this->getCodeNo();
+
 
         return view('admin.orders.edit_checkout', compact(
             'order_couponable_discount_amount',
@@ -297,10 +316,13 @@ class OrderController extends Controller
             'couponsDictionary',
             'categories',
             'customers',
-            'breadcrumbs'
+            'departments',
+            'breadcrumbs',
+            'code_no'
+
         ));
     }
-    public function update_checkout(UpdateOrderRequest $request,$id)
+    public function update_checkout(UpdateOrderRequest $request, $id)
     {
         $completedStatus = Status::where('title', 'Completed')->first()->id;
 
@@ -337,7 +359,15 @@ class OrderController extends Controller
                         'register_no' => $request->patient_register_no
                     ]);
                 }
+                if ($request->code) {
+                    Staff::create([
+                        'customer_id' => $customer->id,
+                        'department_id' => $request->department_id,
+                        'code' => $request->code,
+                    ]);
+                }
             }
+
 
             $cartItems = Cart::getContent();
             $this->storeOrderItem($order, $cartItems);
@@ -385,7 +415,8 @@ class OrderController extends Controller
                 'coupon_id' =>  $request->checkout ? $request->coupon_id : null,
                 'is_delivery' =>  $request->is_delivery,
                 'delivery_charge' => $request->checkout ? $delivery_charge_amount : null,
-                'is_credit' => $request->checkout ? $request->payment_type : null
+                'is_credit' => $request->checkout ? $request->payment_type : null,
+                'note'      => $request->note
 
 
             ]);
@@ -446,6 +477,13 @@ class OrderController extends Controller
                         'register_no' => $request->patient_register_no
                     ]);
                 }
+                if ($request->code) {
+                    Staff::create([
+                        'customer_id' => $customerId,
+                        'department_id' => $request->department_id,
+                        'code' => $request->code,
+                    ]);
+                }
             }
 
             $cartItems = Cart::getContent();
@@ -496,7 +534,8 @@ class OrderController extends Controller
                 'coupon_id' =>  $request->checkout ? $request->coupon_id : null,
                 'is_delivery' =>  $request->is_delivery,
                 'delivery_charge' => $request->checkout ? $delivery_charge_amount : null,
-                'is_credit' => $request->checkout ? $request->payment_type : null
+                'is_credit' => $request->checkout ? $request->payment_type : null,
+                'note'      => $request->note
 
 
             ]);
@@ -631,7 +670,9 @@ class OrderController extends Controller
                 'is_delivery' =>  $request->is_delivery,
                 'delivery_charge' => $request->checkout ? $delivery_charge_amount : null,
                 'is_delivery' =>  $request->is_delivery,
-                'is_credit' => $request->checkout ? $request->payment_type : null
+                'is_credit' => $request->checkout ? $request->payment_type : null,
+                'note'      => $request->note
+
             ]);
             if ($customer->customer_type_id != 1  && $request->payment_type == 1 && $request->checkout == 1) {
                 $dueAmount = round(($grand_total - $request->paid_amount), 2);
@@ -686,7 +727,7 @@ class OrderController extends Controller
             $canDelete = auth()->user()->can('order_delete');
             $canAdd = auth()->user()->can('order_add');
             $canCreate = auth()->user()->can('order_create');
-            $editCheckout=auth()->user()->can('checkout_edit');
+            $editCheckout = auth()->user()->can('checkout_edit');
             $completedStatus = Status::where('title', 'Completed')->first()->id;
 
             return DataTables::of($data)
@@ -704,7 +745,7 @@ class OrderController extends Controller
                 })
                 ->addColumn(
                     'action',
-                    function ($row, Request $request) use ($processingStatus,$completedStatus, $canEdit, $canDelete, $canAdd, $canCreate, $editCheckout) {
+                    function ($row, Request $request) use ($processingStatus, $completedStatus, $canEdit, $canDelete, $canAdd, $canCreate, $editCheckout) {
                         if ($row->status_id == $processingStatus && $request->mode !== 'history') {
                             if ($canEdit || $canDelete) {
                                 $checkoutBtn = $canCreate ? '<a href="' . route('admin.orders.checkout', $row->id) . '"  class="btn bg-orange btn-xs"
@@ -725,13 +766,13 @@ class OrderController extends Controller
 
                                 return $btn;
                             }
-                        } else if($row->status_id == $completedStatus && $request->mode !== 'history') {
+                        } else if ($row->status_id == $completedStatus && $request->mode !== 'history') {
                             if (auth()->user()->can('order_list')) {
                                 $editBtn =  $editCheckout ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.editCheckout', $row->id) . '"><i class="fa fa-edit"></i></a>' : '';
                                 $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
-                                return  $detail.' '. $editBtn;
+                                return  $detail . ' ' . $editBtn;
                             }
-                        }else{
+                        } else {
                             if (auth()->user()->can('order_list')) {
                                 $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
                                 return   $detail;
@@ -832,7 +873,8 @@ class OrderController extends Controller
             $orderNo = 1;
         }
 
-        return $orderNo;
+        $order_no =  $prefix.''.str_pad($orderNo, 5, 0, STR_PAD_LEFT);
+        return $order_no;
     }
 
     public function getCartDiscoutableAmount()
@@ -843,5 +885,18 @@ class OrderController extends Controller
             $discountable_amount += $item->quantity * $item->attributes->coupon_discount_percentage * $item->price / 100;
         }
         return $discountable_amount;
+    }
+
+    public function getCodeNo()
+    {
+        $latestStaff = Staff::select('id')->orderBy('created_at', 'desc')->first();
+
+        if ($latestStaff instanceof  Staff) {
+            $codeNo = $latestStaff->id + 1;
+        } else {
+            $codeNo = 1;
+        }
+        $code_no = str_pad($codeNo, 4, 0, STR_PAD_LEFT);
+        return $code_no;
     }
 }

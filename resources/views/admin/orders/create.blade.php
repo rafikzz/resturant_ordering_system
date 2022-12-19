@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                             @component('admin.orders.components._add_customers',
-                                ['customers' => $customers, 'customer_type_id' => $default_customer_type_id, 'customer_id' => null])
+                                ['customers' => $customers, 'customer_type_id' => $default_customer_type_id,'departments'=>$departments,'code_no'=>$code_no ,'customer_id' => null])
                             @endcomponent
 
                             <div class="col-md-6">
@@ -249,6 +249,13 @@
                                 </tbody>
 
                             </table>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="note">Note</label>
+                                    <textarea class="form-control" name="note" id="note" rows="3"></textarea>
+                                </div>
+                            </div>
+
                         </div>
                         <hr />
                         <div class="row text-center">
@@ -611,9 +618,9 @@
 
         function calculateSetServiceChargeAndTax(discount = 0) {
             let deliveryCharge = (is_delivery) ? parseFloat($('#delivery_charge').val()) : 0;
-            discount=$('#discount-amount').val() ;
+            discount = $('#discount-amount').val();
             console.log(discount);
-            let temp_total = non_discountable_amount + discountable_amount - coupon_discount -discount;
+            let temp_total = non_discountable_amount + discountable_amount - coupon_discount - discount;
             if (temp_total >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
                 let tax_amount = parseFloat(((parseFloat(temp_total) + parseFloat(service_charge_amount)) * (tax / 100))

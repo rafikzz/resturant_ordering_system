@@ -66,9 +66,9 @@
                                         <th>Operation Amount</th>
                                         <th>Current Balance</th>
                                         <th>Transaction Type</th>
+                                        <th>Operation Type</th>
                                         <th>Author</th>
                                         <th>Created At</th>
-                                        <th>Action</th>
                                     </thead>
                                     <tbody>
 

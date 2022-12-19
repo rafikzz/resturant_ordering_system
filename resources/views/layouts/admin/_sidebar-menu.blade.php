@@ -52,7 +52,7 @@
 @canany('order_list')
     <li class="nav-item has-treeview {{ Request::is('admin/orders*') ? 'menu-open' : '' }}   ">
         <a href="#" class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }} ">
-            <i class="nav-icon fas fa-list-ol"></i>
+            <i class="nav-icon fas fa-clipboard"></i>
             <p>
                 Orders Management
                 <i class="right fas fa-angle-left"></i>
@@ -63,7 +63,7 @@
                 <li class="nav-item">
                     <a href="{{ route('admin.orders.index') }}"
                         class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }}">
-                        <i class="nav-icon fa-fw nav-icon fas fa-bars"></i>
+                        <i class="nav-icon fa-fw nav-icon fas fa-clipboard"></i>
                         <p>Orders</p>
                     </a>
                 </li>
@@ -82,16 +82,25 @@
 @endcan
 @canany('patient_list', 'staff_list')
     <li
-        class="nav-item has-treeview {{ Request::is('admin/staffs*') ? 'menu-open' : '' }} {{ Request::is('admin/patients*') ? 'menu-open' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'menu-open' : '' }}   ">
+        class="nav-item has-treeview {{ Request::is('admin/staffs*') ? 'menu-open' : '' }} {{ Request::is('admin/patients*') ? 'menu-open' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'menu-open' : '' }}   {{ Request::is('admin/customers*') ? 'menu-open' : '' }} ">
         <a href="#"
-            class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}  {{ Request::is('admin/patients*') ? 'active' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'active' : '' }} ">
-            <i class="nav-icon fas fa-users"></i>
+            class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}  {{ Request::is('admin/patients*') ? 'active' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'active' : '' }}  {{ Request::is('admin/customers*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-hospital"></i>
             <p>
-                Patient and Staff
+                Customer and Staff
                 <i class="right fas fa-angle-left"></i>
             </p>
         </a>
         <ul class="nav nav-treeview ">
+            @can('customer_list')
+                <li class="nav-item ">
+                    <a href="{{ url('/admin/customers') }}"
+                        class="nav-link {{ Request::is('admin/customers*') ? 'active' : '' }}">
+                        <i class="nav-icon fa-fw nav-icon fa fa-user"></i>
+                        <p>Walking Customer</p>
+                    </a>
+                </li>
+            @endcan
             @can('patient_list')
                 <li class="nav-item ">
                     <a href="{{ url('/admin/patients') }}"
@@ -169,6 +178,15 @@
         <a href="{{ url('/admin/coupons') }}" class="nav-link {{ Request::is('admin/coupons*') ? 'active' : '' }}">
             <i class="nav-icon fa-fw nav-icon fa fa-ticket-alt"></i>
             <p>Coupons</p>
+        </a>
+    </li>
+@endcan
+@can('coupon_list')
+    <li class="nav-item ">
+        <a href="{{ url('/admin/departments') }}"
+            class="nav-link {{ Request::is('admin/departments*') ? 'active' : '' }}">
+            <i class="nav-icon fa-fw nav-icon fa fa-building"></i>
+            <p>Departments</p>
         </a>
     </li>
 @endcan

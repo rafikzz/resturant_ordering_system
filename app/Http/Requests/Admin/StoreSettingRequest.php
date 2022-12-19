@@ -27,6 +27,7 @@ class StoreSettingRequest extends FormRequest
             'company_name'=>'required|min:3',
             'contact_information'=>'required|min:3',
             'office_location'=>'required|min:3',
+            'bill_no_prefix'=>'max:6',
             'logo'=>'mimes:jpg,jpeg,png,bmp,tiff|image|max:4096',
             'tax'=>'required_with:tax_status|numeric|max:100|min:0',
             'service_charge'=>'required_with:service_charge_status|numeric|max:100|min:0',

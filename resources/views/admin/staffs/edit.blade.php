@@ -37,6 +37,33 @@
                                     </span>
                                 @enderror
                             </div>
+                            <div class="form-group col-md-6">
+                                <label for="department_id"> Department</label>
+                                <select class="form-control" name="department_id" required>
+                                    <option selected value="" disabled>--Select Department--</option>
+                                    @foreach ($departments as $department)
+                                        <option value="{{ $department->id }}"
+                                            {{ $department->id == $customer->staff->department_id ? 'selected' : '' }}>
+                                            {{ $department->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('department_id')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="label" for="code">Code No</label>
+                                <input type="text" name="code" value="{{ old('code',$code_no) }}"
+                                    class="form-control  @error('code') is-invalid @enderror" autocomplete="off"
+                                    placeholder="Enter Staff Code No" required>
+                                @error('code')
+                                    <span class=" text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="col-md-12 text-center">

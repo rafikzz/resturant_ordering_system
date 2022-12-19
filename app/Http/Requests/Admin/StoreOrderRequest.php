@@ -23,24 +23,26 @@ class StoreOrderRequest extends FormRequest
      */
     public function rules()
     {
-        $rules=   [
-            'destination'=>'nullable',
-            'destination_no'=>'nullable',
-            'customer_id'=>'required_without:customer_name',
-            'customer_type'=>'required',
-            'customer_name'=>'required_without:customer_id',
-            'customer_phone_no'=>['required_without:customer_id'],
+        $rules =   [
+            'destination' => 'nullable',
+            'destination_no' => 'nullable',
+            'customer_id' => 'required_without:customer_name',
+            'customer_type' => 'required',
+            'customer_name' => 'required_without:customer_id',
+            'customer_phone_no' => ['required_without:customer_id'],
             'patient_register_no' => '',
-            'discount'=>'nullable',
-            'payment_type'=>'required',
+            'discount' => 'nullable',
+            'payment_type' => 'required',
 
 
-         ];
-         if(request('customer_type') ==3)
-         {
-            $rules['patient_register_no']='required_without:customer_id|unique:table_patients,register_no';
+        ];
+        if (request('customer_type') == 3) {
+            $rules['patient_register_no'] = 'required_without:customer_id|unique:table_patients,register_no';
+        } else if (request('customer_type') == 2) {
+            $rules['code'] = 'required_without:customer_id|unique:table_staffs,code';
+            $rules['department_id'] = 'required_without:customer_id';
+        }
 
-         }
         return $rules;
     }
 }

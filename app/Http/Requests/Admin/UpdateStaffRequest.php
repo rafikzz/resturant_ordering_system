@@ -13,7 +13,7 @@ class UpdateStaffRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -26,6 +26,8 @@ class UpdateStaffRequest extends FormRequest
         return [
             'name'=>'required',
             'phone_no'=>['required'],
+            'code'=>'required|unique:table_staffs,code,'.$this->id . ',customer_id',
+            'department_id'=>'nullable',
         ];
     }
 }

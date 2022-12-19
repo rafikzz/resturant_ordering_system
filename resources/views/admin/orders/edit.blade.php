@@ -104,6 +104,9 @@
                                     'customers' => $customers,
                                     'customer_type_id' => $order->customer->customer_type_id,
                                     'customer_id' => $order->customer_id,
+                                    'departments'=>$departments,
+                                    'code_no'=>$code_no
+
                                 ])
                             @endcomponent
                             <div class="col-md-6">
@@ -293,6 +296,12 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="note">Note</label>
+                                    <textarea class="form-control" name="note" id="note" rows="3">{{ $order->note }}</textarea>
+                                </div>
+                            </div>
                         </div>
                         <div class="row text-center">
                             <div class="col-12 ">

@@ -31,6 +31,7 @@ class CreateTableOrdersTable extends Migration
             $table->decimal('service_charge',10,2)->nullable();
             $table->decimal('delivery_charge',10,2)->nullable();
             $table->decimal('net_total',10,2)->nullable();
+            $table->text('note')->nullable();
             $table->boolean('is_delivery')->nullable()->default(0);
             $table->softDeletes();
             $table->boolean('guest_menu')->nullable();

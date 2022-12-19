@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreStaffRequest extends FormRequest
+class UpdateDepartmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,7 @@ class StoreStaffRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>'required',
-            'phone_no'=>'required',
-            'code'=>'required|unique:table_staffs,code,',
-            'department_id'=>'nullable',
+            'name'=>'required|min:3|unique:table_departments,name'.$this->department->id,
         ];
     }
 }

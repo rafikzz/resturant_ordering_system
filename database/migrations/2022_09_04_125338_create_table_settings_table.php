@@ -19,6 +19,7 @@ class CreateTableSettingsTable extends Migration
             $table->string('logo')->nullable();
             $table->text('contact_information')->nullable();
             $table->text('office_location')->nullable();
+            $table->string('bill_no_prefix')->nullable();
             $table->decimal('tax',10,2)->nullable()->default(0);
             $table->decimal('service_charge',10,2)->nullable()->default(0);
             $table->boolean('tax_status')->nullable()->default(0);
