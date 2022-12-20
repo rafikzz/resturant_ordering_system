@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Customer;
 use App\Models\Order;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -15,24 +16,39 @@ use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithPreCalculateFormulas;
 
 
-class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyles,WithPreCalculateFormulas,WithColumnWidths
+class OrdersExport implements FromCollection, withMapping, WithHeadings, WithStyles, WithPreCalculateFormulas, WithColumnWidths
 {
     // use Exportable;
     private $count;
 
-    public function __construct($startDate,$endDate)
+    public function __construct($startDate, $endDate, $customer_id)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
-
+        $this->customer_id = $customer_id;
+        $this->customer = null;
+        $this->title = 'Sales Report From ' . $this->startDate . ' To ' . $this->endDate;
+        if ($this->customer_id) {
+            $this->customer = Customer::with('customer_type')->with('staff')->with('patient')->find($this->customer_id);
+            $this->name = 'Name:' . $this->customer->name;
+            $this->customer_type_name = 'Type:' . $this->customer->customer_type->name;
+            $this->extra = '';
+            if ($this->customer->customer_type_id == 2) {
+                $this->extra = ($this->customer->staff->department) ? 'Department:' . $this->customer->staff->department->name : 'N/A';
+            }
+            if ($this->customer->customer_type_id == 3) {
+                $this->extra = ($this->customer->patient) ? 'Register No:' . $this->customer->staff->department->name : 'N/A';
+            }
+        }
     }
 
     public function collection()
     {
-        $date=['start'=>$this->startDate,'end'=>$this->endDate];
+        $date = ['start' => $this->startDate, 'end' => $this->endDate];
 
-        $orders=Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->dateBetween($date)->where('status_id',3)->get();
-        $this->count= $orders->count();
+        $orders = Order::with('customer:id,name')->with('order_taken_by:id,name')->with('last_updated_by:id,name')->with('coupon')
+            ->customer($this->customer_id)->dateBetween($date)->where('status_id', 3)->get();
+        $this->count = $orders->count();
         return $orders;
     }
     public function map($order): array
@@ -42,7 +58,7 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
             [
                 $order->id,
                 $order->bill_no,
-                $order->table_no,
+                $order->destination . ' ' . $order->destination_no,
                 $order->customer->name,
                 $order->total,
                 $order->discount,
@@ -53,6 +69,10 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
                 $order->created_at,
                 $order->order_taken_by->name,
                 $order->last_updated_by->name,
+                $order->coupon ? $order->coupon->title : '',
+                $order->guest_menu ? 'Guest Menu' : 'Staff Menu',
+
+
 
 
             ],
@@ -61,43 +81,77 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
 
     public function headings(): array
     {
-        return [
-            'Id',
-            'Bill No',
-            'Table No',
-            'Cusomter Name',
-            'Total',
-            'Discount',
-            'Tax',
-            'Service Charge',
-            'Packaging Charge',
-            'Net Total',
-            'Created At',
-            'Created By',
-            'Last Edited By',
+        if ($this->customer) {
+            return [
+                [$this->title],
+                [$this->name, $this->customer_type_name, $this->extra],
+                [
+                    'Id',
+                    'Bill No',
+                    'Destination No',
+                    'Cusomter Name',
+                    'Total',
+                    'Discount',
+                    'Tax',
+                    'Service Charge',
+                    'Packaging Charge',
+                    'Net Total',
+                    'Created At',
+                    'Created By',
+                    'Last Edited By',
+                    'Coupon',
+                    'Menu Type',
+                ]
 
-        ];
+            ];
+        } else {
+
+            return [
+                [$this->title], [
+                    'Id',
+                    'Bill No',
+                    'Destination No',
+                    'Cusomter Name',
+                    'Total',
+                    'Discount',
+                    'Tax',
+                    'Service Charge',
+                    'Packaging Charge',
+                    'Net Total',
+                    'Created At',
+                    'Created By',
+                    'Last Edited By',
+                    'Coupon',
+                    'Menu Type',
+                ]
+            ];
+        }
     }
 
 
     public function styles(Worksheet $sheet)
     {
-        $numOfRows =$this->count +1;
-        $totalRow = $numOfRows + 1;
+        if ($this->customer) {
+            $numOfRows = $this->count + 3;
+            $totalRow = $numOfRows + 1;
+            $startRow=4;
+        } else {
+            $startRow=3;
+            $numOfRows = $this->count + 2;
+            $totalRow = $numOfRows + 1;
+        }
+
+        $sheet->mergeCells("A1:E1");
 
 
         // Add cell with SUM formula to last row
         $sheet->setCellValue("A{$totalRow}", "Total");
-        $sheet->setCellValue("E{$totalRow}", "=SUM(E2:E{$numOfRows})");
-        $sheet->setCellValue("F{$totalRow}", "=SUM(F2:F{$numOfRows})");
-        $sheet->setCellValue("G{$totalRow}", "=SUM(G2:G{$numOfRows})");
-        $sheet->setCellValue("H{$totalRow}", "=SUM(H2:H{$numOfRows})");
-        $sheet->setCellValue("I{$totalRow}", "=SUM(I2:I{$numOfRows})");
-        $sheet->setCellValue("J{$totalRow}", "=SUM(J2:J{$numOfRows})");
-
-
-
-
+        $sheet->setCellValue("E{$totalRow}", "=SUM(E{$startRow}:E{$numOfRows})");
+        $sheet->setCellValue("F{$totalRow}", "=SUM(F{$startRow}:F{$numOfRows})");
+        $sheet->setCellValue("G{$totalRow}", "=SUM(G{$startRow}:G{$numOfRows})");
+        $sheet->setCellValue("H{$totalRow}", "=SUM(H{$startRow}:H{$numOfRows})");
+        $sheet->setCellValue("I{$totalRow}", "=SUM(I{$startRow}:I{$numOfRows})");
+        $sheet->setCellValue("J{$totalRow}", "=SUM(J{$startRow}:J{$numOfRows})");
     }
     public function columnWidths(): array
     {
@@ -116,6 +170,7 @@ class OrdersExport implements FromCollection, withMapping, WithHeadings,WithStyl
 
         ];
     }
+
 
     // public function query()
     // {

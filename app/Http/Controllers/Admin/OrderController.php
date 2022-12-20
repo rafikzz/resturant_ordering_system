@@ -561,10 +561,8 @@ class OrderController extends Controller
     {
         $cancelledStatus = Status::where('title', 'cancelled')->first()->id;
 
+        $order->delete();
 
-        $order->update([
-            'status_id' => $cancelledStatus
-        ]);
         return redirect()->route('admin.orders.index')->with('success', 'Order Cancelled Successfully');
     }
 
@@ -865,15 +863,14 @@ class OrderController extends Controller
 
     public function getBillNo()
     {
-        $latestOrder = Order::select('id')->orderBy('created_at', 'desc')->first();
+        $latestOrder = Order::withTrashed()->select('id')->orderBy('created_at', 'desc')->first();
 
         if ($latestOrder instanceof  Order) {
             $orderNo = $latestOrder->id + 1;
         } else {
             $orderNo = 1;
         }
-
-        $order_no =  $prefix.''.str_pad($orderNo, 5, 0, STR_PAD_LEFT);
+        $order_no = str_pad($orderNo, 5, 0, STR_PAD_LEFT);
         return $order_no;
     }
 

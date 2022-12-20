@@ -24,7 +24,8 @@
                         let register_no = '';
                         let code = '';
                         let department = '';
-                        let text = '';
+                        let text = customer.name + '(' + customer.phone_no +
+                                ')' ;
 
 
                         if (customer.patient) {

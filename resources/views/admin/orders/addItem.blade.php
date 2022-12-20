@@ -630,7 +630,7 @@
             discount=$('#discount-amount').val() ;
             let temp_total = non_discountable_amount + discountable_amount + order_non_couponable_discount_amount +
                 order_couponable_discount_amount - coupon_discount - discount;
-            if (temp_total) {
+            if (temp_total>=0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
                 let tax_amount = parseFloat(((parseFloat(temp_total) + parseFloat(service_charge_amount)) * (tax / 100))
                     .toFixed(2));

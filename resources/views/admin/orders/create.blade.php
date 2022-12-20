@@ -115,7 +115,7 @@
                             <div class="col-md-6">
                                 <div class="form-group  ml-n2">
                                     <label for="destination_no">Destination No</label>
-                                    <input type="text" class="form-control " placeholder="Set Table No"
+                                    <input type="text" class="form-control " placeholder="Set Destination No"
                                         id="destination_no" autocomplete="off" name="destination_no" re
                                         value="{{ old('destination_no') }}">
                                     @error('destination_no')

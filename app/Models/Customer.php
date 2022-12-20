@@ -21,6 +21,23 @@ class Customer extends Model
     {
         return  ucwords($name);
     }
+    public function customer_name_with_detail()
+    {
+        $name=$this->name;
+        if($this->patient)
+        {
+            $name=$this->name.' (Reg No:'.$this->patient->register_no.')';
+        }
+        if($this->staff)
+        {
+            if($this->staff->department)
+            {
+                $name=$this->name.'(Department-'.$this->staff->department->name.')';
+
+            }
+        }
+        return $name;
+    }
 
     /**
      * Get all of the orders_summary for the Customer

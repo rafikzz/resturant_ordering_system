@@ -41,6 +41,10 @@ class Order extends Model
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class, 'coupon_id');
+    }
 
     public function order_taken_by()
     {
@@ -118,6 +122,14 @@ class Order extends Model
 
         return $query;
 
+    }
+    public function scopeCustomer($query,$customer_id)
+    {
+        if($customer_id)
+        {
+            return $query->where('customer_id',$customer_id);
+        }
+        return $query;
     }
 
     public function totalWithTax($discount = 0)

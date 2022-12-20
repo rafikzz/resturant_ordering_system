@@ -1,10 +1,33 @@
 @extends('layouts.admin.master')
 
 @section('content')
-    <div class="row">
-        <div class="col">
-            <div class="card card-outline card-dark">
-                <form action="{{ route('admin.reports.exportItemSales') }}" method="POST">
+    <form action="{{ route('admin.reports.exportItemSales') }}" method="POST">
+        <div class="row">
+
+            <div class="col-6">
+                <div class="form-group  ml-n2">
+                    <label for="customer_type">Customer Type</label>
+                    <select name="customer_type" id="customer_type" class="form-control">
+                        <option value="">None</option>
+                        @foreach ($customer_types as $customer_type)
+                            <option value="{{ $customer_type->id }}">
+                                {{ $customer_type->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-6">
+                <label for="customer_type">Customer</label>
+                <select name="customer_id" class="form-control select2" width="100%" id="customer-select">
+                    <option value="">All</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col">
+                <div class="card card-outline card-dark">
                     @csrf
                     <div class="card-header">
                         {{-- <h2 class="badge bg-orange">Total Sales: Rs.{{ $totalSales }}</h2>
@@ -20,29 +43,30 @@
                                             <i class="far fa-calendar-alt"></i>
                                         </span>
                                     </div>
-                                    <input type="text" class="form-control float-right"  name="date_range" id="custom-date-range">
+                                    <input type="text" class="form-control float-right" name="date_range"
+                                        id="custom-date-range">
                                 </div>
                             </div>
                         </div>
                     </div>
-                </form>
 
-                <div class="card-body table-responsive">
-                    <table class="table table-bordered" width="100%" id="table">
-                        <thead>
-                            <th>Id</th>
-                            <th>Item Name</th>
-                            <th>Total Quantity</th>
-                            <th>Total Price</th>
-                        </thead>
-                        <tbody id="tablecontents">
+                    <div class="card-body table-responsive">
+                        <table class="table table-bordered" width="100%" id="table">
+                            <thead>
+                                <th>Id</th>
+                                <th>Item Name</th>
+                                <th>Total Quantity</th>
+                                <th>Total Price</th>
+                            </thead>
+                            <tbody id="tablecontents">
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 @endsection
 @section('js')
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
@@ -92,6 +116,8 @@
                     data: function(d) {
                         d.startDate = $('#custom-date-range').val().split('-')[0].trim();
                         d.endDate = $('#custom-date-range').val().split('-')[1].trim();
+                        d.customer_id = $('#customer-select').val();
+
                     }
                 },
                 columns: [{
@@ -122,8 +148,80 @@
             });
 
 
+            $('#customer-select').on('change', function() {
+                table.draw();
+            });
+
+
             $(document).on('change', '#custom-date-range', function() {
                 table.draw();
+
+            });
+            //Getting Customer Type
+            $('#customer_type').on('change', function() {
+                let customer_type = parseInt($(this).val());
+
+                $.ajax({
+                    type: 'GET',
+                    url: '{{ route('admin.customer.getType') }}',
+                    data: {
+                        'customer_type': customer_type,
+
+                    },
+                    success: function(data) {
+
+                        if (data.status === 'success') {
+                            $('#customer-select').find('option').not(':first').remove();
+                            data.customers.forEach(function(customer) {
+                                let register_no = '';
+                                let code = '';
+                                let department = '';
+                                let text = customer.name + '(' + customer.phone_no +
+                                    ')';
+
+
+                                if (customer.patient) {
+                                    register_no = " Register No:" + customer.patient
+                                        .register_no;
+                                    text = code + ' ' + customer.name + '(' + customer
+                                        .phone_no +
+                                        ')' + register_no;
+                                }
+                                if (customer.staff) {
+                                    code = customer.staff.code;
+                                    if (customer.staff) {
+                                        code = customer.staff.code;
+                                        if (customer.staff.department) {
+                                            department = ' Department: ' + customer
+                                                .staff.department
+                                                .name;
+
+                                        }
+                                        text = code + ' ' + customer.name + '(' +
+                                            customer
+                                            .phone_no +
+                                            ') ' + department;
+                                    }
+
+
+                                }
+
+                                let newOption = new Option(text, customer.id, true,
+                                    true);
+                                $('#customer-select').append(newOption);
+                            });
+                            $('#customer-select').val(null).trigger('change');
+
+                        } else {
+                            console.log(data.message);
+
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log('Internal Sever Error');
+
+                    }
+                });
 
             });
             // $('#export').on('click', function() {

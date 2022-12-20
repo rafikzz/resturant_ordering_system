@@ -11,24 +11,24 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $table ='table_order_items';
+    protected $table = 'table_order_items';
 
-    protected $fillable =['order_id','item_id','created_by','updated_by','price','total','removed_quantity','order_no','quantity'];
+    protected $fillable = ['order_id', 'item_id', 'created_by', 'updated_by', 'price', 'total', 'removed_quantity', 'order_no', 'quantity'];
 
 
     public function order()
     {
-        return $this->belongsTo(Order::class,'order_id');
+        return $this->belongsTo(Order::class, 'order_id');
     }
 
     public function item()
     {
-        return $this->belongsTo(Item::class,'item_id');
+        return $this->belongsTo(Item::class, 'item_id');
     }
 
     public function getSubTotalAttribute()
     {
-        return $this->total *$this->price;
+        return $this->total * $this->price;
     }
 
     public function order_taken_by()
@@ -44,12 +44,31 @@ class OrderItem extends Model
     public function scopeCompleted($query)
     {
 
-        return $query->where('is_completed',1);
+        return $query->where('is_completed', 1);
     }
 
     public function getCreatedAtAttribute($data)
     {
         return Carbon::parse($data)->setTimezone('Asia/Kathmandu')->format('Y-m-d g:i a ');
     }
+    public function scopeDateBetween($query, $date)
+    {
 
+        if ($date['start'] && $date['end']) {
+            return  $query->whereHas('order', function ($q) use ($date) {
+                $q->where('status_id', 3)->dateBetween($date);
+            });
+        }
+
+        return $query;
+    }
+    public function scopeCustomer($query, $customer_id)
+    {
+        if ($customer_id) {
+            return   $query->whereHas('order', function ($q) use ($customer_id) {
+                $q->where('status_id', 3)->where('customer_id',$customer_id);
+            });
+        }
+        return $query;
+    }
 }
