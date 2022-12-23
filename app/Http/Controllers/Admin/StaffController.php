@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreCustomerRequest;
+use App\Http\Requests\Admin\StoreStaffRequest;
 use App\Http\Requests\Admin\StoreWalletTransactionRequest;
 use App\Http\Requests\Admin\UpdateCustomerRequest;
+use App\Http\Requests\Admin\UpdateStaffRequest;
 use App\Models\Customer;
 use App\Models\CustomerType;
 use App\Models\CustomerWalletTransaction;
@@ -46,7 +48,7 @@ class StaffController extends Controller
         return view('admin.staffs.create', compact('title', 'breadcrumbs', 'departments', 'code_no'));
     }
 
-    public function store(StoreCustomerRequest $request)
+    public function store(StoreStaffRequest $request)
     {
         $customer_type = CustomerType::where('name', 'Staff')->first();
         $customer_type_id = $customer_type ? $customer_type->id : null;
@@ -72,9 +74,9 @@ class StaffController extends Controller
         DB::commit();
 
         if (isset($request->new)) {
-            return redirect()->route('admin.staffs.create')->with("success", "Customer saved successfully");
+            return redirect()->route('admin.staffs.create')->with("success", "Staff saved successfully");
         } else {
-            return redirect()->route('admin.staffs.index')->with("success", "Customer saved successfully");
+            return redirect()->route('admin.staffs.index')->with("success", "Staff saved successfully");
         }
     }
 
@@ -89,7 +91,7 @@ class StaffController extends Controller
         return view('admin.staffs.edit', compact('title', 'customer', 'departments', 'code_no', 'breadcrumbs'));
     }
 
-    public function update(UpdateCustomerRequest $request, $id)
+    public function update(UpdateStaffRequest $request, $id)
     {
         $customer_type = CustomerType::where('name', 'Staff')->first();
         $customer_type_id = $customer_type ? $customer_type->id : null;
@@ -105,7 +107,7 @@ class StaffController extends Controller
                 'code' => $request->code,
             ]
         );
-        return redirect()->route('admin.staffs.index')->with("success", "Customer updated successfully");
+        return redirect()->route('admin.staffs.index')->with("success", "Staff updated successfully");
     }
 
     public function show($id)
@@ -225,12 +227,12 @@ class StaffController extends Controller
                     'action',
                     function ($row) use ($canEdit, $canShow, $canWalllettransaction) {
                         $walletTransactionBtn = $canWalllettransaction ? '<a href="' . route('admin.staffs.wallet_transaction', $row->id) . '"
-                        class="btn btn-xs btn-success">Wallet Transaction</i></a>' : '';
+                        class="btn btn-xs btn-success" data-toggle="tooltip" title="Wallet Transaction">Wallet Transaction</i></a>' : '';
 
                         $editBtn = $canEdit ? '<a href="' . route('admin.staffs.edit', $row->id) . '"
-                        class="btn btn-xs btn-warning"><i class="fa fa-pencil-alt"></i></a>' : '';
+                        class="btn btn-xs btn-warning" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : '';
                         $showBtn =   $canShow ? '<a href="' . route('admin.staffs.show', $row->id) . '"
-                        class="btn btn-xs btn-info"><i class="fa fa-eye"></i></a>' : '';
+                        class="btn btn-xs btn-primary" data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></a>' : '';
 
                         return $showBtn . ' ' . $editBtn  . ' ' . $walletTransactionBtn;
                     }

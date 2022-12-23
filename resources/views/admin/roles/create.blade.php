@@ -15,10 +15,12 @@
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Role Name</label>
+                                <label class="label" for="name">Role Name @component('compoments.required')
+                                    @endcomponent
+                                </label>
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     class="form-control  @error('name') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter Name" required>
+                                    placeholder="Enter Role Name" required>
                                 @error('name')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -26,7 +28,8 @@
                                 @enderror
                             </div>
                         </div>
-                        <label class="permissions" for="confirm-password">Permssions</label>
+                        <label class="permissions" for="confirm-password">Permssions  @component('compoments.required')
+                            @endcomponent </label>
 
                         <div class="row">
 
@@ -40,6 +43,11 @@
                                 </div>
                             @endforeach
                         </div>
+                        @error('permissions')
+                            <span class=" text-danger" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
                         <div class="col-md-12 text-center">
                             <button type="submit" name="new" value="1" class="btn btn-primary  mt-3">Save and
                                 Create</button>

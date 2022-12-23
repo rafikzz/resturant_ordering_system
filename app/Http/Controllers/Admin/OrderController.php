@@ -189,8 +189,15 @@ class OrderController extends Controller
         }
         DB::commit();
         Cart::clear();
+        if($request->checkout)
+        {
+            return redirect()->route('admin.orders.create')->with('success', 'Order Checked Out Successfully');
 
-        return redirect()->route('admin.orders.create')->with('success', 'Order Created Successfully');
+        }else{
+            return redirect()->route('admin.orders.create')->with('success', 'Order Saved Successfully');
+
+        }
+
     }
 
     public function edit($id)
@@ -335,7 +342,6 @@ class OrderController extends Controller
         if (!(Cart::getContent()->count() || $order->order_items()->count()) && $request->checkout) {
             return redirect()->back()->with('error', 'No Item In Cart For Checkout')->withInput();;
         }
-
         DB::beginTransaction();
         try {
             if ($request->customer_id) {
@@ -404,7 +410,7 @@ class OrderController extends Controller
             $order->update([
                 'customer_id' =>  $customerId,
                 'destination_no' => $request->destination_no,
-                'destination' => ucfirst($request->destination),
+                'destination' => $request->destination,
                 'total' =>  $total,
                 'service_charge' => $request->checkout ? $service_charge_amount : null,
                 'tax' =>  $request->checkout ? $tax_amount : null,
@@ -523,7 +529,7 @@ class OrderController extends Controller
             $order->update([
                 'customer_id' =>  $customerId,
                 'destination_no' => $request->destination_no,
-                'destination' => ucfirst($request->destination),
+                'destination' => $request->destination,
                 'total' =>  $total,
                 'service_charge' => $request->checkout ? $service_charge_amount : null,
                 'tax' =>  $request->checkout ? $tax_amount : null,
@@ -657,6 +663,8 @@ class OrderController extends Controller
             $grand_total = $net_total + $service_charge_amount + $tax_amount + $delivery_charge_amount;
             $completedStatus = Status::where('title', 'Completed')->first()->id;
             $order->update([
+                'destination_no' => $request->destination_no,
+                'destination' => $request->destination,
                 'total' =>  $total,
                 'service_charge' => $request->checkout ? $service_charge_amount : null,
                 'tax' =>  $request->checkout ? $tax_amount : null,
@@ -750,29 +758,29 @@ class OrderController extends Controller
                                 data-toggle="tooltip" title="Checkout"><i class="fa  fa-cash-register"></i> Checkout</a>' : '';
                                 $breakdownBtn = $canCreate ? '<a href="' . route('admin.orders.breakdown.index', $row->id) . '"  class="btn btn-secondary btn-xs"
                                 data-toggle="tooltip" title="Breakdown"><i class="fa  fa-sitemap"></i> Breakdown</a>' : '';
-                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
-                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.edit', $row->id) . '" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"  data-toggle="tooltip" title="Delete"><i class="fa fa-trash-alt"></i></button>' : '';
                                 $formStart = '<form action="' . route('admin.orders.destroy', $row->id) . '" method="POST">
                                 <input type="hidden" name="_method" value="delete">' . csrf_field();
 
-                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
-                                $addBtn = $canAdd ? '<a class="btn btn-xs btn-success"  href="' . route('admin.orders.addItem', $row->id) . '"><i class="fa fa-plus"></i> Item</a>' : '';
+                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"  data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></button>';
+                                $addBtn = $canAdd ? '<a class="btn btn-xs btn-success"  href="' . route('admin.orders.addItem', $row->id) . '"   data-toggle="tooltip" title="Add Items"><i class="fa fa-plus"></i> Item</a>' : '';
 
 
                                 $formEnd = '</form>';
-                                $btn = $formStart . ' ' . $detail . ' ' . $checkoutBtn . ' ' . $addBtn . ' ' . $breakdownBtn . ' ' . $editBtn .  ' ' . $deleteBtn .  $formEnd;
+                                $btn = $formStart . ' ' . $detail . ' '  . $addBtn . ' ' . $editBtn . ' ' . $deleteBtn .  ' ' . $checkoutBtn . ' '. $breakdownBtn .  $formEnd;
 
                                 return $btn;
                             }
                         } else if ($row->status_id == $completedStatus && $request->mode !== 'history') {
                             if (auth()->user()->can('order_list')) {
-                                $editBtn =  $editCheckout ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.editCheckout', $row->id) . '"><i class="fa fa-edit"></i></a>' : '';
-                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
+                                $editBtn =  $editCheckout ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.editCheckout', $row->id) . '"  data-toggle="tooltip" title="Edit Checkout"><i class="fa fa-edit"></i></a>' : '';
+                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"  data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></button>';
                                 return  $detail . ' ' . $editBtn;
                             }
                         } else {
                             if (auth()->user()->can('order_list')) {
-                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
+                                $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"  data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></button>';
                                 return   $detail;
                             }
                         }
@@ -790,6 +798,7 @@ class OrderController extends Controller
     {
         if (request()->ajax()) {
             $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->where('id', $request->order_id)->first();
+            $customer= Customer::with('staff.department')->with('patient')->with('customer_type')->find($order->customer_id);
             $orderItems = OrderItem::select('item_id', DB::raw('sum(total * price) as total_price'), DB::raw('sum(total * price)/sum(total) as average_price'), DB::raw('sum(total) as total_quantity'))
                 ->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->get();
             $billRoute = route('orders.getBill', $order->id);
@@ -797,6 +806,7 @@ class OrderController extends Controller
             if ($order) {
                 return response()->json([
                     'order' => $order,
+                    'customer'=>$customer,
                     'billRoute' => $billRoute,
                     'orderItems' => $orderItems,
                     'status' => 'success',

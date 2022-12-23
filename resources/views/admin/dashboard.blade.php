@@ -6,7 +6,7 @@
             <div class="clearfix hidden-md-up"></div>
             <div class="col-12 col-sm-6 col-md-3">
                 <div class="info-box mb-3">
-                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-dollar-sign"></i></span>
+                    <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-dollar-sign"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text">Total Sales</span>
                         <span class="info-box-number">{{ $totalSales }}</span>
@@ -33,20 +33,7 @@
         <div class="clearfix hidden-md-up"></div>
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
-                <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-hamburger"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Top Sellling Item</span>
-                    <span class="info-box-number">
-                        {{ $topSoldItem }}
-                    </span>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-                <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
+                <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Total Staff</span>
                     <span class="info-box-number">{{ $totalStaffs }}</span>
@@ -68,8 +55,7 @@
     </div>
     <div class="row">
         <section class="col-lg-6">
-
-            <div class="card">
+            <div class="card vh-80">
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-chart-pie mr-1"></i>
@@ -85,9 +71,9 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <canvas id="sales1" width="200" height="100"></canvas>
+                    <canvas id="sales1" class="wh-80"></canvas>
                 </div>
-
+            </div>
         </section>
         <section class="col-lg-6">
             <div class="card">
@@ -106,16 +92,9 @@
                 <div class="card-body p-0">
                     <ul class="products-list product-list-in-card pl-2 pr-2">
                         <table class="table">
-                            <thead>
-                                <th>Item Image</th>
-                                <th>Item Name</th>
-                            </thead>
                             <tbody>
                                 @foreach ($topSoldItems as $cartItem)
                                     <tr>
-                                        <td> <img src="{{ $cartItem->item->image() }}" alt="Product Image"
-                                                class="img-size-50">
-                                        </td>
                                         <td>{{ $cartItem->item->name }}</td>
                                     </tr>
                                 @endforeach
@@ -123,10 +102,11 @@
                         </table>
                     </ul>
                 </div>
-                <div class="card-footer text-center">
-                    <a href="{{ route('admin.items.index') }}" class="uppercase">View All Items</a>
-                </div>
-
+                @can('item_list')
+                    <div class="card-footer text-center">
+                        <a href="{{ route('admin.items.index') }}" class="uppercase">View All Items</a>
+                    </div>
+                @endcan
             </div>
         </section>
 
@@ -151,8 +131,8 @@
                         datasets: [{
                             label: 'Total Sales',
                             data: Object.values(dataResult.salesData),
-                            borderColor: 'rgba(75, 192, 192)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(0,123,255)',
+                            backgroundColor: 'rgba(0,123,255, 0.2)',
                             borderWidth: 1
 
                         }]

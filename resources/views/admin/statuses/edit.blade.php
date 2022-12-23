@@ -27,7 +27,9 @@
                                 @enderror
                             </div> --}}
                             <div class="form-group col-md-6">
-                                <label>Status Color</label>
+                                <label>Status Color @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <div class="input-group my-colorpicker2 colorpicker-element" data-colorpicker-id="2">
                                     <input type="text" class="form-control" name="color"
                                         value="{{ old('color') ?: $status->color }}" data-original-title="" title="">

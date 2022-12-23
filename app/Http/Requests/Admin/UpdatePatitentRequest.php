@@ -23,10 +23,11 @@ class UpdatePatitentRequest extends FormRequest
      */
     public function rules()
     {
+        dd($this);
         return [
             'name'=>'required',
             'phone_no'=>['required'],
-            'register_no'=>'required|unique:table_patients,register_no,'.$this->id . ',customer_id',
+            'register_no'=>'required|unique:table_patients,register_no,'.$this->patient . ',customer_id',
 
         ];
     }

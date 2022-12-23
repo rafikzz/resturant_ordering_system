@@ -5,7 +5,7 @@
         <div class="row">
 
             <div class="col-6">
-                <div class="form-group  ml-n2">
+                <div class="form-group">
                     <label for="customer_type">Customer Type</label>
                     <select name="customer_type" id="customer_type" class="form-control">
                         <option value="">None</option>

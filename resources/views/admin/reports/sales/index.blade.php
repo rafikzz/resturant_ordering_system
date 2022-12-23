@@ -6,7 +6,7 @@
         <div class="row">
 
             <div class="col-6">
-                <div class="form-group  ml-n2">
+                <div class="form-group">
                     <label for="customer_type">Customer Type</label>
                     <select name="customer_type" id="customer_type" class="form-control">
                         <option value="">None</option>
@@ -19,10 +19,12 @@
                 </div>
             </div>
             <div class="col-6">
-                <label for="customer_type">Customer</label>
-                <select name="customer_id" class="form-control select2" width="100%" id="customer-select">
-                    <option value="">All</option>
-                </select>
+                <div class="form-group ">
+                    <label for="customer_type">Customer</label>
+                    <select name="customer_id" class="form-control select2 " width="100%" id="customer-select">
+                        <option value="">All</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -30,12 +32,13 @@
                 <div class="card card-outline card-dark">
                     <div class="card-header">
                         @csrf
+                        <button id="export" class="btn btn-success">Export
+                            Excel</button>
                         @isset($totalSales)
                             <h2 class="badge bg-orange">Total Sales: Rs.{{ $totalSales }}</h2>
                         @endisset
                         <h2 class="badge bg-orange">Todays Sales: Rs.{{ $todaysSales }}</h2>
-                        <button id="export" class="btn btn-success">Export
-                            Excel</button>
+
                         <div class="card-tools form-inline">
                             <div class="form-group">
                                 <label>Date range:</label>

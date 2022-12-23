@@ -17,10 +17,12 @@
                         @method('PUT')
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="title">Coupon Title</label>
+                                <label class="label" for="title">Coupon Title  @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <input type="text" name="title" value="{{ old('title') ?: $coupon->title }}"
                                     class="form-control  @error('title') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter Title" required autocomplete="off">
+                                    placeholder="Enter Coupon Name" required autocomplete="off">
                                 @error('title')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -29,7 +31,9 @@
                             </div>
 
                             <div class="form-group col-md-6">
-                                <label class="label" for="discount">Discount Amount</label>
+                                <label class="label" for="discount">Discount Amount  @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <input type="number" min="0" name="discount"
                                     value="{{ old('discount') ?: $coupon->discount }}"
                                     class="form-control  @error('discount') is-invalid @enderror"
@@ -42,7 +46,9 @@
                             </div>
                         </div>
                         <div class="form-group col-6 ml-n2">
-                            <label>Expiry Date:</label>
+                            <label>Expiry Date:  @component('compoments.required')
+
+                                @endcomponent</label>
                             <div class="input-group expiry-date">
                                 <input type="text" class="form-control float-right" id="expiry-date" name="expiry_date"
                                     value="{{ old('expiry_date') ?: $coupon->expiry_date }}">

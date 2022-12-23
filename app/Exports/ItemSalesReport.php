@@ -7,13 +7,12 @@ use App\Models\Customer;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\withMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ItemSalesReport implements FromCollection, withMapping, WithHeadings, ShouldAutoSize, WithStyles
+class ItemSalesReport implements FromCollection, withMapping, WithHeadings, WithStyles
 {
 
     public function __construct($startDate, $endDate, $customer_id)

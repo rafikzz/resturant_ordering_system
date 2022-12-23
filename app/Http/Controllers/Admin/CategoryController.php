@@ -175,10 +175,10 @@ class CategoryController extends Controller
                     function ($row, Request $request) use(  $canEdit,$canDelete) {
                         if (  $canEdit||$canDelete) {
                             if ($request->mode == 0) {
-                                $editBtn =    $canEdit? '<a class="btn btn-xs btn-warning" href="' . route('admin.categories.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $editBtn =    $canEdit? '<a class="btn btn-xs btn-warning" href="' . route('admin.categories.edit', $row->id) . '" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : '';
                                 if(!($row->items_count))
                                 {
-                                    $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                    $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt" data-toggle="tooltip" title="Delete"></i></button>' : '';
 
                                 }
                                 else{
@@ -191,7 +191,7 @@ class CategoryController extends Controller
 
                                 return $btn;
                             } else {
-                                $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
                                 $formStart = '<form action="' . route('admin.categories.forceDelete', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                 <input type="hidden" name="_method" value="delete" />';

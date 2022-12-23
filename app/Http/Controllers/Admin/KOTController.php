@@ -59,7 +59,7 @@ class KOTController extends Controller
                     'action',
                     function ($row, Request $request) use ($processingStatus) {
 
-                            $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"><i class="fa fa-eye"></i></button>';
+                            $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"  data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></button>';
                             return  $detail;
                     }
                 )->orderColumn('status', function ($query, $order) {

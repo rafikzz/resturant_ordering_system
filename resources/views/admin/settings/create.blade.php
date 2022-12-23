@@ -12,7 +12,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="label" for="company_name">Company Name</label>
+                                    <label class="label" for="company_name">Company Name  @component('compoments.required')
+
+                                        @endcomponent</label>
                                     <input type="text" name="company_name"
                                         value="{{ (old('company_name') ?: isset($setting)) ? $setting->company_name : '' }}"
                                         class="form-control  @error('company_name') is-invalid @enderror" autocomplete="off"
@@ -26,7 +28,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="label" for="contact_information">Contact Information</label>
+                                    <label class="label" for="contact_information">Contact Information  @component('compoments.required')
+
+                                        @endcomponent</label>
                                     <input type="text" name="contact_information"
                                         value="{{ (old('contact_information') ?: isset($setting)) ? $setting->contact_information : '' }}"
                                         class="form-control  @error('contact_information') is-invalid @enderror"
@@ -40,7 +44,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="label" for="office_location">Office Location</label>
+                                    <label class="label" for="office_location">Office Location  @component('compoments.required')
+
+                                        @endcomponent</label>
                                     <input type="text" name="office_location"
                                         value="{{ (old('office_location') ?: isset($setting)) ? $setting->office_location : '' }}"
                                         class="form-control  @error('office_location') is-invalid @enderror" minlength="3"
@@ -59,12 +65,14 @@
                                         value="{{ (old('bill_no_prefix') ?: isset($setting)) ? $setting->bill_no_prefix : '' }}"
                                         class="form-control  @error('bill_no_prefix') is-invalid @enderror"
                                         autocomplete="off" maxlength="6" placeholder="Enter Bill No Prefix">
+                                        <span class="text-xs">Note:Add Prefix to bill no</span>
                                     @error('bill_no_prefix')
                                         <span class=" text-danger" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
                                     @enderror
                                 </div>
+
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group  d-flex">

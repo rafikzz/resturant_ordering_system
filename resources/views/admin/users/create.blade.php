@@ -15,10 +15,12 @@
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">User Name</label>
+                                <label class="label" for="name">User Name @component('compoments.required')
+                                    @endcomponent
+                                </label>
                                 <input type="text" name="name" value="{{ old('name') }}"
-                                    class="form-control  @error('name') is-invalid @enderror" minlength="3" autocomplete="off"
-                                    placeholder="Enter Name" required>
+                                    class="form-control  @error('name') is-invalid @enderror" minlength="3"
+                                    autocomplete="off" placeholder="Enter User Name" required>
                                 @error('name')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -26,10 +28,12 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="email">User Email</label>
+                                <label class="label" for="email">User Email @component('compoments.required')
+                                    @endcomponent
+                                </label>
                                 <input type="email" name="email" value="{{ old('email') }}"
-                                    class="form-control  @error('email') is-invalid @enderror" placeholder="Enter Email" autocomplete="off"
-                                    required>
+                                    class="form-control  @error('email') is-invalid @enderror" placeholder="Enter User Email"
+                                    autocomplete="off" required>
                                 @error('email')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -39,7 +43,9 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="password">Password</label>
+                                <label class="label" for="password">Password @component('compoments.required')
+                                    @endcomponent
+                                </label>
                                 <input type="password" name="password"
                                     class="form-control  @error('password') is-invalid @enderror" minlength="8"
                                     placeholder="Enter Password" required>
@@ -50,7 +56,10 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="confirm-password">Confirm Password</label>
+                                <label class="label" for="confirm-password">Confirm Password
+                                    @component('compoments.required')
+                                    @endcomponent
+                                </label>
                                 <input type="password" name="confirm-password"
                                     class="form-control  @error('confirm-password') is-invalid @enderror" minlength="8"
                                     placeholder="Confirm Password" required>
@@ -62,16 +71,24 @@
                             </div>
                         </div>
                         <div class="form-group col-md-6 ml-n2">
-                            <label class="roles" for="confirm-password">Roles</label>
-                            <select class="select2" name="roles[]" multiple="multiple" style="width: 100%;color:black">
+                            <label class="roles" for="roles">Roles  @component('compoments.required')
+                                @endcomponent</label>
+                            <select class="select2" name="roles[]" multiple="multiple" data-placeholder="Select User Roles"
+                                style="width: 100%;color:black" required>
                                 @foreach ($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
+                            @error('roles')
+                                <span class=" text-danger" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
 
                         <div class="col-md-12 text-center">
-                            <button type="submit" name="new" value="1" class="btn btn-primary  mt-3">Save and Create</button>
+                            <button type="submit" name="new" value="1" class="btn btn-primary  mt-3">Save and
+                                Create</button>
                             <button type="submit" class="btn btn-primary  mt-3">Save and exit</button>
                         </div>
                     </form>

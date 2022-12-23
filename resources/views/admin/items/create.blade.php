@@ -5,7 +5,7 @@
         <div class="col">
             <div class="card card-outline card-success ">
                 <div class="card-header">
-                    <h2 class="card-title">Add Item</h2>
+                    <h2 class="card-title">Add Food Item</h2>
                     <div class="card-tools">
                         <a class="btn btn-primary" href="{{ route('admin.items.index') }}"> Back</a></i></a>
                     </div>
@@ -15,10 +15,12 @@
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Item Name</label>
+                                <label class="label" for="name">Food Item Name @component('compoments.required')
+
+                                @endcomponent</label>
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     class="form-control  @error('name') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter Name" required autocomplete="off">
+                                    placeholder="Enter Food Item Name" required autocomplete="off">
                                 @error('name')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -26,10 +28,12 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="price">Staff Item Price</label>
+                                <label class="label" for="price">Staff Item Price @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <input type="number" name="price" value="{{ old('price') }}"
                                     class="form-control  @error('price') is-invalid @enderror" min="0" step="0.01"
-                                    placeholder="Enter Staff Item Price" required autocomplete="off">
+                                    placeholder="Enter Price For Staff" required autocomplete="off">
                                 @error('price')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -37,10 +41,12 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="guest_price">Guest Item Price</label>
+                                <label class="label" for="guest_price">Guest Item Price @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <input type="number" name="guest_price" value="{{ old('guest_price') }}"
                                     class="form-control  @error('guest_price') is-invalid @enderror" min="0" step="0.01"
-                                    placeholder="Enter Guest Item Price" required autocomplete="off">
+                                    placeholder="Enter Price For Guest" required autocomplete="off">
                                 @error('guest_price')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -48,9 +54,11 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6 ">
-                                <label for="category_id"> Category</label>
+                                <label for="category_id"> Menu Category @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <select class="form-control" name="category_id" required>
-                                    <option selected value="" disabled>--Select Category--</option>
+                                    <option selected value="" disabled>--Select Menu Category--</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->title }}</option>
                                     @endforeach

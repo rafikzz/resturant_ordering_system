@@ -93,7 +93,7 @@ class StatusController extends Controller
                 ->addColumn(
                     'action',
                     function ($row) use($canEdit) {
-                        $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.statuses.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : 'No Action';
+                        $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.statuses.edit', $row->id) . '" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : 'No Action';
                         return $editBtn;
                     }
                 )

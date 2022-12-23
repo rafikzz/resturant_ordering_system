@@ -15,7 +15,8 @@
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Patient Name</label>
+                                <label class="label" for="name">Patient Name  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     class="form-control  @error('name') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter Patient Name" required>
@@ -26,10 +27,11 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="phone_no">Contact No.</label>
+                                <label class="label" for="phone_no">Contact No.  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="phone_no" value="{{ old('phone_no') }}"
                                     class="form-control  @error('phone_no') is-invalid @enderror" autocomplete="off"
-                                    placeholder="Enter Phone No" required>
+                                    placeholder="Enter Contact No" required>
                                 @error('phone_no')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -37,7 +39,8 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="register_no">Register No.</label>
+                                <label class="label" for="register_no">Register No.  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="register_no" value="{{ old('register_no') }}"
                                     class="form-control  @error('register_no') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter Register No" required>

@@ -26,8 +26,8 @@ class UpdateStaffRequest extends FormRequest
         return [
             'name'=>'required',
             'phone_no'=>['required'],
-            'code'=>'required|unique:table_staffs,code,'.$this->id . ',customer_id',
-            'department_id'=>'nullable',
+            'code'=>'required|unique:table_staffs,code,'.$this->staff . ',customer_id',
+            'department_id'=>'required',
         ];
     }
 }

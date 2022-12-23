@@ -28,17 +28,22 @@
                                     <td>{{ $department->name }}</td>
                                     <td>{{ $department->created_at->diffForHumans() }}</td>
                                     <td class="form-inline">
-                                        <form action="{{ route('admin.departments.destroy', $department->id) }}" method="post">
+                                        <form action="{{ route('admin.departments.destroy', $department->id) }}"
+                                            method="post">
                                             @csrf
                                             @method('DELETE')
-                                            @can('department_delete')
+                                            @can('department_edit')
                                                 <a href="{{ route('admin.departments.edit', $department->id) }}"
-                                                    class="btn btn-warning btn-xs">
+                                                    class="btn btn-warning btn-xs"  data-toggle="tooltip" title="Edit">
                                                     <i class="fa fa-pencil-alt"></i>
                                                 </a>
                                             @endcan
+
                                             @can('department_delete')
-                                                <button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>
+                                                @if (!$department->staffs_count)
+                                                    <button type="submit" class="btn btn-xs btn-danger btn-delete"  data-toggle="tooltip" title="Delete"><i
+                                                            class="fa fa-trash-alt"></i></button>
+                                                @endif
                                             @endcan
                                         </form>
                                     </td>

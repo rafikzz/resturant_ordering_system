@@ -15,7 +15,9 @@
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="title">Status Name</label>
+                                <label class="label" for="title">Status Name @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <input type="text" name="title" value="{{ old('title') }}"
                                     class="form-control  @error('title') is-invalid @enderror" minlength="3" autocomplete="off"
                                     placeholder="Enter title" required>
@@ -26,7 +28,9 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Status Color</label>
+                                <label>Status Color @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <div class="input-group my-colorpicker2 colorpicker-element" data-colorpicker-id="2">
                                     <input type="text" name="color" class="form-control" data-original-title=""
                                         title="">

@@ -178,9 +178,9 @@ class ItemController extends Controller
                     function ($row, Request $request) use ($canDelete, $canEdit) {
                         if ($canEdit || $canDelete) {
                             if ($request->mode == 0) {
-                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.items.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.items.edit', $row->id) . '" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : '';
                                 if (!($row->order_items_count)) {
-                                    $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                    $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-alt"></i></button>' : '';
                                 } else {
                                     $deleteBtn = null;
                                 }

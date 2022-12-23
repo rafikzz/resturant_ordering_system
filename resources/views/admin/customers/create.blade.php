@@ -15,7 +15,9 @@
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Customer Name</label>
+                                <label class="label" for="name">Customer Name @component('compoments.required')
+
+                                    @endcomponent</label>
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     class="form-control  @error('name') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter Customer Name" required>
@@ -26,10 +28,11 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="phone_no">Contact No.</label>
+                                <label class="label" for="phone_no">Contact No. @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="phone_no" value="{{ old('phone_no') }}"
                                     class="form-control  @error('phone_no') is-invalid @enderror" autocomplete="off"
-                                    placeholder="Enter phone_no" required>
+                                    placeholder="Enter Contact No" required>
                                 @error('phone_no')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>

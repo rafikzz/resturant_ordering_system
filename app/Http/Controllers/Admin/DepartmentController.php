@@ -27,7 +27,7 @@ class DepartmentController extends Controller
     public function index()
     {
         $title = $this->title;
-        $departments =Department::latest()->get();
+        $departments =Department::withCount('staffs')->latest()->get();
         $breadcrumbs =[ 'Department'=>'#'];
         return view('admin.departments.index', compact('title','breadcrumbs','departments'));
 
@@ -93,7 +93,7 @@ class DepartmentController extends Controller
         $breadcrumbs =[ 'Department'=>route('admin.departments.index'), 'Edit'=>'#'];
 
 
-        return view('admin.departments.edit', compact('title','breadcrumbs','Department'));
+        return view('admin.departments.edit', compact('title','breadcrumbs','department'));
     }
 
     /**

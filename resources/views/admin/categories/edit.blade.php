@@ -5,7 +5,7 @@
         <div class="col">
             <div class="card card-outline card-warning ">
                 <div class="card-header">
-                    <h2 class="card-title ">Edit Category</h2>
+                    <h2 class="card-title ">Edit Menu Category</h2>
                     <div class="card-tools">
                         <a class="btn btn-primary" href="{{ route('admin.categories.index') }}"> Back</a></i></a>
                     </div>
@@ -17,10 +17,11 @@
                         @method('PUT')
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="title">Category Name</label>
+                                <label class="label" for="title">Category Name @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="title" value="{{ old('title') ?: $category->title }}"
                                     class="form-control  @error('title') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter title" required autocomplete="off">
+                                    placeholder="Enter Category Name" required autocomplete="off">
                                 @error('title')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -28,10 +29,13 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="coupon_discount_percentage">Coupon Discount Percentage</label>
+                                <label class="label" for="coupon_discount_percentage">Coupon Discount Percentage @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="number" name="coupon_discount_percentage" value="{{ old('coupon_discount_percentage') ?: $category->coupon_discount_percentage }}"
                                     class="form-control  @error('coupon_discount_percentage') is-invalid @enderror" min="0" max="100" step="0.01"
-                                    placeholder="Enter Discount Percentage" required autocomplete="off">
+                                    placeholder="Enter Coupon Discount Percentage" required autocomplete="off">
+                                    <span class="text-xs">Note: Set this value 0 if you don't want coupon discount to be applied for category of food items</span>
+
                                 @error('coupon_discount_percentage')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -39,11 +43,13 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="order">Category Order</label>
+                                <label class="label" for="order">Category Order @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="number" min="0" step="1" name="order"
                                     value="{{ old('order') ?: $category->order }}"
                                     class="form-control  @error('order') is-invalid @enderror" placeholder="Enter order"
                                     required>
+                                    <span class="text-xs">Note: Order in which you want your category to be listed</span>
                                 @error('order')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>

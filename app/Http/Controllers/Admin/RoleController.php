@@ -16,9 +16,9 @@ class RoleController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:role_list|role_create|role_edit|role_delete', ['only' => ['index','show','getData']]);
-        $this->middleware('permission:role_create', ['only' => ['create','store']]);
-        $this->middleware('permission:role_edit', ['only' => ['edit','update',]]);
+        $this->middleware('permission:role_list|role_create|role_edit|role_delete', ['only' => ['index', 'show', 'getData']]);
+        $this->middleware('permission:role_create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:role_edit', ['only' => ['edit', 'update',]]);
         $this->middleware('permission:role_delete', ['only' => ['destroy']]);
         $this->title = 'Role Management';
     }
@@ -27,9 +27,9 @@ class RoleController extends Controller
         // $roles = Role::with('roles')->orderBy('id', 'desc')->get();
         $title = $this->title;
 
-        $breadcrumbs =[ 'Role'=>route('admin.roles.index')];
+        $breadcrumbs = ['Role' => route('admin.roles.index')];
 
-        return view('admin.roles.index', compact('title','breadcrumbs'));
+        return view('admin.roles.index', compact('title', 'breadcrumbs'));
     }
 
 
@@ -37,24 +37,21 @@ class RoleController extends Controller
     {
         $permissions = Permission::all();
         $title = $this->title;
-        $breadcrumbs =[ 'Role'=>route('admin.roles.index'),'Create'=>'#'];
+        $breadcrumbs = ['Role' => route('admin.roles.index'), 'Create' => '#'];
 
-        return view('admin.roles.create', compact('permissions', 'title','breadcrumbs'));
+        return view('admin.roles.create', compact('permissions', 'title', 'breadcrumbs'));
     }
 
 
     public function store(StoreRoleRequest $request)
     {
-        $role = Role::create(['name'=>$request->name]);
+        $role = Role::create(['name' => $request->name]);
         $role->syncPermissions($request->permissions);
-        if(isset($request->new))
-        {
+        if (isset($request->new)) {
             return redirect()->route('admin.roles.create')->with("success", "Role saved successfully");
-
-        }else{
+        } else {
             return redirect()->route('admin.roles.index')->with("success", "Role saved successfully");
         }
-
     }
 
 
@@ -62,29 +59,30 @@ class RoleController extends Controller
     {
         $role = Role::findOrFail($id);
         $title = $this->title;
-        $breadcrumbs =[ 'Role'=>route('admin.roles.index'),'Show'=>'#'];
+        $breadcrumbs = ['Role' => route('admin.roles.index'), 'Show' => '#'];
 
 
-        return view('admin.roles.show', compact('role', 'title','breadcrumbs'));
+        return view('admin.roles.show', compact('role', 'title', 'breadcrumbs'));
     }
 
 
     public function edit($id)
     {
-        $role = Role::findOrFail($id);
-        $breadcrumbs =[ 'Role'=>route('admin.roles.index'),'Edit'=>'#'];
+        $role = Role::where('id','!=','1')->findOrFail($id);
 
-        $rolePermissions = $role->permissions->pluck('name','name')->toArray();
+        $breadcrumbs = ['Role' => route('admin.roles.index'), 'Edit' => '#'];
+
+        $rolePermissions = $role->permissions->pluck('name', 'name')->toArray();
         $permissions = Permission::all();
         $title = $this->title;
 
-        return view('admin.roles.edit', compact('rolePermissions','permissions', 'role', 'title','breadcrumbs'));
+        return view('admin.roles.edit', compact('rolePermissions', 'permissions', 'role', 'title', 'breadcrumbs'));
     }
 
 
-    public function update(UpdateRoleRequest $request,Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        $role->update(['name'=>$request->name]);
+        $role->update(['name' => $request->name]);
         $role->syncPermissions($request->permissions);
         return redirect()->route('admin.roles.index')->with("success", "Role updated successfully");
     }
@@ -102,32 +100,41 @@ class RoleController extends Controller
     {
         if ($request->ajax()) {
             $data = Role::select('*');
-            $canEdit=auth()->user()->can('role_edit') ;
-            $canDelete=auth()->user()->can('role_delete') ;
+            $canEdit = auth()->user()->can('role_edit');
+            $canDelete = auth()->user()->can('role_delete');
 
             return DataTables::of($data)
                 ->editColumn('created_at', function (Role $role) {
                     return [
                         'display' => $role->created_at->diffForHumans(),
                         'timestamp' => $role->created_at
-                     ];
+                    ];
                 })
                 ->addColumn(
                     'action',
-                    function ($row) use( $canEdit, $canDelete) {
+                    function ($row) use ($canEdit, $canDelete) {
                         if ($canEdit ||  $canDelete) {
-                        $editBtn =  $canEdit ? '<a class="btn btn-xs btn-primary" href="' . route('admin.roles.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
-                        // $deleteBtn =   $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
-                        $deleteBtn='';
-                        $formStart = '<form action="' . route('admin.roles.destroy', $row->id) . '" method="POST">
+
+                            if ($row->name != "Superadmin") {
+                                $deleteBtn =   $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"   data-toggle="tooltip" title="Delete"><i class="fa fa-trash-alt">
+                                </i></a></button>' : '';
+                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.roles.edit', $row->id) . '" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"
+                                ></i></a>' : '';
+
+                            } else {
+                                $editBtn ='No Action';
+                                $deleteBtn = '';
+                            }
+
+                            $formStart = '<form action="' . route('admin.roles.destroy', $row->id) . '" method="POST"">
                                 ' . csrf_field() . '
                                  <input type="hidden" name="_method" value="delete" />';
-                        $formEnd = '</form>';
-                        $btn = $formStart . $editBtn . ' ' . $deleteBtn . $formEnd;
+                            $formEnd = '</form>';
+                            $btn = $formStart . $editBtn . ' ' . $deleteBtn . $formEnd;
 
 
-                        return $btn;
-                        }else{
+                            return $btn;
+                        } else {
                             return 'No Action';
                         }
                     }

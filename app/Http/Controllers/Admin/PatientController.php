@@ -7,7 +7,9 @@ use App\Exports\PatientOrderItems;
 use App\Exports\PatientOrdersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePatitentRequest;
+use App\Http\Requests\Admin\StoreStaffRequest;
 use App\Http\Requests\Admin\UpdatePatitentRequest;
+use App\Http\Requests\Admin\UpdateStaffRequest;
 use App\Models\Customer;
 use App\Models\CustomerType;
 use App\Models\CustomerWalletTransaction;
@@ -49,7 +51,7 @@ class PatientController extends Controller
         return view('admin.patients.create', compact('title', 'breadcrumbs'));
     }
 
-    public function store(StorePatitentRequest $request)
+    public function store(StoreStaffRequest $request)
     {
         $customer_type = CustomerType::where('name', 'Patient')->first();
         $customer_type_id = $customer_type ? $customer_type->id : null;
@@ -94,7 +96,7 @@ class PatientController extends Controller
         return view('admin.patients.edit', compact('title', 'customer', 'breadcrumbs'));
     }
 
-    public function update(UpdatePatitentRequest $request, $id)
+    public function update(UpdateStaffRequest $request, $id)
     {
         $customer_type = CustomerType::where('name', 'Patient')->first();
         $customer_type_id = $customer_type ? $customer_type->id : null;
@@ -163,17 +165,17 @@ class PatientController extends Controller
                     'action',
                     function ($row) use ($canEdit, $canDischarge) {
                         $editBtn = $canEdit ? '<a href="' . route('admin.patients.edit', $row->id) . '"
-                        class="btn btn-xs btn-warning"><i class="fa fa-pencil-alt"></i></a>' : '';
+                        class="btn btn-xs btn-warning" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : '';
                         if ($row->status) {
                             $dischargeBtn = $canDischarge ? '<a href="' . route('admin.patients.discharge', $row->id) . '"
-                            class="btn btn-xs btn-success"><i class="fa fa-directions"> Discharge</i></a>' : '';
+                            class="btn btn-xs btn-success" data-toggle="tooltip" title="Discharge"><i class="fa fa-directions"> Discharge</i></a>' : '';
                         } else {
                             $dischargeBtn = null;
                         }
 
 
                         $showBtn = '<a href="' . route('admin.patients.show', $row->id) . '"
-                        class="btn btn-xs btn-info"><i class="fa fa-eye"></i></a>';
+                        class="btn btn-xs btn-primary" data-toggle="tooltip" title="Show"><i class="fa fa-eye"></i></a>';
                         $exportBtn = '<a href="' . route('admin.patients.export', $row->id) . '"
                         class="btn btn-xs btn-success">Export Order</i></a>';
                         $btn = $showBtn . ' ' . $editBtn . ' ' . $dischargeBtn.' '.$exportBtn;

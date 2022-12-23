@@ -135,9 +135,9 @@ class CustomerController extends Controller
                     'action',
                     function ($row) use ($canEdit) {
                         $editBtn = $canEdit ? '<a href="' . route('admin.customers.edit', $row->id) . '"
-                        class="btn btn-xs btn-warning"><i class="fa fa-pencil-alt"></i></a>' : '';
+                        class="btn btn-xs btn-warning" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt" ></i></a>' : '';
                         $showBtn = '<a href="' . route('admin.customers.show', $row->id) . '"
-                        class="btn btn-xs btn-info"><i class="fa fa-eye"></i></a>';
+                        class="btn btn-xs btn-primary" data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></a>';
 
                         return $showBtn . ' ' . $editBtn;
                     }

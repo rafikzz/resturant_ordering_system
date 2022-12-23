@@ -17,10 +17,11 @@
                         @method('PUT')
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Depatment</label>
+                                <label class="label" for="name">Department Name  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="name" value="{{ old('name') ?: $department->name }}"
                                     class="form-control  @error('name') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter name" required autocomplete="off">
+                                    placeholder="Enter Department Name" required autocomplete="off">
                                 @error('name')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>

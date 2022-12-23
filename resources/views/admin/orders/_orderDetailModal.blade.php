@@ -12,24 +12,50 @@
             </div>
             <div class="modal-body">
 
-                <div class="row">
-                    <div class="col-12">
-                        <b>Bill No</b>: <b id="bill-no"></b>
+                <div class="row" id="order-details">
+                    <div class="col-6">
+                        <div class="col-12">
+                            <h5>General Information</h5>
+                        </div>
+                        <div class="col-12">
+                            <span>Menu Type</span>: <span id="menu-type"></span>
+                        </div>
+                        <div class="col-12">
+                            <span>Bill No</span>: <span id="bill-no"></span>
+                        </div>
+                        <div class="col-12">
+                            <span>Order Date</span>: <span id="order-date"></span>
+                        </div>
+                        <div class="col-12" id="order-destination">
+                            <span>Destination</span>: <span id="destination"></span>
+                        </div>
+                        <div class="col-12">
+                            <span>Status</span>: <span id="order-status"></span>
+                        </div>
+                        <div class="col-12" id="paymentType">
+                            <span>Payment Type</span>: <span id="payment-type"></span>
+                        </div>
+
                     </div>
-                    <div class="col-12">
-                        <b>Customer Name</b>: <b id="customer-name"></b>
-                    </div>
-                    <div class="col-12">
-                        <b>Customer Contact</b>: <b id="customer-contact"></b>
-                    </div>
-                    <div class="col-12">
-                        <b>Order Date</b>: <b id="order-date"></b>
-                    </div>
-                    <div class="col-12">
-                        <b>Status</b>: <b id="order-status"></b>
-                    </div>
-                    <div class="col-12" id="paymentType" >
-                        <b>Payment Type</b>: <b id="payment-type"></b>
+                    <div class="col-6">
+                        <div class="col-12">
+                            <h5>Customer Information</h5>
+                        </div>
+                        <div class="col-12">
+                            <span>Customer Name</span>: <span id="customer-name"></span>
+                        </div>
+                        <div class="col-12">
+                            <span>Customer Type</span>: <span id="customer-type"></span>
+                        </div>
+                        <div class="col-12" id="department" style="display: none;">
+                            <span>Department</span>: <span id="depart"></span>
+                        </div>
+                        <div class="col-12" id="patient" style="display: none;">
+                            <span>Patient Register No:</span>: <span id="register-no"></span>
+                        </div>
+                        <div class="col-12">
+                            <span>Customer Contact</span>: <span id="customer-contact"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -44,6 +70,11 @@
 
                         </tbody>
                     </table>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <span>Note</span>: <span  id="note"></span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer justify-content-end">

@@ -5,7 +5,7 @@
         <div class="col">
             <div class="card card-outline card-success ">
                 <div class="card-header">
-                    <h2 class="card-title">Add Category</h2>
+                    <h2 class="card-title">Add Menu Category</h2>
                     <div class="card-tools">
                         <a class="btn btn-primary" href="{{ route('admin.categories.index') }}"> Back</a></i></a>
                     </div>
@@ -15,10 +15,11 @@
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="title">Category Name</label>
+                                <label class="label" for="title">Category Name @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="title" value="{{ old('title') }}"
                                     class="form-control  @error('title') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter Name" required autocomplete="off">
+                                    placeholder="Enter Category Name" required autocomplete="off">
                                 @error('title')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -26,10 +27,12 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="coupon_discount_percentage">Coupon Discount Percentage</label>
-                                <input type="number" name="coupon_discount_percentage" value="{{ old('coupon_discount_percentage') }}"
+                                <label class="label" for="coupon_discount_percentage">Coupon Discount Percentage @component('compoments.required')
+                                    @endcomponent</label></label>
+                                <input type="number" name="coupon_discount_percentage" value="{{ old('coupon_discount_percentage',100) }}"
                                     class="form-control  @error('coupon_discount_percentage') is-invalid @enderror" step="0.01" min="0" max="100"
-                                    placeholder="Enter Percentage" required autocomplete="off">
+                                    placeholder="Enter Coupon Discount Percentage" required autocomplete="off">
+                                    <span class="text-xs">Note: Set this value 0 if you don't want coupon discount to be applied for category of food items</span>
                                 @error('coupon_discount_percentage')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -37,7 +40,7 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="title">Status</label>
+                                <label class="label" for="title">Status
                                 <div class="custom-control custom-switch  ">
                                     <input type="checkbox" value="1" class="custom-control-input" name="status"
                                         id="status">

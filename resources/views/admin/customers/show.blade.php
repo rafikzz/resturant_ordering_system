@@ -45,8 +45,8 @@
                 ajax: {
                     url: "{{ route('admin.orders.getData') }}",
                     data: function(d) {
-                        d.mode = 'history',
-                            d.customer_id = {{ $customer->id }};
+                        d.mode = 'history';
+                        d.customer_id = {{ $customer->id }};
 
                     }
                 },
@@ -127,18 +127,20 @@
 
                             data.orderItems.forEach(function(item) {
                                 $('#table-items').append(template(item.item.name, item
-                                    .total_quantity, parseFloat(item.average_price)));
+                                    .total_quantity, parseFloat(item
+                                        .average_price)));
                             });
                             $('#table-items').append(
                                 "<tr><td colspan='3'>Total</td><td>" +
                                 foramtValue(data.order.total) + "</td></tr>");
-                            if (data.order.discount && data.order.discount != 0 || data.order.status_id ==3) {
+                            if (data.order.discount && data.order.discount != 0 || data.order
+                                .status_id == 3) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Discount</td><td>" +
                                     foramtValue(data.order.discount) + "</td></tr>");
                             }
 
-                            if (data.order.service_charge && data.order.service_charge != 0 ) {
+                            if (data.order.service_charge && data.order.service_charge != 0) {
                                 $('#table-items').append(
                                     "<tr><td colspan='3'>Service Charge</td><td>" +
                                     foramtValue(data.order.service_charge) + "</td></tr>");

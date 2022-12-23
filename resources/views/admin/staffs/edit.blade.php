@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col">
-            <div class="card card-outline card-success ">
+            <div class="card card-outline card-warning ">
                 <div class="card-header">
                     <h2 class="card-title">Edit Staff</h2>
                     <div class="card-tools">
@@ -16,7 +16,8 @@
                         @method('PUT')
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Staff Name</label>
+                                <label class="label" for="name">Staff Name @component('compoments.required')
+                                    @endcomponent </label>
                                 <input type="text" name="name" value="{{ old('name')?:$customer->name }}"
                                     class="form-control  @error('name') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter Staff Name" required>
@@ -27,10 +28,11 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="phone_no">Contact No.</label>
+                                <label class="label" for="phone_no">Contact No. @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="phone_no" value="{{ old('phone_no')?:$customer->phone_no }}"
                                     class="form-control  @error('phone_no') is-invalid @enderror" autocomplete="off"
-                                    placeholder="Enter Staff Phone No" required>
+                                    placeholder="Enter Staff Contact No" required>
                                 @error('phone_no')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -38,7 +40,8 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="department_id"> Department</label>
+                                <label for="department_id"> Department @component('compoments.required')
+                                    @endcomponent</label>
                                 <select class="form-control" name="department_id" required>
                                     <option selected value="" disabled>--Select Department--</option>
                                     @foreach ($departments as $department)
@@ -54,7 +57,8 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="code">Code No</label>
+                                <label class="label" for="code">Code No @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="code" value="{{ old('code',$code_no) }}"
                                     class="form-control  @error('code') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter Staff Code No" required>

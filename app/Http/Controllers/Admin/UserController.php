@@ -87,11 +87,14 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user)
     {
-        $data = $request->except(['_token', '_method', 'roles',]);
+        $data = $request->except(['_token', '_method', 'roles','confirm-password']);
         if($request->password)
         {
-        $data['password'] = Hash::make($data['password']);
+         $data['password'] = Hash::make($data['password']);
+        }else{
+            unset($data['password']);
         }
+
         $user->update($data);
         $user->syncRoles($request->roles);
         return redirect()->route('admin.users.index')->with("success", "User updated successfully");
@@ -139,7 +142,7 @@ class UserController extends Controller
                 ->addColumn('roles', function (User $user) {
                     $var='';
                     foreach ($user->roles as $role) {
-                        $var =$var.' '. '<label class="badge badge-info" >' . $role->name . '</label>';
+                        $var =$var.' '. '<label class="badge badge-info">' . $role->name . '</label>';
                     }
                     return $var;
 
@@ -149,10 +152,10 @@ class UserController extends Controller
                     function ($row, Request $request) use($canEdit,$canDelete) {
                         if($canEdit){
                             if ($request->mode == 0) {
-                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.users.edit', $row->id) . '"><i class="fa fa-pencil-alt"></i></a>' : '';
+                                $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning" href="' . route('admin.users.edit', $row->id) . '"   data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : '';
                                 if(!($row->created_orders_count || $row->updated_orders_count))
                                 {
-                                    $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                    $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"   data-toggle="tooltip" title="Delete"><i class="fa fa-trash-alt"></i></button>' : '';
 
                                 }
                                 else{
@@ -167,11 +170,11 @@ class UserController extends Controller
 
                                 return $btn;
                             } else {
-                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
+                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"   data-toggle="tooltip" title="Delete">Delete</button>' : '';
                                 $formStart = '<form action="' . route('admin.users.forceDelete', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                  <input type="hidden" name="_method" value="delete" />';
-                                 $restoreBtn =  $canDelete ? '<a class="btn btn-xs btn-success" href="' . route('admin.users.restore', $row->id) . '">Restore</a>' : '';
+                                 $restoreBtn =  $canDelete ? '<a class="btn btn-xs btn-success" href="' . route('admin.users.restore', $row->id) . '" data-toggle="tooltip" title="Restore" >Restore</a>' : '';
                                 $formEnd = '</form>';
                                 $btn = $formStart .$restoreBtn .'  '.$deleteBtn . $formEnd;
 

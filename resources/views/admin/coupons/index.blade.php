@@ -36,7 +36,7 @@
                                             @csrf
                                             @method('delete')
                                             @can('coupon_edit')
-                                                <a href="{{ route('admin.coupons.edit', $coupon->id) }}"
+                                                <a href="{{ route('admin.coupons.edit', $coupon->id) }}"  data-toggle="tooltip" title="Detail"
                                                     class="btn btn-warning btn-xs">
                                                     <i class="fa fa-pencil-alt"></i>
                                                 </a>

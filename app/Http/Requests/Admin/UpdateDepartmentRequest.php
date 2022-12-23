@@ -24,7 +24,7 @@ class UpdateDepartmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>'required|min:3|unique:table_departments,name'.$this->department->id,
+            'name'=>'required|min:3|unique:table_departments,name,'.$this->department->id,
         ];
     }
 }

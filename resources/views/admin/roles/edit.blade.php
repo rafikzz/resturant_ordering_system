@@ -16,10 +16,11 @@
                         @method('PUT')
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Role Name</label>
+                                <label class="label" for="name">Role Name  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="name" value="{{ old('name') ?: $role->name }}"
                                     class="form-control  @error('name') is-invalid @enderror" minlength="3"
-                                    placeholder="Enter Name" required readonly>
+                                    placeholder="Enter Role Name" required >
                                 @error('name')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -27,7 +28,8 @@
                                 @enderror
                             </div>
                         </div>
-                        <label class="permissions" for="confirm-password">Permssions</label>
+                        <label class="permissions" for="confirm-password">Permssions  @component('compoments.required')
+                            @endcomponent</label>
                         <div class="row">
                             @foreach ($permissions as $permission)
                                 <div class="col-3">

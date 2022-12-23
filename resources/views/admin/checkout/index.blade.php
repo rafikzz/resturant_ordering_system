@@ -216,13 +216,14 @@
             coupon_discount = 0;
             if ($(this).val()) {
                 coupon_discount = couponDictionary[$(this).val()];
-                if (coupon_discount >=  order_couponable_discount_amount) {
-                    coupon_discount =  order_couponable_discount_amount;
+                if (coupon_discount >= order_couponable_discount_amount) {
+                    coupon_discount = order_couponable_discount_amount;
                     $('#discount').attr('max', order_non_couponable_discount_amount);
                 } else {
                     coupon_discount = coupon_discount;
                     $('#discount').attr('max',
-                        order_non_couponable_discount_amount + order_couponable_discount_amount  - coupon_discount);
+                        order_non_couponable_discount_amount + order_couponable_discount_amount -
+                        coupon_discount);
                 }
             } else {
                 $('#discount').attr('max', total);
@@ -248,8 +249,8 @@
             calculateSetServiceChargeAndTax()
 
         }
-         //for applying packaging charge
-         $('#apply-charge').on('click', function(e) {
+        //for applying packaging charge
+        $('#apply-charge').on('click', function(e) {
             let delivery = parseFloat($('#delivery').val());
             if (isNaN(delivery)) {
                 delivery = 0;
@@ -275,7 +276,7 @@
         //Calculate
         function calculateSetServiceChargeAndTax(discount = 0) {
             let deliveryCharge = (is_delivery) ? parseFloat($('#delivery_charge').val()) : 0;
-            discount=$('#discount-amount').val() ;
+            discount = $('#discount-amount').val();
             let temp_total = total - coupon_discount - discount;
             if (temp_total + deliveryCharge >= 0) {
                 let service_charge_amount = parseFloat((parseFloat((service_charge / 100) * temp_total)).toFixed(2));
@@ -351,7 +352,7 @@
                 },
                 success: function(data) {
                     if (data.status === 'success') {
-                        setModalData(data.order);
+                        setModalData(data.order, data.customer);
 
                         $('#get-bill').attr('href', data.billRoute);
 
@@ -418,28 +419,59 @@
         function clearModal() {
             $('#bill-no').html('');
             $('#customer-name').html('');
+            $('#menu-type').html('');
             $('#customer-contact').html('');
             $('#order-date').html('');
-
             $('#order-status').html('');
             $('#table-items').html('');
+            $('#depart').html('');
+            $('#department').css('display', 'none');
+            $('#register-no').html('');
+            $('#destination').html('');
+            $('#patient').css('display', 'none');
             $('#get-bill').attr('href', 'javascript:void(0)');
-            $('#paymentType').css('display', 'none');
-            $('#payment-type').html('');
-            $('#order-status').html('');
-
+            $('#note').html('');
         }
 
-        function setModalData(order) {
+        function setModalData(order, customer) {
+            if (order.guest_menu == 1) {
+                $('#menu-type').html('Guest Menu');
+            } else {
+                $('#menu-type').html('Staff Menu');
+            }
             $('#bill-no').html(order.bill_no);
             $('#customer-name').html(order.customer.name);
+            $('#customer-type').html(customer.customer_type.name);
             $('#customer-contact').html(order.customer.phone_no);
             $('#order-date').html(order.order_datetime);
-            if (order.payment_type_id) {
-                $('#paymentType').css('display', 'block');
-                $('#payment-type').html(order.payment_type.name);
-            }
             $('#order-status').html(order.status.title);
+            let destination = "";
+            let destination_no = "";
+            if (order.destination) {
+                destination = order.destination;
+            }
+            if (order.destination_no) {
+                destination_no = order.destination_no;
+            }
+            $('#destination').html(`${destination} ${destination_no}`);
+            if (customer.staff) {
+                if (customer.staff.department) {
+                    $('#department').css('display', 'block');
+                    $('#depart').html(customer.staff.department.name);
+                }
+            }
+            if (customer.patient) {
+                $('#patient').css('display', 'block');
+                $('#register-no').html(customer.patient.register_no);
+            }
+
+            if (order.is_credit) {
+                $('#payment-type').html('Account');
+
+            } else {
+                $('#payment-type').html('Cash');
+            }
+            $('#note').html(order.note);
         }
 
         // function calculateSetServiceChargeAndTax(discount) {

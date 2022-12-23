@@ -12,9 +12,9 @@ class Department extends Model
 
     protected $fillable = ['name'];
 
-    public function customers()
+    public function staffs()
     {
-        return $this->hasMany(Customer::class,'customer_id');
+        return $this->hasMany(Staff::class);
     }
 
 }

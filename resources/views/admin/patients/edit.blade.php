@@ -16,7 +16,8 @@
                         @method('PUT')
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label class="label" for="name">Staff Name</label>
+                                <label class="label" for="name">Staff Name  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="name" value="{{ old('name')?:$customer->name }}"
                                     class="form-control  @error('name') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter Staff Name" required>
@@ -27,10 +28,11 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="phone_no">Contact No.</label>
+                                <label class="label" for="phone_no">Contact No.  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="phone_no" value="{{ old('phone_no')?:$customer->phone_no }}"
                                     class="form-control  @error('phone_no') is-invalid @enderror" autocomplete="off"
-                                    placeholder="Enter phone_no" required>
+                                    placeholder="Enter Contact No" required>
                                 @error('phone_no')
                                     <span class=" text-danger" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -38,7 +40,8 @@
                                 @enderror
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="label" for="register_no">Register No.</label>
+                                <label class="label" for="register_no">Register No.  @component('compoments.required')
+                                    @endcomponent</label>
                                 <input type="text" name="register_no" value="{{ old('register_no')?:($customer->patient)?$customer->patient->register_no:'' }}"
                                     class="form-control  @error('register_no') is-invalid @enderror" autocomplete="off"
                                     placeholder="Enter Register No" required>
@@ -51,7 +54,7 @@
                         </div>
 
                         <div class="col-md-12 text-center">
-                            <button type="submit" class="btn btn-primary  mt-3">Edit Customer</button>
+                            <button type="submit" class="btn btn-primary  mt-3">Edit Patient</button>
                         </div>
                     </form>
                 </div>

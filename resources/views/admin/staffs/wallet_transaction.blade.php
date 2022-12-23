@@ -14,7 +14,9 @@
                     @csrf
                     <div class="row">
                         <div class="form-group col-md-6 ">
-                            <label for="transaction_type_id"> Transaction Type</label>
+                            <label for="transaction_type_id"> Transaction Type  @component('compoments.required')
+
+                                @endcomponent</label>
                             <select class="form-control" name="transaction_type_id" required>
                                 <option selected value="" disabled>--Select Transaction Type--</option>
                                 @foreach ($transaction_types as $transaction_type)
@@ -28,7 +30,9 @@
                             @enderror
                         </div>
                         <div class="form-group col-md-6">
-                            <label class="label" for="amount">Transaction Amount</label>
+                            <label class="label" for="amount">Transaction Amount  @component('compoments.required')
+
+                                @endcomponent</label>
                             <input type="number" name="amount" min="0" step="0.01" value="{{ old('amount') }}"
                                 class="form-control  @error('amount') is-invalid @enderror" autocomplete="off"
                                 placeholder="Enter amount" required>
@@ -39,7 +43,9 @@
                             @enderror
                         </div>
                         <div class="form-group col-md-12">
-                            <label for="description">Description</label>
+                            <label for="description">Description  @component('compoments.required')
+
+                                @endcomponent</label>
                             <textarea name="description" placeholder="Description About Transaction"  class="form-control">{{ old('description') }}</textarea>
                         </div>
                     </div>

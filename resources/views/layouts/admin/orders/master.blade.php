@@ -36,9 +36,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
     <style>
-        [class*="sidebar-dark-"] {
-            background-color: #000;
-        }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
             background-color: #3e4e4e;
