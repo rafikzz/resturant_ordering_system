@@ -15,8 +15,8 @@ class StatusController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:order_list|order_create|order_edit|order_delete', ['only' => ['index','show','getData']]);
-        $this->middleware('permission:order_edit', ['only' => ['edit','update',]]);
+        $this->middleware('permission:status_list|status_edit', ['only' => ['index','show','getData']]);
+        $this->middleware('permission:status_edit', ['only' => ['edit','update',]]);
         $this->title = 'Status Management';
     }
     public function index()

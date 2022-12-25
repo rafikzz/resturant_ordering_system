@@ -32,6 +32,7 @@ class PatientController extends Controller
     {
         $this->middleware('permission:patient_list|patient_create|patient_edit|patient_delete', ['only' => ['index', 'show', 'getData']]);
         $this->middleware('permission:patient_create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:patient_edit', ['only' => ['edit', 'update']]);
         $this->middleware('permission:patient_discharge', ['only' => ['discharge']]);
 
         $this->title = 'Patient Management';

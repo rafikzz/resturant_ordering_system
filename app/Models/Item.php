@@ -12,7 +12,7 @@ class Item extends Model
     use HasFactory,SoftDeletes;
 
     protected $table ='table_items';
-    protected $fillable = ['name','status','price','category_id','image','for_staff'];
+    protected $fillable = ['name','status','price','guest_price','category_id','image','for_staff'];
 
     public function image()
     {

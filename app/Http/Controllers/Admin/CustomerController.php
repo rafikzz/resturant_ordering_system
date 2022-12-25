@@ -19,6 +19,8 @@ class CustomerController extends Controller
     {
         $this->middleware('permission:customer_list|customer_create|customer_edit|customer_delete', ['only' => ['index', 'show', 'getData']]);
         $this->middleware('permission:customer_create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:customer_edit', ['only' => ['edit', 'update']]);
+
         $this->title = 'Walking Customer Management';
     }
     public function index(Request $request)

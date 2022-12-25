@@ -16,7 +16,7 @@ class KOTController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:order_list', ['only' => ['edit', 'update',]]);
+        $this->middleware('permission:order_list', ['only' => ['index', 'getData', 'getOrderDetail',]]);
         $this->title = 'KOT';
     }
     public function index()

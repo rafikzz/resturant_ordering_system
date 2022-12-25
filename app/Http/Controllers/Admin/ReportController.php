@@ -19,7 +19,7 @@ class ReportController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:report_list', ['only' => ['index']]);
+        $this->middleware('permission:report_list', ['only' => ['index','getSalesData']]);
         $this->title = 'Sales Reports';
     }
     public function index(Request $request)

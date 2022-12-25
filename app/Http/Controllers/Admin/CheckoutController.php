@@ -145,9 +145,11 @@ class CheckoutController extends Controller
 
             $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->findOrFail($id);
             $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
+            $customer= Customer::with('staff.department')->with('patient')->with('customer_type')->find($order->customer_id);
             $billRoute = route('orders.getBill', $order->id);
             if ($order) {
                 return response()->json([
+                    'customer'=>$customer,
                     'order' => $order,
                     'billRoute' => $billRoute,
                     'orderItems' => $orderItems,

@@ -29,9 +29,10 @@ class OrderController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:order_list|order_create|order_edit|order_delete', ['only' => ['index', 'show', 'getData']]);
+        $this->middleware('permission:order_list|order_create|order_edit|order_delete|checkout_edit', ['only' => ['index', 'show']]);
         $this->middleware('permission:order_create', ['only' => ['create', 'store']]);
-        $this->middleware('permission:order_edit', ['only' => ['edit', 'update',]]);
+        $this->middleware('permission:order_edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:order_add', ['only' => ['addMoreItem', 'updateMoreItem']]);
         $this->middleware('permission:order_delete', ['only' => ['destroy', 'restore', 'forceDelete']]);
         $this->middleware('permission:checkout_edit', ['only' => ['edit_checkout', 'update_checkout']]);
 
@@ -732,6 +733,7 @@ class OrderController extends Controller
             $canEdit = auth()->user()->can('order_edit');
             $canDelete = auth()->user()->can('order_delete');
             $canAdd = auth()->user()->can('order_add');
+            $canBreakDown = auth()->user()->can('order_breakdown');
             $canCreate = auth()->user()->can('order_create');
             $editCheckout = auth()->user()->can('checkout_edit');
             $completedStatus = Status::where('title', 'Completed')->first()->id;
@@ -751,12 +753,12 @@ class OrderController extends Controller
                 })
                 ->addColumn(
                     'action',
-                    function ($row, Request $request) use ($processingStatus, $completedStatus, $canEdit, $canDelete, $canAdd, $canCreate, $editCheckout) {
+                    function ($row, Request $request) use ($processingStatus, $completedStatus, $canEdit, $canDelete, $canAdd, $canCreate, $editCheckout,$canBreakDown) {
                         if ($row->status_id == $processingStatus && $request->mode !== 'history') {
                             if ($canEdit || $canDelete) {
                                 $checkoutBtn = $canCreate ? '<a href="' . route('admin.orders.checkout', $row->id) . '"  class="btn bg-orange btn-xs"
                                 data-toggle="tooltip" title="Checkout"><i class="fa  fa-cash-register"></i> Checkout</a>' : '';
-                                $breakdownBtn = $canCreate ? '<a href="' . route('admin.orders.breakdown.index', $row->id) . '"  class="btn btn-secondary btn-xs"
+                                $breakdownBtn = $canBreakDown ? '<a href="' . route('admin.orders.breakdown.index', $row->id) . '"  class="btn btn-secondary btn-xs"
                                 data-toggle="tooltip" title="Breakdown"><i class="fa  fa-sitemap"></i> Breakdown</a>' : '';
                                 $editBtn =  $canEdit ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.edit', $row->id) . '" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-alt"></i></a>' : '';
                                 $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"  data-toggle="tooltip" title="Delete"><i class="fa fa-trash-alt"></i></button>' : '';
@@ -768,7 +770,8 @@ class OrderController extends Controller
 
 
                                 $formEnd = '</form>';
-                                $btn = $formStart . ' ' . $detail . ' '  . $addBtn . ' ' . $editBtn . ' ' . $deleteBtn .  ' ' . $checkoutBtn . ' '. $breakdownBtn .  $formEnd;
+                                $btn= "{$formStart} {$detail} {$addBtn} {$editBtn} {$deleteBtn} {$checkoutBtn} {$breakdownBtn} {$formEnd}";
+                                // $btn = $formStart . ' ' . $detail . ' '  . $addBtn . ' ' . $editBtn . ' ' . $deleteBtn .  ' ' . $checkoutBtn . ' '. $breakdownBtn .  $formEnd;
 
                                 return $btn;
                             }
@@ -776,7 +779,7 @@ class OrderController extends Controller
                             if (auth()->user()->can('order_list')) {
                                 $editBtn =  $editCheckout ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.editCheckout', $row->id) . '"  data-toggle="tooltip" title="Edit Checkout"><i class="fa fa-edit"></i></a>' : '';
                                 $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"  data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></button>';
-                                return  $detail . ' ' . $editBtn;
+                                return "{$detail} {$editBtn}";
                             }
                         } else {
                             if (auth()->user()->can('order_list')) {

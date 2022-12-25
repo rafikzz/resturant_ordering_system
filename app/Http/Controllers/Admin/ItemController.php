@@ -55,8 +55,8 @@ class ItemController extends Controller
         Item::create([
             'name' => $request->name,
             'price' => $request->price,
+            'guest_price' => $request->guest_price,
             'status' => isset($request->status) ? 1 : 0,
-            'for_staff' => isset($request->for_staff) ? 1 : 0,
             'category_id' => $request->category_id,
             'image' => isset($imagePath) ? $imagePath : ''
 
@@ -96,10 +96,8 @@ class ItemController extends Controller
     {
         $item->name = $request->name;
         $item->price = $request->price;
-        $item->order = $request->order;
+        $item->guest_price = $request->guest_price;
         $item->category_id = $request->category_id;
-        $item->for_staff = ($request->for_staff) ? 1 : 0;
-
 
         if ($image = $request->file('image')) {
             $path = 'items/';
@@ -192,11 +190,11 @@ class ItemController extends Controller
 
                                 return $btn;
                             } else {
-                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash-alt"></i></button>' : '';
+                                $deleteBtn =  $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete" data-toggle="tooltip" title="Delete"><i class="fa fa-trash-alt" ></i></button>' : '';
                                 $formStart = '<form action="' . route('admin.items.forceDelete', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                 <input type="hidden" name="_method" value="delete" />';
-                                $restoreBtn = $canDelete ? '<a class="btn btn-xs btn-success" href="' . route('admin.items.restore', $row->id) . '">Restore</a>' : '';
+                                $restoreBtn = $canDelete ? '<a class="btn btn-xs btn-success" href="' . route('admin.items.restore', $row->id) . '" data-toggle="tooltip" title="Restore">Restore</a>' : '';
                                 $formEnd = '</form>';
                                 $btn = $formStart . $restoreBtn . '  ' . $deleteBtn . $formEnd;
 

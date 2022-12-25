@@ -4,7 +4,7 @@
         <p>Dashboard</p>
     </a>
 </li>
-@can('user_list')
+@canany(['user_list','role_list'])
     <li
         class="nav-item has-treeview {{ Request::is('admin/users*') ? 'menu-open' : '' }}  {{ Request::is('admin/roles*') ? 'menu-open' : '' }}  ">
         <a href="#"
@@ -16,12 +16,14 @@
             </p>
         </a>
         <ul class="nav nav-treeview ">
-            <li class="nav-item">
-                <a href="{{ url('/admin/users') }}" class="nav-link {{ Request::is('admin/users*') ? 'active' : '' }}">
-                    <i class="nav-icon fa-fw nav-icon fas fa-user"></i>
-                    <p>Users</p>
-                </a>
-            </li>
+            @can('user_list')
+                <li class="nav-item">
+                    <a href="{{ url('/admin/users') }}" class="nav-link {{ Request::is('admin/users*') ? 'active' : '' }}">
+                        <i class="nav-icon fa-fw nav-icon fas fa-user"></i>
+                        <p>Users</p>
+                    </a>
+                </li>
+            @endcan
             @can('role_list')
                 <li class="nav-item ">
                     <a href="{{ url('/admin/roles') }}" class="nav-link {{ Request::is('admin/roles*') ? 'active' : '' }}">
@@ -44,31 +46,17 @@
 @can('item_list')
     <li class="nav-item ">
         <a href="{{ url('/admin/items') }}" class="nav-link {{ Request::is('admin/items*') ? 'active' : '' }}">
-            <i class="nav-icon fa-fw nav-icon fa fa-bread-slice"></i>
+            <i class="nav-icon fa-fw nav-icon fa fa-coffee"></i>
             <p>Food Items</p>
         </a>
     </li>
 @endcan
-@canany('order_list')
-    <li class="nav-item has-treeview {{ Request::is('admin/orders*') ? 'menu-open' : '' }}   ">
-        <a href="#" class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }} ">
-            <i class="nav-icon fas fa-clipboard"></i>
-            <p>
-                Orders Management
-                <i class="right fas fa-angle-left"></i>
-            </p>
+@can('order_list')
+    <li class="nav-item">
+        <a href="{{ route('admin.orders.index') }}" class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }}">
+            <i class="nav-icon fa-fw nav-icon fas fa-clipboard"></i>
+            <p>Orders</p>
         </a>
-        <ul class="nav nav-treeview ">
-            @can('order_list')
-                <li class="nav-item">
-                    <a href="{{ route('admin.orders.index') }}"
-                        class="nav-link {{ Request::is('admin/orders*') ? 'active' : '' }}">
-                        <i class="nav-icon fa-fw nav-icon fas fa-clipboard"></i>
-                        <p>Orders</p>
-                    </a>
-                </li>
-            @endcan
-        </ul>
     </li>
 @endcan
 
@@ -80,12 +68,12 @@
         </a>
     </li>
 @endcan
-@canany('patient_list', 'staff_list')
+@canany(['patient_list', 'staff_list', 'customer_list', 'patient_discharge'])
     <li
         class="nav-item has-treeview {{ Request::is('admin/staffs*') ? 'menu-open' : '' }} {{ Request::is('admin/patients*') ? 'menu-open' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'menu-open' : '' }}   {{ Request::is('admin/customers*') ? 'menu-open' : '' }} ">
         <a href="#"
             class="nav-link {{ Request::is('admin/staffs*') ? 'active' : '' }}  {{ Request::is('admin/patients*') ? 'active' : '' }} {{ Request::is('admin/patient-discharge-payments*') ? 'active' : '' }}  {{ Request::is('admin/customers*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-hospital"></i>
+            <i class="nav-icon fas fa-hospital-user"></i>
             <p>
                 Customer and Staff
                 <i class="right fas fa-angle-left"></i>
@@ -130,9 +118,7 @@
         </ul>
     </li>
 @endcan
-
-
-@canany('report_list')
+@can('report_list')
     <li class="nav-item has-treeview {{ Request::is('admin/reports*') ? 'menu-open' : '' }}   ">
         <a href="#" class="nav-link {{ Request::is('admin/reports*') ? 'active' : '' }} ">
             <i class="nav-icon fas fa-list-ol"></i>
@@ -142,30 +128,26 @@
             </p>
         </a>
         <ul class="nav nav-treeview ">
-            @can('report_list')
-                <li class="nav-item">
-                    <a href="{{ route('admin.reports.sales.index') }}"
-                        class="nav-link {{ Request::is('admin/reports/sales') ? 'active' : '' }}">
-                        <i class="nav-icon fa-fw nav-icon fas fa-bars"></i>
-                        <p>Sales Report</p>
-                    </a>
-                </li>
-            @endcan
+            <li class="nav-item">
+                <a href="{{ route('admin.reports.sales.index') }}"
+                    class="nav-link {{ Request::is('admin/reports/sales') ? 'active' : '' }}">
+                    <i class="nav-icon fa-fw nav-icon fas fa-bars"></i>
+                    <p>Sales Report</p>
+                </a>
+            </li>
         </ul>
         <ul class="nav nav-treeview ">
-            @can('report_list')
-                <li class="nav-item">
-                    <a href="{{ route('admin.reports.item_sales.index') }}"
-                        class="nav-link {{ Request::is('admin/reports/item-sales') ? 'active' : '' }}">
-                        <i class="nav-icon fa-fw nav-icon fas fa-book"></i>
-                        <p>Item Sales Report</p>
-                    </a>
-                </li>
-            @endcan
+            <li class="nav-item">
+                <a href="{{ route('admin.reports.item_sales.index') }}"
+                    class="nav-link {{ Request::is('admin/reports/item-sales') ? 'active' : '' }}">
+                    <i class="nav-icon fa-fw nav-icon fas fa-book"></i>
+                    <p>Item Sales Report</p>
+                </a>
+            </li>
         </ul>
     </li>
 @endcan
-@can('order_edit')
+@can('order_list')
     <li class="nav-item ">
         <a href="{{ url('/admin/kot') }}" class="nav-link {{ Request::is('admin/kot*') ? 'active' : '' }}">
             <i class="nav-icon fa-fw nav-icon fa fa-list-alt"></i>
@@ -181,7 +163,7 @@
         </a>
     </li>
 @endcan
-@can('coupon_list')
+@can('department_list')
     <li class="nav-item ">
         <a href="{{ url('/admin/departments') }}"
             class="nav-link {{ Request::is('admin/departments*') ? 'active' : '' }}">

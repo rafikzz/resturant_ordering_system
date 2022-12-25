@@ -191,11 +191,11 @@ class CategoryController extends Controller
 
                                 return $btn;
                             } else {
-                                $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete">Delete</button>' : '';
+                                $deleteBtn = $canDelete ? '<button type="submit" class="btn btn-xs btn-danger btn-delete" data-toggle="tooltip" title="Delete">Delete</button>' : '';
                                 $formStart = '<form action="' . route('admin.categories.forceDelete', $row->id) . '" method="POST">
                                 ' . csrf_field() . '
                                 <input type="hidden" name="_method" value="delete" />';
-                                $restoreBtn = $canDelete ? '<a class="btn btn-xs btn-success" href="' . route('admin.categories.restore', $row->id) . '">Restore</a>' : '';
+                                $restoreBtn = $canDelete ? '<a class="btn btn-xs btn-success" href="' . route('admin.categories.restore', $row->id) . '" data-toggle="tooltip" title="Restore">Restore</a>' : '';
                                 $formEnd = '</form>';
                                 $btn = $formStart . $restoreBtn . '  ' . $deleteBtn . $formEnd;
 

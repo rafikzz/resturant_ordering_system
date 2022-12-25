@@ -15,7 +15,7 @@ class OrderBreakDownController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:order_create', ['only' => ['index', 'store']]);
+        $this->middleware('permission:order_breakdown', ['only' => ['index', 'store','test','store_test']]);
         $this->title = 'Order Management';
     }
     public function index($id)

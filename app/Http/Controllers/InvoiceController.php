@@ -41,7 +41,7 @@ class InvoiceController extends Controller
             'phone'          => $order->customer->phone_no
         ]);
         $setting=Setting::first();
-        $prefix =isset($setting)?$setting->bill_no_prefix:'B';
+        $prefix =isset($setting)?($setting->bill_no_prefix?:'B'):'B';
         $serviceCharge =$order->service_charge?:0.00;
         $deliveryCharge =$order->delivery_charge?:0.00;
 

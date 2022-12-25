@@ -33,8 +33,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet"
         href="{{ asset('admin-lte/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css') }}">
     {{-- Owl Carousel --}}
-    <link href="{{ asset('css/owl.carousel.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/owl.theme.default.min.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('css/owl.carousel.css') }}" rel="stylesheet"> --}}
+    {{-- <link href="{{ asset('css/owl.theme.default.min.css') }}" rel="stylesheet"> --}}
 
 
     <style>
@@ -202,13 +202,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{ asset('admin-lte/plugins/daterangepicker/daterangepicker.js') }}"></script>
 
     {{-- jQuery Ui --}}
-    <script src="{{ asset('js/jQuery-ui.js') }}"></script>
+    <script src="{{ asset('js/jQuery-ui.js') }}" defer></script>
     {{-- Bs custom file Input --}}
     <script src="{{ asset('admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
     {{-- Owl Carousel --}}
-    <script src="{{ asset('js/owl.carousel.js') }}"></script>
+    {{-- <script src="{{ asset('js/owl.carousel.js') }}"></script> --}}
     {{-- Ck Editor --}}
-    <script src="{{ asset('js/ckeditor/ckeditor.js') }}"></script>
+    {{-- <script src="{{ asset('js/ckeditor/ckeditor.js') }}"></script> --}}
     {{-- BsColorPicker --}}
     <script src="{{ asset('admin-lte/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
     {{-- Sweet Alert --}}
@@ -238,9 +238,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @endif
     </script> --}}
     <script>
-        $(document).ready(function() {
-            $('.select2').select2();
-        });
+        $('.select2').select2();
         jQuery.ajaxSetup({
             beforeSend: function() {
                 $('#overlay').show()

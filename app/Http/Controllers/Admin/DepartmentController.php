@@ -13,7 +13,7 @@ class DepartmentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:coupon_list|department_create|department_edit|department_delete', ['only' => ['index','show','getData']]);
+        $this->middleware('permission:department_list|department_create|department_edit|department_delete', ['only' => ['index','show','getData']]);
         $this->middleware('permission:department_create', ['only' => ['create','store']]);
         $this->middleware('permission:department_edit', ['only' => ['edit','update',]]);
         $this->middleware('permission:department_delete', ['only' => ['destroy']]);

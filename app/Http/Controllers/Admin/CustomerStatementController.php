@@ -12,7 +12,7 @@ class CustomerStatementController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:customer_statetment_list', ['only' => ['edit', 'update',]]);
+        $this->middleware('permission:customer_statetment_list', ['only' => ['index', 'getReport',]]);
         $this->title = 'Customer Statements';
     }
 
