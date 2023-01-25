@@ -91,7 +91,13 @@
                                 </div>
                             </div>
                             @component('admin.orders.components._add_customers',
-                                ['customers' => $customers, 'customer_type_id' => $default_customer_type_id,'departments'=>$departments,'code_no'=>$code_no ,'customer_id' => null])
+                                [
+                                    'customers' => $customers,
+                                    'customer_type_id' => $default_customer_type_id,
+                                    'departments' => $departments,
+                                    'code_no' => $code_no,
+                                    'customer_id' => null,
+                                ])
                             @endcomponent
 
                             <div class="col-md-6">
@@ -479,6 +485,22 @@
                     });
                 }
             });
+        });
+        $("#order-form").validate({
+            rules: {
+                pName: {
+                    required: true,
+                    minlength: 8
+                },
+                action: "required"
+            },
+            messages: {
+                pName: {
+                    required: "Please enter some data",
+                    minlength: "Your data must be at least 8 characters"
+                },
+                action: "Please provide some data"
+            }
         });
 
 

@@ -1,9 +1,8 @@
     <div class="container-fluid">
-        <a href="{{ route('dashboard') }}" class="navbar-brand">
-            {{-- <img src="../../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-                style="opacity: .8"> --}}
-            <span class="brand-text font-weight-light">{{ config('app.name', 'Laravel') }}</span>
 
+        <a href="{{ route('dashboard') }}" class="navbar-brand">
+            <img src="{{ asset('assets/img/logo.png') }}" alt="AdminLTE Logo" class="brand-image my-auto"
+                style="opacity: .8">
         </a>
         <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,11 +65,9 @@
             <li class="nav-item dropdown ml-3">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    User
+                    {{ auth()->user()->name }}
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item disabled">{{ auth()->user()->name }}</a>
-                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ route('logout') }}"
                         onclick="event.preventDefault();
                           document.getElementById('logout-form').submit();">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\OrderCheckoutRequest;
+use App\Http\Services\PrintOrderService;
 use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\CustomerWalletTransaction;
@@ -140,29 +141,30 @@ class CheckoutController extends Controller
         //     $items[$item->id] =  (new InvoiceItem())->title($item->item->name)->pricePerUnit($item->price)->quantity($item->total)->subTotalPrice($item->price*$item->total);
         // }
         //
+        PrintOrderService::printBill($order->id);
 
-        if ($request->ajax()) {
+        // if ($request->ajax()) {
 
-            $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->findOrFail($id);
-            $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
-            $customer= Customer::with('staff.department')->with('patient')->with('customer_type')->find($order->customer_id);
-            $billRoute = route('orders.getBill', $order->id);
-            if ($order) {
-                return response()->json([
-                    'customer'=>$customer,
-                    'order' => $order,
-                    'billRoute' => $billRoute,
-                    'orderItems' => $orderItems,
-                    'status' => 'success',
-                    'message' => 'Order fetched successfully',
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'No Order found',
-                ]);
-            }
-        }
+        //     $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->findOrFail($id);
+        //     $orderItems = OrderItem::with('item:id,name')->where('order_id', $order->id)->where('total', '>', 0)->get();
+        //     $customer= Customer::with('staff.department')->with('patient')->with('customer_type')->find($order->customer_id);
+        //     $billRoute = route('orders.getBill', $order->id);
+        //     if ($order) {
+        //         return response()->json([
+        //             'customer'=>$customer,
+        //             'order' => $order,
+        //             'billRoute' => $billRoute,
+        //             'orderItems' => $orderItems,
+        //             'status' => 'success',
+        //             'message' => 'Order fetched successfully',
+        //         ]);
+        //     } else {
+        //         return response()->json([
+        //             'status' => 'fail',
+        //             'message' => 'No Order found',
+        //         ]);
+        //     }
+        // }
 
 
         return redirect()->route('admin.orders.index')->with('success', 'Order Checked Out Successfully');

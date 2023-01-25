@@ -15,7 +15,7 @@ class CustomerSeeder extends Seeder
     public function run()
     {
         Customer::create([
-            'name'=>'Walking Customer',
+            'name'=>'Walk-in Customer',
             'customer_type_id'=>1,
             'phone_no'=>'N/A',
         ]);

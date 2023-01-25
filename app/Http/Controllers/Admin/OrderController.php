@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreOrderRequest;
 use App\Http\Requests\Admin\UpdateOrderRequest;
+use App\Http\Services\PrintOrderService;
 use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Customer;
@@ -73,12 +74,11 @@ class OrderController extends Controller
         $departments = Department::orderBy('name')->get();
         $code_no = $this->getCodeNo();
 
-        return view('admin.orders.create', compact('title', 'categories', 'guest_menu', 'code_no','delivery_charge', 'customer_types', 'coupons', 'couponsDictionary', 'default_customer_type_id', 'customers', 'tax', 'service_charge', 'breadcrumbs', 'departments'));
+        return view('admin.orders.create', compact('title', 'categories', 'guest_menu', 'code_no', 'delivery_charge', 'customer_types', 'coupons', 'couponsDictionary', 'default_customer_type_id', 'customers', 'tax', 'service_charge', 'breadcrumbs', 'departments'));
     }
 
     public function store(StoreOrderRequest $request)
     {
-
         $setting = Setting::first();
         $tax = isset($setting) ? $setting->getTax() : 0;
         $service_charge = isset($setting) ? $setting->getServiceCharge() : 0;
@@ -190,15 +190,21 @@ class OrderController extends Controller
         }
         DB::commit();
         Cart::clear();
-        if($request->checkout)
+        //For Printing Bill
+        if($cartItems->count() )
         {
-            return redirect()->route('admin.orders.create')->with('success', 'Order Checked Out Successfully');
-
-        }else{
-            return redirect()->route('admin.orders.create')->with('success', 'Order Saved Successfully');
-
+            PrintOrderService::printKot($order->id);
         }
 
+        if ($request->checkout) {
+            PrintOrderService::printBill($order->id);
+        }
+
+        if ($request->checkout) {
+            return redirect()->back()->with('success', 'Order Checked Out Successfully');
+        } else {
+            return redirect()->back()->with('success', 'Order Saved Successfully');
+        }
     }
 
     public function edit($id)
@@ -439,9 +445,10 @@ class OrderController extends Controller
             Cart::clear();
             DB::rollback();
             throw $th;
+        } finally {
+            DB::commit();
+            Cart::clear();
         }
-        Cart::clear();
-        DB::commit();
 
         return redirect()->route('admin.orders.index')->with('success', 'Order Edited Successfully');
     }
@@ -561,6 +568,9 @@ class OrderController extends Controller
         }
         Cart::clear();
         DB::commit();
+        if ($request->checkout) {
+            PrintOrderService::printBill($order->id);
+        }
 
         return redirect()->route('admin.orders.index')->with('success', 'Order Edited Successfully');
     }
@@ -634,7 +644,8 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $cartItems = Cart::getContent();
-            $this->storeOrderItem($order, $cartItems);
+            //Order No For Printing Kot
+            $orderNo = $this->storeOrderItem($order, $cartItems);
             $total = $order->getTotal();
             $order_items = OrderItem::where('order_id', $order->id)->with('item.category')->where('total', '>', 0)->get();
             $coupon_discoutable_amount = $this->getCouponableDiscountAmount($order_items);
@@ -695,6 +706,14 @@ class OrderController extends Controller
         }
         DB::commit();
         Cart::clear();
+        //For Printing Bill
+        if ($orderNo) {
+            PrintOrderService::printKot($order->id, $orderNo);
+        }
+        if ($request->checkout) {
+            PrintOrderService::printBill($order->id);
+        }
+
         return redirect()->route('admin.orders.index')->with('success', 'Order Added Successfully');
     }
 
@@ -753,9 +772,13 @@ class OrderController extends Controller
                 })
                 ->addColumn(
                     'action',
-                    function ($row, Request $request) use ($processingStatus, $completedStatus, $canEdit, $canDelete, $canAdd, $canCreate, $editCheckout,$canBreakDown) {
+                    function ($row, Request $request) use ($processingStatus, $completedStatus, $canEdit, $canDelete, $canAdd, $canCreate, $editCheckout, $canBreakDown) {
+                        $kotDetail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs kot-detail my-2"  data-toggle="tooltip" title="KOT">KOT</button>';
+
                         if ($row->status_id == $processingStatus && $request->mode !== 'history') {
+
                             if ($canEdit || $canDelete) {
+
                                 $checkoutBtn = $canCreate ? '<a href="' . route('admin.orders.checkout', $row->id) . '"  class="btn bg-orange btn-xs"
                                 data-toggle="tooltip" title="Checkout"><i class="fa  fa-cash-register"></i> Checkout</a>' : '';
                                 $breakdownBtn = $canBreakDown ? '<a href="' . route('admin.orders.breakdown.index', $row->id) . '"  class="btn btn-secondary btn-xs"
@@ -770,21 +793,20 @@ class OrderController extends Controller
 
 
                                 $formEnd = '</form>';
-                                $btn= "{$formStart} {$detail} {$addBtn} {$editBtn} {$deleteBtn} {$checkoutBtn} {$breakdownBtn} {$formEnd}";
+                                $btn = "{$formStart} {$detail} {$kotDetail} {$addBtn} {$editBtn} {$deleteBtn} {$checkoutBtn} {$breakdownBtn} {$formEnd}";
                                 // $btn = $formStart . ' ' . $detail . ' '  . $addBtn . ' ' . $editBtn . ' ' . $deleteBtn .  ' ' . $checkoutBtn . ' '. $breakdownBtn .  $formEnd;
-
                                 return $btn;
                             }
                         } else if ($row->status_id == $completedStatus && $request->mode !== 'history') {
                             if (auth()->user()->can('order_list')) {
                                 $editBtn =  $editCheckout ? '<a class="btn btn-xs btn-warning"  href="' . route('admin.orders.editCheckout', $row->id) . '"  data-toggle="tooltip" title="Edit Checkout"><i class="fa fa-edit"></i></a>' : '';
                                 $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"  data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></button>';
-                                return "{$detail} {$editBtn}";
+                                return "{$detail} {$kotDetail} {$editBtn}";
                             }
                         } else {
                             if (auth()->user()->can('order_list')) {
                                 $detail = '<button rel="' . $row->id . '"  class="btn btn-primary btn-xs get-detail my-2"  data-toggle="tooltip" title="Detail"><i class="fa fa-eye"></i></button>';
-                                return   $detail;
+                                return  "{$detail} ";
                             }
                         }
                     }
@@ -801,7 +823,7 @@ class OrderController extends Controller
     {
         if (request()->ajax()) {
             $order = Order::with('status:id,title')->with('payment_type:id,name')->with('customer')->where('id', $request->order_id)->first();
-            $customer= Customer::with('staff.department')->with('patient')->with('customer_type')->find($order->customer_id);
+            $customer = Customer::with('staff.department')->with('patient')->with('customer_type')->find($order->customer_id);
             $orderItems = OrderItem::select('item_id', DB::raw('sum(total * price) as total_price'), DB::raw('sum(total * price)/sum(total) as average_price'), DB::raw('sum(total) as total_quantity'))
                 ->with('item')->where('order_id', $order->id)->where('total', '>', 0)->groupBy('item_id')->get();
             $billRoute = route('orders.getBill', $order->id);
@@ -809,7 +831,7 @@ class OrderController extends Controller
             if ($order) {
                 return response()->json([
                     'order' => $order,
-                    'customer'=>$customer,
+                    'customer' => $customer,
                     'billRoute' => $billRoute,
                     'orderItems' => $orderItems,
                     'status' => 'success',
@@ -826,18 +848,23 @@ class OrderController extends Controller
     public function storeOrderItem($order, $cartItems, $statusId = 1)
     {
         $orderNo = $order->getOrderNo();
-        foreach ($cartItems as $item) {
-            OrderItem::create([
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
-                'order_no' => $orderNo,
-                'item_id' => $item->id,
-                'price' => $item->price,
-                'quantity' => $item->quantity,
-                'total' => $item->quantity,
-                'order_id' => $order->id,
-            ]);
+        if ($cartItems->count()) {
+            foreach ($cartItems as $item) {
+                OrderItem::create([
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                    'order_no' => $orderNo,
+                    'item_id' => $item->id,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                    'total' => $item->quantity,
+                    'order_id' => $order->id,
+                ]);
+            }
+            return $orderNo;
         }
+
+        return null;
     }
 
     public function store_customer_wallet_transacion($order, $dueAmount, $paidAmount)

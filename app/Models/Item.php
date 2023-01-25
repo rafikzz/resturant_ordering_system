@@ -17,7 +17,7 @@ class Item extends Model
     public function image()
     {
 
-        return (Storage::disk('public')->exists($this->image)) ? '/storage/' . $this->image : asset('noimgavialable.png');
+        return (Storage::disk('public')->exists($this->image)) ? '/storage/' . $this->image : asset('assets/img/product/noimage.jpg');
     }
 
     /**

@@ -18,11 +18,13 @@ class CartController extends Controller
             if (isset($cartItems)) {
                 $discountable_amount = $this->getDiscoutableAmount();
                 $total = Cart::getTotal();
+                $order_count=$cartItems->count();
                 $non_discountable_amount = $total - $discountable_amount;
                 return response()->json([
                     'discountable_amount' => $discountable_amount,
                     'non_discountable_amount' => $non_discountable_amount,
                     'total' => $total,
+                    'order_count'=>$order_count,
                     'status' => 'success',
                     'message' => 'Item added successfully',
                 ]);
@@ -56,18 +58,22 @@ class CartController extends Controller
                     'name' => $item->name,
                     'price' => $price,
                     'quantity' => '1',
-                    'attributes' => ['coupon_discount_percentage' => (float)$item->category->coupon_discount_percentage]
+                    'attributes' => ['coupon_discount_percentage' => (float)$item->category->coupon_discount_percentage,
+                    'image'=>$item->image()
+                    ]
 
                 ));
                 $cartItems = Cart::getContent();
                 $discountable_amount = $this->getDiscoutableAmount();
                 $total = Cart::getTotal();
+                $order_count=$cartItems->count();
                 $non_discountable_amount = $total - $discountable_amount;
                 return response()->json([
                     'discountable_amount' => $discountable_amount,
                     'non_discountable_amount' => $non_discountable_amount,
                     'items' => $cartItems,
                     'total' => $total,
+                    'order_count'=>$order_count,
                     'status' => 'success',
                     'message' => 'Item added successfully',
                 ]);
@@ -88,11 +94,16 @@ class CartController extends Controller
                 Cart::remove($item->id);
                 $discountable_amount = $this->getDiscoutableAmount();
                 $total = Cart::getTotal();
+                $cartItems = Cart::getContent();
+
+                $order_count=$cartItems->count();
+
                 $non_discountable_amount = $total - $discountable_amount;
                 return response()->json([
                     'discountable_amount' => $discountable_amount,
                     'non_discountable_amount' => $non_discountable_amount,
                     'total' => $total,
+                    'order_count' => $order_count,
                     'status' => 'success',
                     'message' => 'Item removed successfully',
                 ]);
@@ -118,11 +129,15 @@ class CartController extends Controller
                 ));
                 $discountable_amount = $this->getDiscoutableAmount();
                 $total = Cart::getTotal();
+                $cartItems = Cart::getContent();
+
+                $order_count=$cartItems->count();
                 $non_discountable_amount = $total - $discountable_amount;
                 return response()->json([
                     'discountable_amount' => $discountable_amount,
                     'non_discountable_amount' => $non_discountable_amount,
                     'total' => $total,
+                    'order_count' => $order_count,
                     'status' => 'success',
                     'message' => 'Item Quantity Updated successfully.',
                 ]);
@@ -147,6 +162,7 @@ class CartController extends Controller
                 'discountable_amount' => $discountable_amount,
                 'non_discountable_amount' => $non_discountable_amount,
                 'total' => $total,
+                'order_count' => 0,
                 'message' => 'Cart Cleared Successfully',
             ]);
         }

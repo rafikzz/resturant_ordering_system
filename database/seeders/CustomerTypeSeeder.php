@@ -15,7 +15,7 @@ class CustomerTypeSeeder extends Seeder
     public function run()
     {
         $customer_types = [
-            ['Walking Customer',  0,0,1],
+            ['Walk-in Customer',  0,0,1],
             [ 'Staff',  1,1,0],
             ['Patient', 1,0,0],
 

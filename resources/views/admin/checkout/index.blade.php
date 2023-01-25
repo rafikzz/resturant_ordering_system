@@ -149,12 +149,10 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <button id="print-bill" class="btn btn-primary">Checkout and Print Bill</button>
                         <button type="submit" class="btn btn-primary">Checkout</button>
                     </div>
                 </form>
             </div>
-            @include('admin.orders._orderDetailModal')
         </div>
     </div>
 @endsection

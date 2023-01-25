@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Services\PrintOrderService;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Status;
@@ -95,4 +96,5 @@ class KOTController extends Controller
             }
         }
     }
+
 }

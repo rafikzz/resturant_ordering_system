@@ -107,7 +107,6 @@
         $(document).on('change', '.item-select', function() {
             let item = $(this);
             let item_id = $(this).val();
-            console.log(item_id, itemQuantityDictionary[item_id]);
             if (item_id) {
                 item.parent('td').closest('tr').find('.max_quantity').html(itemQuantityDictionary[item_id]);
                 item.parent('td').closest('tr').find('.transfer_quantity').attr('max', itemQuantityDictionary[

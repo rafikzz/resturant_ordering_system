@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-        @include('admin.kot._orderDetailModal')
+        @include('admin.kot._orderKotDetailModal')
     </div>
 @endsection
 @section('js')
@@ -47,6 +47,7 @@
             // $('#table').DataTable({
             //     "aaSorting": []
             // });
+            //For Getting Order Table
             var table = $('#table').DataTable({
                 responsive: true,
                 processing: true,
@@ -113,7 +114,7 @@
 
             });
 
-
+            //For Changing Data
             $(document).on('change', '#mode', function() {
                 table.draw();
             });
@@ -136,33 +137,76 @@
                     }
                 });
             });
+            /For Kot Display
+        $(document).on('click', '.kot-detail', function() {
+            let order_id = $(this).attr('rel');
+            $('#kot-modal').modal('toggle');
+            $('.kot-detail').attr('disabled', true);
 
-            $(document).on('click', '.get-detail', function() {
-                let order_id = $(this).attr('rel');
-                $('#modal-lg').modal('toggle');
-                $('.get-detail').attr('disabled', true);
+            clearKOTModal();
 
-                clearModal();
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('admin.kot.getOrderDetail') }}',
+                data: {
+                    'order_id': order_id
+                },
+                beforeSend: function() {
+                    $('#overlay').show();
+                },
+                success: function(data) {
+                    $('#overlay').hide();
+                    $('.kot-detail').attr('disabled', false);
 
+                    if (data.status === 'success') {
+                        setKOTModalData(data.order);
+                        $('#kot-get-bill').attr('href', data.billRoute);
+                        for (let key in data.orderItems) {
+                            $('#kot-ordered-tems').append(kotTemplate(data.orderItems[key], key, data
+                                .order.id));
+                        }
+
+                    } else {
+                        console.log('false');
+                    }
+
+
+                },
+                error: function(xhr) {
+
+                    $('#overlay').hide();
+                    $('.kot-detail').attr('disabled', false);
+                    console.log('Internal Serve Error');
+                }
+            });
+        });
+
+
+
+        $(document).on('click', '.print-this', function() {
+            var order_no = $(this).attr('rel');
+            var order_id = $(this).attr('data-order_id');
+            if (order_id) {
                 $.ajax({
                     type: 'GET',
-                    url: '{{ route('admin.kot.getOrderDetail') }}',
+                    url: '{{ route('invoice.printKot') }}',
                     data: {
-                        'order_id': order_id
+                        'order_id': order_id,
+                        'order_no': order_no,
                     },
                     beforeSend: function() {
                         $('#overlay').show();
                     },
                     success: function(data) {
                         $('#overlay').hide();
-                        $('.get-detail').attr('disabled', false);
+                        $('.kot-detail').attr('disabled', false);
 
                         if (data.status === 'success') {
-                            setModalData(data.order);
-                            $('#get-bill').attr('href', data.billRoute);
+                            setKOTModalData(data.order);
+                            $('#kot-get-bill').attr('href', data.billRoute);
                             for (let key in data.orderItems) {
-
-                                $('#ordered-tems').append(template(data.orderItems[key],key));
+                                $('#kot-ordered-tems').append(kotTemplate(data.orderItems[key], key,
+                                    data.order.id));
                             }
 
                         } else {
@@ -174,81 +218,53 @@
                     error: function(xhr) {
 
                         $('#overlay').hide();
-                        $('.get-detail').attr('disabled', false);
+                        $('.kot-detail').attr('disabled', false);
                         console.log('Internal Serve Error');
                     }
                 });
-            });
+            }
+
 
         });
-
-        $(document).on('click', '.complete-order-item', function() {
-            let btn = $(this);
-            let item_id = btn.attr('rel');
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                url: "{{ route('admin.kot.completeOrderItem') }}",
-                data: {
-                    item_id: item_id,
-                    "_token": "{{ csrf_token() }}",
-                },
-                success: function(response) {
-                    if (response.status == "success") {
-                        btn.closest('td').html('Completed');
-                    } else {
-                        console.log(response);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click','.print-this',function(){
-            let key= $(this).attr('rel');
-            $('#talbeNO, #orderDate, #order-list-'+key).printThis({
-                header: "<h1>KOT Slip</h1>",
-                importCSS: true,
-                printDelay: 1000,
-
-            });
-        });
-
-        function template(items,key) {
-            let template ='<div class="col-6"><h5>Order Slip '+key
-                +'</h5> </div> <div class="col-6"> <a href="javascript:void(0);" rel="'+key+'" class="btn btn-primary btn-xs print-this float-right ">Print This</a> </div> <div class="col-12"> <table class="table table-sm" id="order-list-'+
-                    key+'"> <thead> <th>Item Name</th> <th>Quantity</th> </thead> <tbody> ';
+        //For Displaying Order Items
+        function kotTemplate(items, key, order_id) {
+            let template = '<div class="col-6"><h5>Order Slip ' + key +
+                '</h5> </div> <div class="col-6"> <a href="javascript:void(0);" rel="' + key +
+                '" data-order_id="' + order_id +
+                '" class="btn btn-primary btn-xs print-this float-right ">Print This</a> </div> <div class="col-12"> <table class="table table-sm" id="order-list-' +
+                key + '"> <thead> <th>Item Name</th> <th>Quantity</th> </thead> <tbody> ';
             items.forEach(function(value) {
-                template +='<tr><td><b>'+value.item.name+'</b></td><td><b>'+value.total+'</b></td></tr>';
+                template += '<tr><td><b>' + value.item.name + '</b></td><td><b>' + value.total + '</b></td></tr>';
             });
-            template+='</tbody></table></div>';
+            template += '</tbody></table></div>';
             return template;
 
         }
-
-        function clearModal() {
-            $('#bill-no').html('');
-            $('#customer-name').html('');
-            $('#customer-contact').html('');
-            $('#order-date').html('');
-            $('#order-status').html('');
-            $('#ordered-tems').html('');
-            $('#get-bill').attr('href', 'javascript:void(0)');
-            $('#table-no').html('');
-
-
-        }
-
-        function setModalData(order) {
-            $('#bill-no').html(order.bill_no);
-            $('#customer-name').html(order.customer.name);
-            $('#customer-contact').html(order.customer.phone_no);
-            $('#order-date').html(order.order_datetime);
-            $('#order-status').html(order.status.title);
-            $('#table-no').html(order.table_no);
+        //For Cleariing Kot Modal
+        function clearKOTModal() {
+            $('#kot-bill-no').html('');
+            $('#kot-customer-name').html('');
+            $('#kot-customer-contact').html('');
+            $('#kot-order-date').html('');
+            $('#kot-order-status').html('');
+            $('#kot-ordered-tems').html('');
+            $('#kot-get-bill').attr('href', 'javascript:void(0)');
+            $('#kot-table-no').html('');
+            $('#print-kot-all').attr('data-order_id','');
 
 
         }
+        //For Setting Data in Kot Modal
+        function setKOTModalData(order) {
+            $('#kot-bill-no').html(order.bill_no);
+            $('#kot-customer-name').html(order.customer.name);
+            $('#kot-customer-contact').html(order.customer.phone_no);
+            $('#kot-order-date').html(order.order_datetime);
+            $('#kot-order-status').html(order.status.title);
+            $('#kot-table-no').html(order.table_no);
+            $('#print-kot-all').attr('data-order_id',order.id);
 
+        }
 
         function foramtValue(val) {
             return 'Rs. ' + val;

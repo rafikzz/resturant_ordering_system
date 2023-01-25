@@ -23,7 +23,7 @@ class StoreOrderRequest extends FormRequest
      */
     public function rules()
     {
-        $rules =   [
+            $rules =   [
             'destination' => 'nullable',
             'destination_no' => 'nullable',
             'customer_id' => 'required_without:customer_name',

@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\StatusController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\PosController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,6 +48,9 @@ Route::post('/dashboard/getSalesData',  [DashboardController::class, 'getSalesCh
 
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], function () {
+
+    Route::get('pos',[PosController::class,'index'])->name('pos');
+
     //User route
     Route::resource('users', UserController::class);
     Route::get('get-user-data', [UserController::class, 'getData'])->name('users.getData');
@@ -134,7 +138,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Patient Controller
     Route::resource('patients', PatientController::class);
     Route::post('patients/{id}/discharge', [PatientController::class,'discharge'])->name('patients.discharge');
-    Route::get('patients/{id}/discharge', [PatientController::class,'discharge_show'])->name('patients.discharge');
+    Route::get('patients/{id}/discharge', [PatientController::class,'discharge_show'])->name('patients.discharge.show');
     Route::get('patients/{id}/export', [PatientController::class,'export'])->name('patients.export');
     Route::get('patients/export/export-order-items', [PatientController::class,'exportOrderItems'])->name('patients.exportOrderItems');
 
@@ -160,7 +164,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 
 
-
     //Report Controller
     Route::get('reports/sales', [ReportController::class, 'index'])->name('reports.sales.index');
     Route::get('get-sales-report-data', [ReportController::class, 'getSalesData'])->name('reports.salesData');
@@ -174,9 +177,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth'], fu
     //Customer Statement Controller
     Route::get('reports/customer-statement', [CustomerStatementController::class, 'index'])->name('reports.customer_statement');
     //KOT Controller
-    Route::get('kot', [KOTController::class, 'index'])->name('kot.index');
-    Route::post('complete-order-item', [KOTController::class, 'completeOrderItem'])->name('kot.completeOrderItem');
-    Route::get('get-order-data-for-kot', [KOTController::class, 'getData'])->name('kot.getData');
+    // Route::get('kot', [KOTController::class, 'index'])->name('kot.index');
+    // Route::get('get-order-data-for-kot', [KOTController::class, 'getData'])->name('kot.getData');
     Route::get('get-order-detail-for-kot', [KOTController::class, 'getOrderDetail'])->name('kot.getOrderDetail');
 
     //Payment Type Controller
@@ -194,4 +196,6 @@ Route::get('/home', function(){
     return redirect()->route('dashboard');
 })->name('home');
 //Invoice Controller
-Route::get('/order/invoice/{order}', [App\Http\Controllers\InvoiceController::class, 'index'])->name('orders.getBill');
+Route::get('/order/invoice/{order}', [App\Http\Controllers\InvoiceController::class, 'printReceipt'])->name('orders.getBill')->middleware('auth');
+Route::get('/invoice/print/kot', [App\Http\Controllers\InvoiceController::class, 'printKot'])->name('invoice.printKot')->middleware('auth');
+

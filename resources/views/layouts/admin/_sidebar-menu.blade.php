@@ -59,6 +59,14 @@
         </a>
     </li>
 @endcan
+@can('order_create')
+    <li class="nav-item">
+        <a href="{{ route('admin.pos') }}" class="nav-link {{ Request::is('admin/pos*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-shopping-cart"></i>
+            <p>POS</p>
+        </a>
+    </li>
+@endcan
 
 @can('status_list')
     <li class="nav-item ">
@@ -147,14 +155,14 @@
         </ul>
     </li>
 @endcan
-@can('order_list')
+{{-- @can('order_list')
     <li class="nav-item ">
         <a href="{{ url('/admin/kot') }}" class="nav-link {{ Request::is('admin/kot*') ? 'active' : '' }}">
             <i class="nav-icon fa-fw nav-icon fa fa-list-alt"></i>
             <p>KOT</p>
         </a>
     </li>
-@endcan
+@endcan --}}
 @can('coupon_list')
     <li class="nav-item ">
         <a href="{{ url('/admin/coupons') }}" class="nav-link {{ Request::is('admin/coupons*') ? 'active' : '' }}">

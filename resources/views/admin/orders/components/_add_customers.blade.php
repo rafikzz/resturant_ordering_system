@@ -3,14 +3,14 @@
     <div class="form-check mx-2">
         <input class="form-check-input" type="radio" name="new_or_old" id="existingCustomer" value="existing"
             {{ old('new_or_old') !== 'new' ? 'checked' : '' }}>
-        <label class="form-check-label" for="existing">
+        <label class="form-check-label" for="existingCustomer">
             Existing
         </label>
     </div>
     <div class="form-check mx-2">
         <input class="form-check-input" type="radio" name="new_or_old" id="newCustomer" value="new"
             {{ old('new_or_old') == 'new' ? 'checked' : '' }}>
-        <label class="form-check-label" for="new">
+        <label class="form-check-label" for="newCustomer">
             New
         </label>
     </div>
@@ -48,7 +48,9 @@
     style="display: {{ old('new_or_old') === 'new' ? 'block' : 'none' }};">
     <div class="row d-flex">
         <div class="col-6">
-            <label for="customer_name">Customer Name</label>
+            <label for="customer_name">Customer Name @component('compoments.required')
+
+                @endcomponent</label>
             <input class="form-control" name="customer_name" value="{{ old('customer_name') }}" type="text"
                 placeholder="Enter Customer Name" autocomplete="off"
                 {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} required>
@@ -59,7 +61,9 @@
             @enderror
         </div>
         <div class="col-6">
-            <label for="customer_phone_no">Customer Number</label>
+            <label for="customer_phone_no">Customer Number @component('compoments.required')
+
+                @endcomponent</label>
             <input class="form-control" name="customer_phone_no" type="text" value="{{ old('customer_phone_no') }}"
                 placeholder="Enter Customer Phone No" autocomplete="off" required
                 {{ old('new_or_old') !== 'new' ? 'disabled' : '' }}>
@@ -73,7 +77,9 @@
     </div>
     <div class="row d-flex staff-block" {{ $customer_type_id == 2 ? '' : 'style=display:none' }}>
         <div class="col-md-6 staff-block" {{ $customer_type_id == 2 ? '' : 'style=display:none' }}>
-            <label for="department_id">Department</label>
+            <label for="department_id">Department @component('compoments.required')
+
+                @endcomponent</label>
             <select name="department_id" id="department_id" class="form-control" required
                 {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} {{ $customer_type_id == 2 ? '' : 'disabled' }}>
                 <option value="">Choose Department</option>
@@ -90,7 +96,9 @@
             @enderror
         </div>
         <div class="col-6 staff-block" {{ $customer_type_id == 2 ? '' : 'style=display:none' }}>
-            <label for="customer_phone_no">Code No</label>
+            <label for="customer_phone_no">Code No @component('compoments.required')
+
+                @endcomponent</label>
             <input class="form-control" name="code" type="text" value="{{ old('code', $code_no) }}"
                 placeholder="Enter code" autocomplete="off" required
                 {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} {{ $customer_type_id == 2 ? '' : 'disabled' }}
@@ -104,7 +112,9 @@
     </div>
 
     <div class="row col-6" {{ $customer_type_id == 3 ? '' : 'style=display:none' }} id="patient-reg">
-        <label for="customer_phone_no">Patient Registred No</label>
+        <label for="customer_phone_no">Patient Registred No @component('compoments.required')
+
+            @endcomponent</label>
         <input class="form-control" name="patient_register_no" type="text" value="{{ old('patient_register_no') }}"
             placeholder="Enter Customer Phone No" autocomplete="off" required
             {{ old('new_or_old') !== 'new' ? 'disabled' : '' }} {{ $customer_type_id == 3 ? '' : 'disabled' }}
